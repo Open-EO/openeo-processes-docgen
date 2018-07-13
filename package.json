@@ -1,0 +1,39 @@
+{
+  "name": "openeo-processes-docgen",
+  "version": "0.1.0",
+  "author": "Matthias Mohr",
+  "contributors": [
+    {
+      "name": "Matthias Mohr"
+    }
+  ],
+  "description": "Library to generate user Interface from documents following the specification for openEO processes.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/m-mohr/openeo-processes-docgen/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/m-mohr/openeo-processes-docgen.git"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "commonmark": "^0.28.1",
+    "json-schema-ref-parser": "^5.0.3",
+    "vue": "^2.5.13"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.0.0-beta.6",
+    "@vue/cli-service": "^3.0.0-beta.6",
+    "vue-template-compiler": "^2.5.13"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
