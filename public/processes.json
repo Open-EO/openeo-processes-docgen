@@ -5,7 +5,7 @@
     "description": "Filters and selects a single dataset provided by the back-end. The back-end provider decides which of the potential datasets is the most relevant one to be selected.",
 	"min_parameters": 1,
 	"links": [
-		{"href": "http://wwww.google.de", "rel":"test"}
+		{"href": "http://wwww.openeo.org", "rel":"maintainer"}
 	],
     "parameters": {
       "data_id": {
