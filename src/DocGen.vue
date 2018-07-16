@@ -29,16 +29,16 @@ export default {
 	},
 	data() {
 		return {
+			document: window.processesDocument || this.$config.document,
 			processes: {}
 		};
 	},
 	created() {
 		EventBus.$on('changeDocument', this.changeDocument);
-		EventBus.$on('documentChanged', this.documentChanged);
 	},
 	mounted() {
-		if (typeof this.$config.document === 'string' && this.$config.document.length > 0) {
-			EventBus.$emit('changeDocument', this.$config.document);
+		if (typeof this.document === 'string' && this.document.length > 0) {
+			EventBus.$emit('changeDocument', this.document);
 		}
 	},
 	methods: {

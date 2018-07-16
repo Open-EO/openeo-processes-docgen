@@ -7,7 +7,7 @@
 			<span class="summary" v-if="process.summary">{{ process.summary }}</span>
 		</h2>
 		<div class="content">
-			<div class="description" v-html="$utils.markup(process.description)"></div>
+			<div class="description" v-if="process.description" v-html="$utils.markup(process.description)"></div>
 			<div class="links" v-if="process.links">
 				<strong>Additional links:</strong>
 				<ul>
@@ -32,18 +32,18 @@
 					</h6>
 					<div class="content">
 						<!-- ToDo: Dependencies -->
-						<div class="description" v-html="$utils.markup(param.description)"></div>
+						<div class="description" v-if="param.description" v-html="$utils.markup(param.description)"></div>
 						<p class="mimeType" v-if="param.mime_type"><strong>MIME type: </strong>{{ param.mime_type }}</p>
 						<SchemaPanel :schema="param.schema" />
 					</div>
 				</div>
-				<p class="content" v-if="Object.keys(process.parameters).length== 0">None</p>
+				<p class="content" v-if="Object.keys(process.parameters).length === 0">None</p>
 			</div>
 
 			<div class="returns">
 				<h3>Returns</h3>
 				<div class="content">
-					<div class="description" v-html="$utils.markup(process.returns.description)"></div>
+					<div class="description" v-if="process.returns.description" v-html="$utils.markup(process.returns.description)"></div>
 					<p class="mimeType" v-if="process.returns.mime_type"><strong>MIME type: </strong>{{ process.returns.mime_type }}</p>
 					<SchemaPanel :schema="process.returns.schema" />
 				</div>

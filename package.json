@@ -18,8 +18,14 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+	"build": "vue-cli-service build",
+	"npm_build": "vue-cli-service build --target lib --name DocGen src/DocGen.vue"
   },
+  "main": "dist/docgen.umd.min.js",
+  "files": [
+	"dist/DocGen.css",
+    "dist/DocGen.umd.min.js"
+  ],
   "dependencies": {
     "axios": "^0.18.0",
     "commonmark": "^0.28.1",

@@ -1,6 +1,6 @@
 <template>
 	<div class="schemaElement">
-		<SchemaObjectElement v-if="schema.type == 'object'" :schema="schema" :components="components" />
+		<SchemaObjectElement v-if="schema.type == 'object'" :schema="schema" />
 		<!-- ToDo: Circular references lead to endless loop -->
 		<table class="schemaAttrs" v-else>
 			<tr v-for="(val, key) in schema" :key="key">
@@ -13,7 +13,7 @@
 					</ul>
 					<div v-else-if="key == 'description'" class="description" v-html="$utils.markup(val)"></div>
 					<code v-else-if="key == 'pattern'">{{ val }}</code>
-					<SchemaElement v-else-if="typeof val === 'object'" :schema="val" :components="components" />
+					<SchemaElement v-else-if="typeof val === 'object'" :schema="val" />
 					<span v-else>{{ val }}</span>
 				</td>
 			</tr>

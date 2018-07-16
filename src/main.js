@@ -11,6 +11,6 @@ Vue.config.productionTip = false;
 
 Vue.component('SchemaElement', SchemaElement);
 
-window.App = new Vue({
+new Vue({
 	render: h => h(DocGen)
 }).$mount('#app');
