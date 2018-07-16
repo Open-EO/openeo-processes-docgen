@@ -7,7 +7,7 @@
 			<span class="summary" v-if="process.summary">{{ process.summary }}</span>
 		</h2>
 		<div class="content">
-			<div class="description" v-if="process.description" v-html="$utils.markup(process.description)"></div>
+			<DescriptionElement v-if="process.description" :description="process.description"></DescriptionElement>
 			<div class="links" v-if="process.links">
 				<strong>Additional links:</strong>
 				<ul>
@@ -32,9 +32,9 @@
 					</h6>
 					<div class="content">
 						<!-- ToDo: Dependencies -->
-						<div class="description" v-if="param.description" v-html="$utils.markup(param.description)"></div>
+						<DescriptionElement v-if="param.description" :description="param.description"></DescriptionElement>
 						<p class="mimeType" v-if="param.mime_type"><strong>MIME type: </strong>{{ param.mime_type }}</p>
-						<SchemaPanel :schema="param.schema" />
+						<SchemaPanel :schema="param.schema"></SchemaPanel>
 					</div>
 				</div>
 				<p class="content" v-if="Object.keys(process.parameters).length === 0">None</p>
@@ -43,9 +43,9 @@
 			<div class="returns">
 				<h3>Returns</h3>
 				<div class="content">
-					<div class="description" v-if="process.returns.description" v-html="$utils.markup(process.returns.description)"></div>
+					<DescriptionElement v-if="process.returns.description" :description="process.returns.description"></DescriptionElement>
 					<p class="mimeType" v-if="process.returns.mime_type"><strong>MIME type: </strong>{{ process.returns.mime_type }}</p>
-					<SchemaPanel :schema="process.returns.schema" />
+					<SchemaPanel :schema="process.returns.schema"></SchemaPanel>
 				</div>
 			</div>
 
@@ -55,7 +55,7 @@
 					<li class="exception" v-for="(exception, name) in process.exceptions" :key="name">
 						<strong class="name">{{ name }}</strong>
 						<span class="code" v-if="exception.code">({{ exception.code }})</span>
-						<div class="description" v-if="exception.description" v-html="$utils.markup(exception.description)"></div>
+						<DescriptionElement v-if="exception.description" :description="exception.description"></DescriptionElement>
 					</li>
 				</ul>
 			</div>
@@ -68,12 +68,14 @@
 <script>
 import EventBus from '../eventbus.js';
 import SchemaPanel from './SchemaPanel.vue';
+import DescriptionElement from './DescriptionElement.vue';
 
 export default {
 	name: 'ProcessPanel',
 	props: ['process'],
 	components: {
-		SchemaPanel
+		SchemaPanel,
+		DescriptionElement
 	}
 }
 </script>

@@ -2,17 +2,21 @@
 	<div class="schemaContainer">
 		<h6>Schema</h6>
 		<div class="content">
-			<SchemaElement :schema="schema" />
+			<SchemaElement :schema="schema"></SchemaElement>
 		</div>
 	</div>
 </template>
 
 <script>
 import EventBus from '../eventbus.js';
+import SchemaElement from './SchemaElement.vue';
 
 export default {
 	name: 'SchemaPanel',
-	props: ['schema']
+	props: ['schema'],
+	components: {
+		SchemaElement
+	}
 }
 </script>
 

@@ -21,6 +21,7 @@ import ProcessPanel from './components/ProcessPanel.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
+import Config from './config.js';
 
 export default {
 	name: 'DocGen',
@@ -29,7 +30,7 @@ export default {
 	},
 	data() {
 		return {
-			document: window.processesDocument || this.$config.document,
+			document: window.processesDocument || Config.document,
 			processes: {}
 		};
 	},
