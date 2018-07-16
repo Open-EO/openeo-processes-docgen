@@ -1,8 +1,39 @@
 # openEO Processes DocGen
-Library to generate user Interface from documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
+Library to generate user Interface from documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api). [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
 ## Getting Started
-You can start with the **[online demo](https://open-eo.github.io/openeo-processes-docgen/demo/)**, grab the [compiled files from the gh-pages branch](https://github.com/open-eo/openeo-processes-docgen/tree/gh-pages/demo) or build the files yourself and deploy them to any web host.
+
+You can simply create an HTML file and modify the `window.processesDocument` to a URL of a document you'd like to show:
+```
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>openEO Processes</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+		<script src="https://unpkg.com/vue"></script>
+		<script src="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.css">
+	</head>
+
+	<body>
+		<div id="app"></div>
+		<script>
+			window.processesDocument = 'processes.json';
+			new Vue({
+				render: h => h(DocGen)
+			}).$mount('#app')
+		</script>
+		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>
+	</body>
+
+</html>
+```
+
+## Development
 
 To build the files follow these steps:
 
