@@ -1,5 +1,7 @@
 # openEO Processes DocGen
-Library to generate user Interface from documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api). [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
+Library to generate a humen-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
+
+* [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
 ## Getting Started
 
