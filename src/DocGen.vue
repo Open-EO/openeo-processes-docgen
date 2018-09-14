@@ -49,7 +49,7 @@ export default {
 				.then(response => {
 					refParser.dereference(response.data)
 						.then(schema => {
-							this.processes = schema;
+							this.processes = this.prepare(schema);
 							EventBus.$emit('documentChanged');
 						})
 						.catch(error => {
@@ -59,6 +59,17 @@ export default {
 				.catch(error => {
 					console.log(error);
 				});
+		},
+
+		prepare(processes) {
+			if (Config.sortProcessesByName === true) {
+				processes.sort((a, b) => {
+					var s1 = a.name.toLowerCase();
+					var s2 = b.name.toLowerCase();
+					return (s1 < s1 ? -1 : s1 > s2 ? 1 : 0);
+				});
+			}
+			return processes;
 		}
 
 	}
