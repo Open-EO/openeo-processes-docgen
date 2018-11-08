@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -38,8 +38,8 @@
     "vue-template-compiler": "^2.5.17"
   },
   "browserslist": [
-    "> 1%",
+    "> 5%",
     "last 2 versions",
-    "not ie <= 8"
+    "not ie <= 9"
   ]
 }

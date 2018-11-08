@@ -4,5 +4,7 @@ import DocGen from './DocGen.vue';
 Vue.config.productionTip = false;
 
 new Vue({
+	el: '#app',
+	document: 'processes.json',
 	render: h => h(DocGen)
-}).$mount('#app');
+});

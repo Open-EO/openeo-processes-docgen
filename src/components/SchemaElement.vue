@@ -31,8 +31,8 @@
 			<tr v-for="(val, key) in schema" :key="key">
 				<td class="key">{{ key }}</td>
 				<td class="value">
-					<i class="fas fa-check" v-if="key != 'default' && key != 'example' && val === true" title="true"></i>
-					<i class="fas fa-times" v-else-if="key != 'default' && key != 'example' && val === false" title="false"></i>
+					<span v-if="key != 'default' && key != 'example' && val === true" title="true">✓ Yes</span>
+					<span v-else-if="key != 'default' && key != 'example' && val === false" title="false">✕ No</span>
 					<ul v-else-if="Array.isArray(val)" class="csList">
 						<li v-for="(v, k) in val" :key="k">{{ v }}</li>
 					</ul>

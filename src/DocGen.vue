@@ -1,6 +1,5 @@
 <template>
-	<div id="container">
-		<h1>Processes</h1>
+	<div id="docgen">
 		<div id="toc">
 			<ul>
 				<li v-for="(process, key) in processes" :key="key">
@@ -9,7 +8,7 @@
 				</li>
 			</ul>
 		</div>
-		<div id="content">
+		<div id="processes">
 			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
 		</div>
 	</div>
@@ -29,10 +28,17 @@ export default {
 		ProcessPanel
 	},
 	data() {
-		return {
-			document: window.processesDocument || Config.document,
+		var baseData = {
+			document: null,
+			sortProcessesByName: true,
 			processes: {}
 		};
+		var data = Object.assign(baseData, Config.document, this.$parent.$options);
+		// For backward compatibility
+		if (typeof window.processesDocument === 'string') {
+			data.document = window.processesDocument;
+		}
+		return data;
 	},
 	created() {
 		EventBus.$on('changeDocument', this.changeDocument);
@@ -40,6 +46,9 @@ export default {
 	mounted() {
 		if (typeof this.document === 'string' && this.document.length > 0) {
 			EventBus.$emit('changeDocument', this.document);
+		}
+		else {
+			console.error('No document specified.');
 		}
 	},
 	methods: {
@@ -62,7 +71,7 @@ export default {
 		},
 
 		prepare(processes) {
-			if (Config.sortProcessesByName === true) {
+			if (this.sortProcessesByName === true) {
 				processes.sort((a, b) => {
 					var s1 = a.name.toLowerCase();
 					var s2 = b.name.toLowerCase();
@@ -77,61 +86,31 @@ export default {
 </script>
 
 <style>
-html, body, #app, #container {
+html, body, #docgen, #toc {
 	height: 100%;
 }
 body {
+	margin: 0;
+}
+#docgen {
 	font-family: sans-serif;
 	font-size: 11pt;
 	margin: 0;
 	padding: 0;
 }
-h1 {
-	position: fixed;
-	z-index: 100;
-	width: 100%;
-	font-size: 2rem;
-	padding: 0.5rem;
-	margin: 0;
-	background-color: #3f51b5;
-	color: white;
-}
-h2 {
-	font-size: 1.75rem;
-	margin: 0.5rem 0;
-}
-h2 .summary {
-	font-size: 1.5rem;
-	margin-left: 1.5rem;
-	font-style: italic;
-}
-h3, h4, h5, h6 {
-	margin: 1rem 0 0.5rem 0;
-}
-h3 {
-	font-size: 1.3rem;
-}
-h4 {
-	font-size: 1.2rem;
-}
-h5 {
-	font-size: 1.1rem;
-}
-h6 {
-	font-size: 1rem;
-}
 #toc {
-	height: calc(100% - 3.25rem);
-	margin-top: 3.25rem;
+	margin: 1rem 0;
 	overflow-y: auto;
 	width: 20%;
 	float: left;
 	position: fixed;
 	z-index: 10;
+	border-right: 1px dotted #ccc;
 }
 #toc ul {
+	list-style-type: none;
 	display: block;
-	margin: 0.5rem;
+	margin: 1rem;
 	padding: 0;
 }
 #toc li a {
@@ -145,35 +124,28 @@ h6 {
 	margin-bottom: 0.5rem;
 	font-size: 0.8rem;
 }
-#content {
+#processes {
 	float: right;
 	width: 80%;
-	margin-top: 3.25rem;
 }
-p {
+#docgen p {
 	margin: 0 0 0.5rem 0;
 }
-li p {
+#docgen li p {
 	margin: 0;
 }
-a {
+#docgen a {
 	color: #2F649A;
 	text-decoration: none;
 	cursor: pointer;
 }
-a:hover {
+#docgen a:hover {
 	color: black;
 }
-.anchor {
-	position: relative;
-	display: block;
-	top: -4rem;
-	visibility: hidden;
-}
-button {
+#docgen button {
 	margin: 1px;
 }
-ul, ol {
+#docgen ul, #docgen ol {
 	margin-bottom: 0;
 	margin-top: 0;
 	padding-bottom: 0;

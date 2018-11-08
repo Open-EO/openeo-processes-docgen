@@ -5,7 +5,7 @@ Library to generate a humen-readable version of documents following the [specifi
 
 ## Getting Started
 
-You can simply create an HTML file and modify the `window.processesDocument` to a URL of a document you'd like to show:
+You can simply create an HTML file and modify the `document` option to a URL of a document you'd like to show:
 ```
 <!DOCTYPE html>
 <html>
@@ -15,7 +15,6 @@ You can simply create an HTML file and modify the `window.processesDocument` to 
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
 		<script src="https://unpkg.com/vue"></script>
 		<script src="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.css">
@@ -24,10 +23,11 @@ You can simply create an HTML file and modify the `window.processesDocument` to 
 	<body>
 		<div id="app"></div>
 		<script>
-			window.processesDocument = 'processes.json';
 			new Vue({
+				el: '#app',
+				document: 'processes.json',
 				render: h => h(DocGen)
-			}).$mount('#app')
+			});
 		</script>
 		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>
 	</body>
