@@ -114,7 +114,7 @@ body {
 	padding: 0;
 }
 #docgen code, #docgen kbd, #docgen pre {
-	font-size: 1.7rem;
+	font-size: 1.2em;
 }
 #toc {
 	margin: 1rem 0;

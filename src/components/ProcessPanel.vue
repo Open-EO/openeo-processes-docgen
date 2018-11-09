@@ -1,12 +1,9 @@
 <template>
 	<div class="processPanel">
 		<a class="anchor" :name="process.name"></a><!-- ToDo: Replace name with id -->
-		<h2>
-			
-			{{ process.name }}
-		</h2>
+		<h2>{{ process.name }}</h2>
 
-		<div class="summary" v-if="process.summary">
+		<div class="summary" v-if="process.summary || process.deprecated">
 			<code :class="{ deprecated: process.deprecated }">{{ process.name }}</code><!-- ToDo: Replace name with id -->
 			 — {{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
@@ -56,7 +53,7 @@
 
 		<div class="examples" v-if="process.examples">
 			<h3>Examples</h3>
-			<p>Sorry, displaying examples is not implemented yet.</p> <!-- ToDo: Display examples -->
+			<ProcessExampleElement v-for="(example, name) in process.examples" :key="name" :id="name" :example="example"></ProcessExampleElement>
 		</div>
 
 		<div class="links" v-if="process.links">
@@ -79,13 +76,15 @@
 import EventBus from '../eventbus.js';
 import SchemaPanel from './SchemaPanel.vue';
 import DescriptionElement from './DescriptionElement.vue';
+import ProcessExampleElement from './ProcessExampleElement.vue';
 
 export default {
 	name: 'ProcessPanel',
 	props: ['process'],
 	components: {
 		SchemaPanel,
-		DescriptionElement
+		DescriptionElement,
+		ProcessExampleElement
 	}
 }
 </script>
