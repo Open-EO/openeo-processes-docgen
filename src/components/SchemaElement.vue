@@ -1,10 +1,10 @@
 <template>
 	<div class="schemaElement">
-		<div v-if="schema.type == 'object'" class="schemaObjectElement">
+		<div v-if="schema.type == 'object' && typeof schema.properties =='object'" class="schemaObjectElement">
 			<table class="objectProperties">
 				<template v-if="filteredObjectSchema !== null">
 					<tr v-if="schema.properties">
-						<th colspan="2">Schema Attributes:</th>
+						<th colspan="2">Attributes:</th>
 					</tr>
 					<tr>
 						<td colspan="2" class="inlineSchemaAttrs">
@@ -33,11 +33,11 @@
 				<td class="value">
 					<span v-if="key != 'default' && key != 'example' && val === true" title="true">✓ Yes</span>
 					<span v-else-if="key != 'default' && key != 'example' && val === false" title="false">✕ No</span>
-					<ul v-else-if="Array.isArray(val)" class="csList">
+					<ul v-else-if="key != 'example' && Array.isArray(val)" class="csList">
 						<li v-for="(v, k) in val" :key="k">{{ v }}</li>
 					</ul>
 					<DescriptionElement v-else-if="key == 'description'" :description="val"></DescriptionElement>
-					<code v-else-if="key == 'pattern'">{{ val }}</code>
+					<code v-else-if="key == 'pattern' || key == 'example'">{{ val }}</code>
 					<SchemaElement v-else-if="typeof val === 'object'" :schema="val"></SchemaElement>
 					<span v-else>{{ val }}</span>
 				</td>
@@ -76,9 +76,13 @@ export default {
 
 <style>
 .schemaElement {
-	background-color:rgba(0, 0, 0, 0.1);
+	border-left: 0.5rem solid #ccc;
+	border-bottom: 1px dotted #ccc;
 	padding: 0.25%;
 	width: 99%;
+}
+.inlineSchemaAttrs .schemaElement {
+	border: 0;
 }
 .schemaName {
 	display: inline-block;

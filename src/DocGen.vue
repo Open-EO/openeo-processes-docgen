@@ -89,14 +89,32 @@ export default {
 html, body, #docgen, #toc {
 	height: 100%;
 }
+html {
+	font-size: 62.5%;
+}
+@media only screen and (min-width: 100em) {
+	html {
+		font-size: 68.75%;
+	}
+}
+
+@media only screen and (min-width: 125em) {
+    html {
+		font-size: 75%;
+	}
+}
+
 body {
 	margin: 0;
 }
 #docgen {
 	font-family: sans-serif;
-	font-size: 11pt;
+	font-size: 1.5rem;
 	margin: 0;
 	padding: 0;
+}
+#docgen code, #docgen kbd, #docgen pre {
+	font-size: 1.7rem;
 }
 #toc {
 	margin: 1rem 0;
@@ -110,7 +128,7 @@ body {
 #toc ul {
 	list-style-type: none;
 	display: block;
-	margin: 1rem;
+	margin: 1.5rem;
 	padding: 0;
 }
 #toc li a {
@@ -121,15 +139,18 @@ body {
 }
 #toc li span {
 	display: block;
-	margin-bottom: 0.5rem;
-	font-size: 0.8rem;
+	margin-bottom: 0.75rem;
+	font-size: 1.2rem;
 }
 #processes {
 	float: right;
 	width: 80%;
 }
 #docgen p {
-	margin: 0 0 0.5rem 0;
+	margin: 0 0 0.75rem 0;
+}
+#docgen td p {
+	margin: 0.25rem 0;
 }
 #docgen li p {
 	margin: 0;

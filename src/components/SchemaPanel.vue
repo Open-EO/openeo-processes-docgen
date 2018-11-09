@@ -1,6 +1,5 @@
 <template>
 	<div class="schemaContainer">
-		<h6>Schema</h6>
 		<div class="content">
 			<SchemaElement :schema="schema"></SchemaElement>
 		</div>
@@ -22,10 +21,10 @@ export default {
 
 <style>
 .schemaContainer th {
-	padding: 0.1%;
+	padding: 0.5rem;
 	text-align: left;
 }
 .schemaContainer td {
-	padding: 0.1%;
+	padding: 0.5rem;
 }
 </style>
