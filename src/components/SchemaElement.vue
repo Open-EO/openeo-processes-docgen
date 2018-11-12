@@ -29,15 +29,19 @@
 		<!-- ToDo: Circular references lead to endless loop -->
 		<table class="schemaAttrs" v-else>
 			<tr v-for="(val, key) in schema" :key="key">
-				<td class="key">{{ key }}</td>
+				<td class="key">{{ key }}:</td>
 				<td class="value">
-					<span v-if="key != 'default' && key != 'example' && val === true" title="true">✓ Yes</span>
-					<span v-else-if="key != 'default' && key != 'example' && val === false" title="false">✕ No</span>
-					<ul v-else-if="key != 'example' && Array.isArray(val)" class="csList">
+					<span v-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
+					<span v-else-if="key != 'default' && key != 'examples' && val === false" title="false">✕ No</span>
+					<ul v-else-if="key != 'examples' && Array.isArray(val)" class="csList">
 						<li v-for="(v, k) in val" :key="k">{{ v }}</li>
 					</ul>
+					<ul v-else-if="key == 'examples' && Array.isArray(val) && val.length > 1">
+						<li v-for="(v, k) in val" :key="k"><code>{{ v }}</code></li>
+					</ul>
+					<code v-else-if="key == 'examples' && Array.isArray(val) && val.length === 1">{{ val[0] }}</code>
 					<DescriptionElement v-else-if="key == 'description'" :description="val"></DescriptionElement>
-					<code v-else-if="key == 'pattern' || key == 'example'">{{ val }}</code>
+					<code v-else-if="key == 'pattern'">{{ val }}</code>
 					<SchemaElement v-else-if="typeof val === 'object'" :schema="val"></SchemaElement>
 					<span v-else>{{ val }}</span>
 				</td>
@@ -92,9 +96,9 @@ export default {
 	width: 100%;
 }
 .schemaAttrs .key {
+	text-transform: capitalize;
 	min-width: 80px;
 	width: 8%;
-	font-family: monospace;
 }
 .schemaAttrs .value {
 	width: 90%;

@@ -1,6 +1,7 @@
 <template>
 	<div id="docgen">
 		<div id="toc">
+			<h2>Processes</h2>
 			<ul>
 				<li v-for="(process, key) in processes" :key="key">
 					<a :href="'#' + process.name">{{ process.name }}</a>
@@ -86,24 +87,12 @@ export default {
 </script>
 
 <style>
-html, body, #docgen, #toc {
+html, body {
 	height: 100%;
 }
 html {
 	font-size: 62.5%;
 }
-@media only screen and (min-width: 100em) {
-	html {
-		font-size: 68.75%;
-	}
-}
-
-@media only screen and (min-width: 125em) {
-    html {
-		font-size: 75%;
-	}
-}
-
 body {
 	margin: 0;
 }
@@ -113,38 +102,30 @@ body {
 	margin: 0;
 	padding: 0;
 }
-#docgen code, #docgen kbd, #docgen pre {
-	font-size: 1.2em;
+#docgen table {
+	font-size: 1.5rem;
 }
-#toc {
-	margin: 1rem 0;
-	overflow-y: auto;
-	width: 20%;
-	float: left;
-	position: fixed;
-	z-index: 10;
-	border-right: 1px dotted #ccc;
+#docgen h2 {
+	font-size: 2.5rem;
+	padding: 0 0 0.75rem 0;
+	margin: 0 0 1.5rem 0;
+	border-bottom: 1px dotted #ccc;
 }
-#toc ul {
-	list-style-type: none;
-	display: block;
-	margin: 1.5rem;
-	padding: 0;
+#docgen h3 {
+	font-size: 2rem;
+	margin: 1rem 0 0.5rem 0;
 }
-#toc li a {
-	font-weight: bold;
+#docgen h4 {
+	margin: 1rem 0 0.5rem 0;
+	font-size: 1.7rem;
 }
-#toc li a {
-	font-weight: bold;
+#docgen h5 {
+	margin: 1rem 0 0.5rem 0;
+	font-size: 1.6rem;
 }
-#toc li span {
-	display: block;
-	margin-bottom: 0.75rem;
-	font-size: 1.2rem;
-}
-#processes {
-	float: right;
-	width: 80%;
+#docgen h6 {
+	margin: 1rem 0 0.5rem 0;
+	font-size: 1.5rem;
 }
 #docgen p {
 	margin: 0 0 0.75rem 0;
@@ -171,6 +152,64 @@ body {
 	margin-top: 0;
 	padding-bottom: 0;
 	padding-top: 0;
+}
+#toc {
+	border-right: 1px dotted #ccc;
+}
+#toc h2 {
+	margin: 1.5rem;
+}
+#toc ul {
+	list-style-type: none;
+	display: block;
+	margin: 1.5rem;
+	margin-bottom: 6rem;
+	padding: 0;
+}
+#toc li a {
+	font-weight: bold;
+}
+#toc li a {
+	font-weight: bold;
+}
+#toc li span {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-size: 1.2rem;
+}
+
+@media only screen and (min-width: 64em) {
+	#docgen, #toc {
+		height: 100%;
+	}
+
+	#processes {
+		float: right;
+		width: 80%;
+	}
+	#toc {
+		overflow-y: auto;
+		width: 20%;
+		float: left;
+		position: fixed;
+		z-index: 10;
+		border-right: 1px dotted #ccc;
+	}
+	#toc ul {
+		margin-bottom: 1.5em;
+	}
+}
+
+@media only screen and (min-width: 100em) {
+	html {
+		font-size: 68.75%;
+	}
+}
+
+@media only screen and (min-width: 125em) {
+    html {
+		font-size: 75%;
+	}
 }
 .csList {
   display: inline;

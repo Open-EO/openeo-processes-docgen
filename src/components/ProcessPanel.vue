@@ -89,35 +89,13 @@ export default {
 }
 </script>
 
-<style>
-#docgen h4 {
-	margin: 1rem 0 0.5rem 0;
-	font-size: 1.8rem;
-}
-#docgen h5 {
-	margin: 1rem 0 0.5rem 0;
-	font-size: 1.6rem;
-}
-#docgen h6 {
-	margin: 1rem 0 0.5rem 0;
-	font-size: 1.5rem;
-}
-</style>
-
 <style scoped>
-h2 {
-	font-size: 2.5rem;
-	padding: 0 0 0.75rem 0;
-	margin: 0 0 1.5rem 0;
-	border-bottom: 1px dotted #ccc;
-}
-h3 {
-	font-size: 2rem;
+#docgen h3 {
 	padding: 2.25em 0 0.75rem 0;
 	margin: 0 0 0.75rem 0;
 	border-bottom: 1px dotted #ccc;
 }
-h4 {
+#docgen h4 {
 	padding: 0.5em 0 0.25rem 0;
 }
 .processPanel {
@@ -149,7 +127,6 @@ h2 .deprecated {
 	margin-top: 0.5rem;
 }
 .exception code {
-	font-family: monospace;
 	font-weight: bold;
 }
 </style>
