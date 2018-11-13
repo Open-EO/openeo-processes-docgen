@@ -8,6 +8,10 @@
 					<span>{{ process.summary }}</span>
 				</li>
 			</ul>
+			<div id="doclinks" v-if="links.length > 0">
+				<h2>Related links</h2>
+				<LinkList :links="links" />
+			</div>
 		</div>
 		<div id="processes">
 			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
@@ -18,6 +22,7 @@
 <script>
 import EventBus from './eventbus.js';
 import ProcessPanel from './components/ProcessPanel.vue';
+import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
@@ -26,15 +31,23 @@ import Config from './config.js';
 export default {
 	name: 'DocGen',
 	components: {
-		ProcessPanel
+		ProcessPanel,
+		LinkList
 	},
 	data() {
 		var baseData = {
 			document: null,
 			sortProcessesByName: true,
-			processes: {}
+			processes: null,
+			links: []
 		};
-		var data = Object.assign(baseData, Config.document, this.$parent.$options);
+		var instanceData = {};
+		for (var key in baseData) {
+			if (typeof this.$parent.$options[key] !== 'undefined') {
+				instanceData[key] = this.$parent.$options[key];
+			}
+		}
+		var data = Object.assign(baseData, Config, instanceData);
 		// For backward compatibility
 		if (typeof window.processesDocument === 'string') {
 			data.document = window.processesDocument;
@@ -48,8 +61,18 @@ export default {
 		if (typeof this.document === 'string' && this.document.length > 0) {
 			EventBus.$emit('changeDocument', this.document);
 		}
+		else if (typeof this.processes === 'object') {
+			refParser.dereference(this.processes)
+				.then(schema => {
+					this.processes = this.prepare(schema);
+					EventBus.$emit('dataChanged');
+				})
+				.catch(error => {
+					console.log(error);
+				});
+		}
 		else {
-			console.error('No document specified.');
+			console.error('No data specified.');
 		}
 	},
 	methods: {
@@ -57,14 +80,27 @@ export default {
 		changeDocument(uri) {
 			axios.get(uri)
 				.then(response => {
-					refParser.dereference(response.data)
-						.then(schema => {
-							this.processes = this.prepare(schema);
-							EventBus.$emit('documentChanged');
-						})
-						.catch(error => {
-							console.error(error);
-						});
+					return refParser.dereference(response.data);
+				})
+				.then(schema => {
+					if (Array.isArray(schema)) {
+						// Plain array with processes, convert to openEO API response object.
+						schema = {
+							processes: schema,
+							links: []
+						};
+					}
+					else if (typeof schema.processes == 'object' && typeof schema.links === 'object') {
+						// Response from the openEO API, nothing to do
+					}
+					else {
+						throw "Invalid document specified, can't find processes.";
+					}
+					this.processes = this.prepare(schema.processes);
+					if (Array.isArray(schema.links)) {
+						this.links = schema.links;
+					}
+					EventBus.$emit('dataChanged');
 				})
 				.catch(error => {
 					console.log(error);
@@ -160,11 +196,14 @@ body {
 	margin: 1.5rem;
 }
 #toc ul {
-	list-style-type: none;
+	list-style-type: circle;
 	display: block;
 	margin: 1.5rem;
 	margin-bottom: 6rem;
 	padding: 0;
+}
+#toc li {
+	margin-left: 1.75rem;
 }
 #toc li a {
 	font-weight: bold;

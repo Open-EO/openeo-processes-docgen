@@ -58,15 +58,7 @@
 
 		<div class="links" v-if="process.links">
 			<h3>See Also</h3>
-			<ul>
-				<li v-for="(link, key) in process.links" :key="key">
-					<a :href="link.href" target="_blank">
-						<span v-if="link.title">{{ link.title }}</span>
-						<span v-else>{{ link.href }}</span>
-					</a>
-					<span v-if="link.rel"> ({{ link.rel }})</span>
-				</li>
-			</ul>
+			<LinkList :links="process.links" />
 		</div>
 
 	</div>
@@ -77,6 +69,7 @@ import EventBus from '../eventbus.js';
 import SchemaPanel from './SchemaPanel.vue';
 import DescriptionElement from './DescriptionElement.vue';
 import ProcessExampleElement from './ProcessExampleElement.vue';
+import LinkList from './LinkList.vue';
 
 export default {
 	name: 'ProcessPanel',
@@ -84,7 +77,8 @@ export default {
 	components: {
 		SchemaPanel,
 		DescriptionElement,
-		ProcessExampleElement
+		ProcessExampleElement,
+		LinkList
 	}
 }
 </script>
