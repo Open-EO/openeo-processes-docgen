@@ -10,11 +10,11 @@
   "description": "Library to generate a user Interface for documents following the specification for openEO processes.",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/m-mohr/openeo-processes-docgen/issues"
+    "url": "https://github.com/open-eo/openeo-processes-docgen/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/m-mohr/openeo-processes-docgen.git"
+    "url": "https://github.com/open-eo/openeo-processes-docgen.git"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
