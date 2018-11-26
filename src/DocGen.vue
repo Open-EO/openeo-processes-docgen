@@ -34,25 +34,20 @@ export default {
 		ProcessPanel,
 		LinkList
 	},
+	props: {
+		document: {
+			// window variable for backward compatability
+			default: Config.document || window.processesDocument || null
+		},
+		sortProcessesByName: {
+			default: Config.sortProcessesByName || true
+		}
+	},
 	data() {
-		var baseData = {
-			document: null,
-			sortProcessesByName: true,
+		return {
 			processes: null,
 			links: []
 		};
-		var instanceData = {};
-		for (var key in baseData) {
-			if (typeof this.$parent.$options[key] !== 'undefined') {
-				instanceData[key] = this.$parent.$options[key];
-			}
-		}
-		var data = Object.assign(baseData, Config, instanceData);
-		// For backward compatibility
-		if (typeof window.processesDocument === 'string') {
-			data.document = window.processesDocument;
-		}
-		return data;
 	},
 	created() {
 		EventBus.$on('changeDocument', this.changeDocument);
