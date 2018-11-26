@@ -123,20 +123,12 @@ export default {
 </script>
 
 <style>
-html, body {
-	height: 100%;
-}
-html {
-	font-size: 62.5%;
-}
-body {
-	margin: 0;
-}
 #docgen {
 	font-family: sans-serif;
 	font-size: 1.5rem;
 	margin: 0;
 	padding: 0;
+	display: flex;
 }
 #docgen table {
 	font-size: 1.5rem;
@@ -221,16 +213,16 @@ body {
 	#docgen, #docgen-toc {
 		height: 100%;
 	}
-
+	#docgen-toc, #docgen-processes {
+		height: 100vh;
+		overflow-y: auto;
+	}
 	#docgen-processes {
-		float: right;
-		width: 80%;
+		flex: 4;
 	}
 	#docgen-toc {
-		overflow-y: auto;
-		width: 20%;
-		float: left;
-		position: fixed;
+		flex: 1;
+		height: 100vh;
 		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
