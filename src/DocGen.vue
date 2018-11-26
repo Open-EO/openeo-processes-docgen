@@ -1,6 +1,6 @@
 <template>
 	<div id="docgen">
-		<div id="toc">
+		<div id="docgen-toc">
 			<h2>Processes</h2>
 			<ul>
 				<li v-for="(process, key) in processes" :key="key">
@@ -8,12 +8,12 @@
 					<span>{{ process.summary }}</span>
 				</li>
 			</ul>
-			<div id="doclinks" v-if="links.length > 0">
+			<div id="docgen-links" v-if="links.length > 0">
 				<h2>Related links</h2>
 				<LinkList :links="links" />
 			</div>
 		</div>
-		<div id="processes">
+		<div id="docgen-processes">
 			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
 		</div>
 	</div>
@@ -189,44 +189,44 @@ body {
 	padding-bottom: 0;
 	padding-top: 0;
 }
-#toc {
+#docgen-toc {
 	border-right: 1px dotted #ccc;
 }
-#toc h2 {
+#docgen-toc h2 {
 	margin: 1.5rem;
 }
-#toc ul {
+#docgen-toc ul {
 	list-style-type: circle;
 	display: block;
 	margin: 1.5rem;
 	margin-bottom: 6rem;
 	padding: 0;
 }
-#toc li {
+#docgen-toc li {
 	margin-left: 1.75rem;
 }
-#toc li a {
+#docgen-toc li a {
 	font-weight: bold;
 }
-#toc li a {
+#docgen-toc li a {
 	font-weight: bold;
 }
-#toc li span {
+#docgen-toc li span {
 	display: block;
 	margin-bottom: 0.75rem;
 	font-size: 1.2rem;
 }
 
 @media only screen and (min-width: 64em) {
-	#docgen, #toc {
+	#docgen, #docgen-toc {
 		height: 100%;
 	}
 
-	#processes {
+	#docgen-processes {
 		float: right;
 		width: 80%;
 	}
-	#toc {
+	#docgen-toc {
 		overflow-y: auto;
 		width: 20%;
 		float: left;
@@ -234,7 +234,7 @@ body {
 		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
-	#toc ul {
+	#docgen-toc ul {
 		margin-bottom: 1.5em;
 	}
 }
