@@ -1,38 +1,31 @@
 <template>
 	<div id="docgen">
-		<div id="docgen-toc">
-			<h2>Processes</h2>
-			<ul>
-				<li v-for="(process, key) in processes" :key="key">
-					<a :href="'#' + process.name">{{ process.name }}</a>
-					<span>{{ process.summary }}</span>
-				</li>
-			</ul>
-			<div id="docgen-links" v-if="links.length > 0">
-				<h2>Related links</h2>
-				<LinkList :links="links" />
-			</div>
+		<div id="docgen-toc-and-links-container">
+			<DocGenTOC :processes="processes"></DocGenTOC>
+			<DocGenLinks :links="links"></DocGenLinks>
 		</div>
-		<div id="docgen-processes">
-			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
+		<div id="docgen-processes-container">
+			<DocGenProcesses :processes="processes"></DocGenProcesses>
 		</div>
 	</div>
 </template>
 
 <script>
 import EventBus from './eventbus.js';
-import ProcessPanel from './components/ProcessPanel.vue';
-import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
 import Config from './config.js';
+import DocGenTOC from './components/DocGenTOC.vue';
+import DocGenLinks from './components/DocGenLinks.vue';
+import DocGenProcesses from './components/DocGenProcesses.vue';
 
 export default {
 	name: 'DocGen',
 	components: {
-		ProcessPanel,
-		LinkList
+		DocGenTOC,
+		DocGenLinks,
+		DocGenProcesses
 	},
 	props: {
 		document: {
@@ -176,52 +169,52 @@ export default {
 	padding-bottom: 0;
 	padding-top: 0;
 }
-#docgen-toc {
+#docgen-toc-and-links-container {
 	border-right: 1px dotted #ccc;
 }
-#docgen-toc h2 {
+#docgen-toc-and-links-container h2 {
 	margin: 1.5rem;
 }
-#docgen-toc ul {
+#docgen-toc-and-links-container ul {
 	list-style-type: circle;
 	display: block;
 	margin: 1.5rem;
 	margin-bottom: 6rem;
 	padding: 0;
 }
-#docgen-toc li {
+#docgen-toc-and-links-container li {
 	margin-left: 1.75rem;
 }
-#docgen-toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#docgen-toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#docgen-toc li span {
+#docgen-toc-and-links-container li span {
 	display: block;
 	margin-bottom: 0.75rem;
 	font-size: 1.2rem;
 }
 
 @media only screen and (min-width: 64em) {
-	#docgen, #docgen-toc {
+	#docgen, #docgen-toc-and-links-container {
 		height: 100%;
 	}
-	#docgen-toc, #docgen-processes {
+	#docgen-toc-and-links-container, #docgen-processes-container {
 		height: 100vh;
 		overflow-y: auto;
 	}
-	#docgen-processes {
+	#docgen-processes-container {
 		flex: 4;
 	}
-	#docgen-toc {
+	#docgen-toc-and-links-container {
 		flex: 1;
 		height: 100vh;
 		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
-	#docgen-toc ul {
+	#docgen-toc-and-links-container ul {
 		margin-bottom: 1.5em;
 	}
 }
