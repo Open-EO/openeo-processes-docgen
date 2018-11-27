@@ -220,32 +220,32 @@ export default {
 }
 
 @media only screen and (min-width: 100em) {
-	html {
+	#docgen {
 		font-size: 68.75%;
 	}
 }
 
 @media only screen and (min-width: 125em) {
-    html {
+    #docgen {
 		font-size: 75%;
 	}
 }
-.csList {
+#docgen .csList {
   display: inline;
   list-style: none;
   padding: 0;
 }
-.csList li {
+#docgen .csList li {
   display: inline;
   padding: 0;
 }
-.csList li:after {
+#docgen .csList li:after {
   content: ", ";
 }
-.csList li:last-child:after {
+#docgen .csList li:last-child:after {
     content: "";
 }
-.required {
+#docgen .required {
 	color: blue;
 	font-weight: bold;
 }
