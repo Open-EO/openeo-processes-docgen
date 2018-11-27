@@ -2,12 +2,8 @@
 	<div id="docgen">
 		<div id="toc">
 			<h2>Processes</h2>
-			<ul>
-				<li v-for="(process, key) in processes" :key="key">
-					<a :href="'#' + process.name">{{ process.name }}</a>
-					<span>{{ process.summary }}</span>
-				</li>
-			</ul>
+			<CategorizedProcessesList v-if="categorize" :processes="processes" />
+			<ProcessesList v-else :processes="processes" />
 			<div id="doclinks" v-if="links.length > 0">
 				<h2>Related links</h2>
 				<LinkList :links="links" />
@@ -21,6 +17,8 @@
 
 <script>
 import EventBus from './eventbus.js';
+import ProcessesList from './components/ProcessesList.vue';
+import CategorizedProcessesList from './components/CategorizedProcessesList.vue';
 import ProcessPanel from './components/ProcessPanel.vue';
 import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
@@ -31,6 +29,8 @@ import Config from './config.js';
 export default {
 	name: 'DocGen',
 	components: {
+		ProcessesList,
+		CategorizedProcessesList,
 		ProcessPanel,
 		LinkList
 	},
@@ -38,6 +38,7 @@ export default {
 		var baseData = {
 			document: null,
 			sortProcessesByName: true,
+			categorize: false,
 			processes: null,
 			links: []
 		};
@@ -143,7 +144,7 @@ body {
 }
 #docgen h2 {
 	font-size: 2.5rem;
-	padding: 0 0 0.75rem 0;
+	padding: 0.5rem 0 0.5rem 0;
 	margin: 0 0 1.5rem 0;
 	border-bottom: 1px dotted #ccc;
 }

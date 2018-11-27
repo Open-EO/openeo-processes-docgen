@@ -3,7 +3,10 @@
 		<a class="anchor" :name="process.name"></a><!-- ToDo: Replace name with id -->
 		<h2>{{ process.name }}</h2>
 
-		<div class="summary" v-if="process.summary || process.deprecated">
+		<div class="summary" v-if="process.summary || process.deprecated || process.categories">
+			<ul class="categories" v-if="process.categories">
+				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="value"></li>
+			</ul>
 			<code :class="{ deprecated: process.deprecated }">{{ process.name }}</code><!-- ToDo: Replace name with id -->
 			 — {{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
@@ -101,6 +104,25 @@ export default {
 	.processPanel {
 		margin-bottom: 15rem;
 	}
+}
+.categories {
+	margin: 0 0 0.75rem 0;
+	padding: 0;
+	list-style-type: none;
+}
+.categories .category {
+	display: inline-block;
+	padding: 0.3rem 0.5rem;
+	margin: 0 0.5rem 0.5rem 0;
+	font-size: 0.8em;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	text-transform: uppercase;
+	vertical-align: baseline;
+	border-radius: 3px;
+	color: #fff;
+	background-color: #6c757d;
 }
 code.deprecated {
 	text-decoration: line-through;
