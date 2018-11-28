@@ -27,11 +27,20 @@
 			</table>
 		</div>
 		<!-- ToDo: Circular references lead to endless loop -->
-		<table class="schemaAttrs" v-else>
+		<table v-else class="schemaAttrs">
 			<tr v-for="(val, key) in schema" :key="key">
 				<td class="key">{{ key }}:</td>
 				<td class="value">
-					<span v-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
+					<div v-if="Array.isArray(schema.oneOf)" class="schemaContainer">
+						<SchemaElement v-for="(val, key) in schema.oneOf" :key="key" :schema="val" />
+					</div>
+					<div v-else-if="Array.isArray(schema.anyOf)" class="schemaContainer">
+						<SchemaElement v-for="(val, key) in schema.anyOf" :key="key" :schema="val" />
+					</div>
+					<div v-else-if="Array.isArray(schema.allOf)" class="schemaContainer">
+						<SchemaElement v-for="(val, key) in schema.allOf" :key="key" :schema="val" />
+					</div>
+					<span v-else-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
 					<span v-else-if="key != 'default' && key != 'examples' && val === false" title="false">✕ No</span>
 					<ul v-else-if="key != 'examples' && Array.isArray(val)" class="csList">
 						<li v-for="(v, k) in val" :key="k">{{ v }}</li>

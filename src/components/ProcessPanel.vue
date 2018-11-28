@@ -30,7 +30,9 @@
 					<!-- ToDo: Dependencies -->
 					<DescriptionElement v-if="param.description" :description="param.description"></DescriptionElement>
 					<p class="mediaType" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
-					<SchemaPanel :schema="param.schema"></SchemaPanel>
+					<div class="schemaContainer">
+						<SchemaElement :schema="param.schema"></SchemaElement>
+					</div>
 				</div>
 			</div>
 			<p v-if="Object.keys(process.parameters).length === 0">This process has no parameters.</p>
@@ -40,7 +42,9 @@
 			<h3>Return Value</h3>
 			<DescriptionElement v-if="process.returns.description" :description="process.returns.description"></DescriptionElement>
 			<p class="mediaType" v-if="process.returns.media_type"><strong>Media (MIME) type: </strong>{{ process.returns.media_type }}</p>
-			<SchemaPanel :schema="process.returns.schema"></SchemaPanel>
+			<div class="schemaContainer">
+				<SchemaElement :schema="process.returns.schema"></SchemaElement>
+			</div>
 		</div>
 
 		<div class="exceptions" v-if="process.exceptions">
@@ -69,7 +73,7 @@
 
 <script>
 import EventBus from '../eventbus.js';
-import SchemaPanel from './SchemaPanel.vue';
+import SchemaElement from './SchemaElement.vue';
 import DescriptionElement from './DescriptionElement.vue';
 import ProcessExampleElement from './ProcessExampleElement.vue';
 import LinkList from './LinkList.vue';
@@ -78,7 +82,7 @@ export default {
 	name: 'ProcessPanel',
 	props: ['process'],
 	components: {
-		SchemaPanel,
+		SchemaElement,
 		DescriptionElement,
 		ProcessExampleElement,
 		LinkList
@@ -149,5 +153,12 @@ h2 .deprecated {
 }
 .exception code {
 	font-weight: bold;
+}
+.schemaContainer th {
+	padding: 0.5rem;
+	text-align: left;
+}
+.schemaContainer td {
+	padding: 0.5rem;
 }
 </style>

@@ -263,7 +263,6 @@ body {
 		width: 20%;
 		float: left;
 		position: fixed;
-		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
 	#toc ul {
