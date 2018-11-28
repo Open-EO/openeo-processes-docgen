@@ -1,5 +1,5 @@
 <template>
-	<div class="schemaElement">
+	<div class="schemaElement" v-if="typeof schema === 'object' && schema !== null">
 		<div v-if="schema.type == 'object' && typeof schema.properties =='object'" class="schemaObjectElement">
 			<table class="objectProperties">
 				<template v-if="filteredObjectSchema !== null">
@@ -73,6 +73,9 @@ export default {
 				filtered[key] = this.schema[key];
 			}
 			return filtered;
+		},
+		normalizedSchema() {
+
 		}
 	}
 }

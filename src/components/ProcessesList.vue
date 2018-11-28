@@ -1,7 +1,7 @@
 <template>
 	<ul class="processesList uncategorizedProcessesList">
 		<li v-for="(process, key) in processes" :key="key">
-			<a :href="'#' + process.name">{{ process.name }}</a>
+			<a :href="'#' + process.id">{{ process.id }}</a>
 			<span>{{ process.summary }}</span>
 		</li>
 	</ul>

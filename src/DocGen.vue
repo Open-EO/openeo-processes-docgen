@@ -2,7 +2,7 @@
 	<div id="docgen">
 		<div id="toc">
 			<h2>Processes</h2>
-			<CategorizedProcessesList v-if="categorize" :processes="processes" />
+			<ProcessesListCategorized v-if="categorize" :processes="processes" />
 			<ProcessesList v-else :processes="processes" />
 			<div id="doclinks" v-if="links.length > 0">
 				<h2>Related links</h2>
@@ -18,7 +18,7 @@
 <script>
 import EventBus from './eventbus.js';
 import ProcessesList from './components/ProcessesList.vue';
-import CategorizedProcessesList from './components/CategorizedProcessesList.vue';
+import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
 import ProcessPanel from './components/ProcessPanel.vue';
 import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
@@ -30,14 +30,14 @@ export default {
 	name: 'DocGen',
 	components: {
 		ProcessesList,
-		CategorizedProcessesList,
+		ProcessesListCategorized,
 		ProcessPanel,
 		LinkList
 	},
 	data() {
 		var baseData = {
 			document: null,
-			sortProcessesByName: true,
+			sortProcessesById: true,
 			categorize: false,
 			processes: null,
 			links: []
@@ -109,11 +109,42 @@ export default {
 		},
 
 		prepare(processes) {
-			if (this.sortProcessesByName === true) {
+			// Compatibility for openEO API v0.3 and v0.4
+			processes = processes.map(proc => {
+				if (typeof proc.id === 'undefined') {
+					// name => id
+					proc.id = proc.name;
+					delete proc.name;
+					// mime_type => media_type
+					if (typeof proc.parameters === 'object') {
+						for(var key in proc.parameters) {
+							var param = proc.parameters[key];
+							if (typeof param.mime_type !== 'undefined') {
+								param.media_type = param.mime_type;
+								delete param.mime_type;
+							}
+						}
+					}
+					if (typeof proc.returns.mime_type !== 'undefined') {
+						proc.returns.media_type = proc.returns.mime_type;
+						delete proc.returns.mime_type;
+					}
+					// exception object
+					if (proc.exceptions) {
+						for(var key in proc.exceptions) {
+							if (typeof proc.exceptions[key].message === 'undefined') {
+								proc.exceptions[key].message = proc.exceptions[key].description;
+							}
+						}
+					}
+				}
+				return proc;
+			});
+			if (this.sortProcessesById === true) {
 				processes.sort((a, b) => {
-					var s1 = a.name.toLowerCase();
-					var s2 = b.name.toLowerCase();
-					return (s1 < s1 ? -1 : s1 > s2 ? 1 : 0);
+					var s1 = a.id.toLowerCase();
+					var s2 = b.id.toLowerCase();
+					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
 				});
 			}
 			return processes;

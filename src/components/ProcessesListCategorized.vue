@@ -1,20 +1,18 @@
 <template>
 	<div class="categories">
-		<div class="category" v-for="category in sortedCategories" :key="category">
-			<h3>{{ category }}</h3>
-			<ul class="processesList categorizedProcessesList">
-				<li v-for="(pi, key) in categories[category]" :key="key">
-					<a :href="'#' + processes[pi].name">{{ processes[pi].name }}</a>
-					<span>{{ processes[pi].summary }}</span>
-				</li>
-			</ul>
-		</div>
+		<div class="toggleAllControls"><a @click="expandAll">Expand all</a> | <a @click="collapseAll">Collapse all</a></div>
+		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="processes" />
 	</div>
 </template>
 
 <script>
+import ProcessesListCategory from './ProcessesListCategory.vue';
+
 export default {
-	name: 'CategorizedProcessesList',
+	name: 'ProcessesListCategorized',
+	components: {
+		ProcessesListCategory
+	},
 	props: ['processes'],
 	data() {
 		return {
@@ -47,7 +45,19 @@ export default {
 					this.categories[category].push(pi);
 				}
 			}
-			console.log(this.categories);
+		}
+	},
+	methods: {
+		expandAll() {
+			this.toggleAll(true);
+		},
+		collapseAll() {
+			this.toggleAll(false);
+		},
+		toggleAll(expand) {
+			for(var i in this.$refs.categoryElements) {
+				this.$refs.categoryElements[i].toggle(expand);
+			}
 		}
 	}
 }
@@ -65,5 +75,14 @@ export default {
 }
 #toc ul {
     margin-top: 0em;
+}
+.toggleAllControls {
+	text-align: center;
+}
+.categorizedProcessesList {
+	display: none;
+}
+.expanded {
+	display: block;
 }
 </style>

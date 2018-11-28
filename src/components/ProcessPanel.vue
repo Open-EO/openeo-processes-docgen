@@ -1,13 +1,13 @@
 <template>
 	<div class="processPanel">
-		<a class="anchor" :name="process.name"></a><!-- ToDo: Replace name with id -->
-		<h2>{{ process.name }}</h2>
+		<a class="anchor" :name="process.id"></a><!-- ToDo: Replace name with id -->
+		<h2>{{ process.id }}</h2>
 
 		<div class="summary" v-if="process.summary || process.deprecated || process.categories">
 			<ul class="categories" v-if="process.categories">
-				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="value"></li>
+				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
 			</ul>
-			<code :class="{ deprecated: process.deprecated }">{{ process.name }}</code><!-- ToDo: Replace name with id -->
+			<code :class="{ deprecated: process.deprecated }">{{ process.id }}</code><!-- ToDo: Replace name with id -->
 			 — {{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
 		</div>
@@ -29,7 +29,7 @@
 				<div class="details">
 					<!-- ToDo: Dependencies -->
 					<DescriptionElement v-if="param.description" :description="param.description"></DescriptionElement>
-					<p class="mimeType" v-if="param.mime_type"><strong>Media type: </strong>{{ param.mime_type }}</p><!-- ToDo: Replace with media_type -->
+					<p class="mediaType" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
 					<SchemaPanel :schema="param.schema"></SchemaPanel>
 				</div>
 			</div>
@@ -39,7 +39,7 @@
 		<div class="returns">
 			<h3>Return Value</h3>
 			<DescriptionElement v-if="process.returns.description" :description="process.returns.description"></DescriptionElement>
-			<p class="mimeType" v-if="process.returns.mime_type"><strong>MIME type: </strong>{{ process.returns.mime_type }}</p><!-- ToDo: Replace with media_type -->
+			<p class="mediaType" v-if="process.returns.media_type"><strong>Media (MIME) type: </strong>{{ process.returns.media_type }}</p>
 			<SchemaPanel :schema="process.returns.schema"></SchemaPanel>
 		</div>
 
@@ -82,6 +82,11 @@ export default {
 		DescriptionElement,
 		ProcessExampleElement,
 		LinkList
+	},
+	methods: {
+		formatCategory(name) {
+			return name.replace('_', ' ');
+		}
 	}
 }
 </script>
