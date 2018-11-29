@@ -43,8 +43,6 @@ export default {
 #docgen h3 {
 	text-transform: capitalize;
 	font-size: 1.6rem;
-	margin-left: 1.5rem;
-	margin-right: 1.5rem;
 	cursor: pointer;
 }
 #docgen h3 .toggle {

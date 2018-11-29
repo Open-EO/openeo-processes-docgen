@@ -1,10 +1,13 @@
 <template>
 	<div id="docgen">
 		<div id="toc">
-			<h2>Processes</h2>
-			<ProcessesListCategorized v-if="categorize" :processes="processes" />
-			<ProcessesList v-else :processes="processes" />
-			<div id="doclinks" v-if="links.length > 0">
+			<h2 class="navBlock">Processes</h2>
+			<div id="searchBox" class="navBlock">
+				<input type="search" v-model="searchTerm" placeholder="Search in process names" /><button>🔎</button>
+			</div>
+			<ProcessesListCategorized v-if="categorize" :processes="processes" :searchTerm="searchTerm" />
+			<ProcessesList v-else :processes="processes" :searchTerm="searchTerm" />
+			<div id="docLinks" class="navBlock" v-if="links.length > 0">
 				<h2>Related links</h2>
 				<LinkList :links="links" />
 			</div>
@@ -36,6 +39,7 @@ export default {
 	},
 	data() {
 		var baseData = {
+			searchTerm: '',
 			document: null,
 			sortProcessesById: true,
 			categorize: false,
@@ -224,14 +228,36 @@ body {
 #toc {
 	border-right: 1px dotted #ccc;
 }
-#toc h2 {
+#toc .navBlock {
 	margin: 1.5rem;
+}
+#toc .noProcessesFound {
+	text-align: center;
+	display: block;
+	margin: 1rem;
+}
+#toc #searchBox input, #toc #searchBox button {
+	height: 1.9rem;
+	font-size: 1.3rem;
+	margin: 0;
+	padding: 0.3rem;
+	vertical-align: bottom;
+	display: inline-block;
+	border: 1px solid #cccc;
+	box-sizing: content-box;
+	background-color: #fff;
+
+}
+#toc #searchBox input {
+	width: calc(100% - 3.4rem);
+}
+#toc #searchBox button {
+	width: 1.9rem;
+	border-left: 0;
 }
 #toc ul {
 	list-style-type: circle;
 	display: block;
-	margin: 1.5rem;
-	margin-bottom: 6rem;
 	padding: 0;
 }
 #toc li {
@@ -265,8 +291,8 @@ body {
 		position: fixed;
 		border-right: 1px dotted #ccc;
 	}
-	#toc ul {
-		margin-bottom: 1.5em;
+	#toc #docLinks {
+		margin-top: 6rem;
 	}
 }
 

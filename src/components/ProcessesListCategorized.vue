@@ -1,7 +1,8 @@
 <template>
-	<div class="categories">
+	<div class="categories navBlock">
 		<div class="toggleAllControls"><a @click="expandAll">Expand all</a> | <a @click="collapseAll">Collapse all</a></div>
-		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="processes" />
+		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="filteredProcesses" />
+		<strong class="noProcessesFound" v-if="filteredProcesses.length === 0">No processes found</strong>
 	</div>
 </template>
 
@@ -13,11 +14,12 @@ export default {
 	components: {
 		ProcessesListCategory
 	},
-	props: ['processes'],
+	props: ['processes', 'searchTerm'],
 	data() {
 		return {
 			categories: {},
-			uncategorizedName: 'uncategorized'
+			uncategorizedName: 'uncategorized',
+			filteredProcesses: this.processes || []
 		};
 	},
 	computed: {
@@ -27,24 +29,14 @@ export default {
 		}
 	},
 	watch: {
-		processes(newProcesses, old) {
-			if (typeof newProcesses !== 'object') {
+		processes() {
+			if (typeof this.processes !== 'object') {
 				return;
 			}
-			this.categories = {};
-			for(var pi in newProcesses) {
-				var process = newProcesses[pi];
-				if (!Array.isArray(process.categories)) {
-					process.categories = [this.uncategorizedName];
-				}
-				for(var ci in process.categories) {
-					var category = process.categories[ci];
-					if (typeof this.categories[category] !== 'object') {
-						this.categories[category] = [];
-					}
-					this.categories[category].push(pi);
-				}
-			}
+			this.filter();
+		},
+		searchTerm() {
+			this.filter();
 		}
 	},
 	methods: {
@@ -58,6 +50,34 @@ export default {
 			for(var i in this.$refs.categoryElements) {
 				this.$refs.categoryElements[i].toggle(expand);
 			}
+		},
+		filter() {
+			if (this.searchTerm) {
+				this.filteredProcesses = this.processes.filter(process => process.id.toLowerCase().includes(this.searchTerm.toLowerCase()));
+				this.categorize();
+				this.$nextTick(() => this.expandAll());
+			}
+			else {
+				this.filteredProcesses = this.processes;
+				this.categorize();
+				this.$nextTick(() => this.collapseAll());
+			}
+		},
+		categorize() {
+			this.categories = {};
+			for(var pi in this.filteredProcesses) {
+				var process = this.filteredProcesses[pi];
+				if (!Array.isArray(process.categories)) {
+					process.categories = [this.uncategorizedName];
+				}
+				for(var ci in process.categories) {
+					var category = process.categories[ci];
+					if (typeof this.categories[category] !== 'object') {
+						this.categories[category] = [];
+					}
+					this.categories[category].push(pi);
+				}
+			}
 		}
 	}
 }
@@ -66,12 +86,6 @@ export default {
 <style scoped>
 #doclinks h2 {
 	margin-top: 2.5rem;
-}
-#docgen h3 {
-	text-transform: capitalize;
-	font-size: 1.75rem;
-	margin-left: 1.5rem;
-	margin-right: 1.5rem;
 }
 #toc ul {
     margin-top: 0em;
