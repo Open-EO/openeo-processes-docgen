@@ -1,7 +1,7 @@
 <template>
-	<div class="category">
-		<h3 @click="toggle()"><span class="toggle" v-text="expanded ? '-' : '+'"></span> {{ displayName }} ({{ processCount }})</h3>
-		<ul :class="{ processesList: true, categorizedProcessesList: true, expanded: expanded }">
+	<div :class="{ category: true, expanded: expanded }">
+		<h3 @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</h3>
+		<ul class="processesList categorizedProcessesList">
 			<li v-for="pi in processIndices" :key="pi">
 				<a :href="'#' + processes[pi].id">{{ processes[pi].id }}</a>
 				<span>{{ processes[pi].summary }}</span>
@@ -49,11 +49,15 @@ export default {
 	display: inline-block;
 	width: 1rem;
 }
+#docgen .expanded h3 .toggle {
+	transform: rotate(90deg);
+}
 #toc ul {
 	display: none;
+	margin-left: 1.5rem;
     margin-top: 0em;
 }
-#toc ul.expanded {
+#toc .expanded ul {
 	display: block;
 }
 </style>

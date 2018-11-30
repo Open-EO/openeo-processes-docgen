@@ -256,7 +256,7 @@ body {
 	border-left: 0;
 }
 #toc ul {
-	list-style-type: circle;
+	list-style-type: square;
 	display: block;
 	padding: 0;
 }
