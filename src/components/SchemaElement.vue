@@ -31,14 +31,8 @@
 			<tr v-for="(val, key) in schema" :key="key">
 				<td class="key">{{ key }}:</td>
 				<td class="value">
-					<div v-if="Array.isArray(schema.oneOf)" class="schemaContainer">
-						<SchemaElement v-for="(val, key) in schema.oneOf" :key="key" :schema="val" />
-					</div>
-					<div v-else-if="Array.isArray(schema.anyOf)" class="schemaContainer">
-						<SchemaElement v-for="(val, key) in schema.anyOf" :key="key" :schema="val" />
-					</div>
-					<div v-else-if="Array.isArray(schema.allOf)" class="schemaContainer">
-						<SchemaElement v-for="(val, key) in schema.allOf" :key="key" :schema="val" />
+					<div v-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schemaContainer">
+						<SchemaElement v-for="(v, k) in val" :key="k" :schema="v" />
 					</div>
 					<span v-else-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
 					<span v-else-if="key != 'default' && key != 'examples' && val === false" title="false">✕ No</span>
@@ -50,6 +44,7 @@
 					</ul>
 					<code v-else-if="key == 'examples' && Array.isArray(val) && val.length === 1">{{ val[0] }}</code>
 					<DescriptionElement v-else-if="key == 'description'" :description="val"></DescriptionElement>
+					<code v-else-if="key == 'default' && (typeof val === 'object' || typeof val === 'boolean')">{{ JSON.stringify(val) }}</code>
 					<code v-else-if="key == 'pattern'">{{ val }}</code>
 					<SchemaElement v-else-if="typeof val === 'object'" :schema="val"></SchemaElement>
 					<span v-else>{{ val }}</span>
@@ -82,9 +77,6 @@ export default {
 				filtered[key] = this.schema[key];
 			}
 			return filtered;
-		},
-		normalizedSchema() {
-
 		}
 	}
 }
