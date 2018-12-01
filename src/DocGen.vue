@@ -19,6 +19,7 @@ import Config from './config.js';
 import DocGenTOC from './components/DocGenTOC.vue';
 import DocGenLinks from './components/DocGenLinks.vue';
 import DocGenProcesses from './components/DocGenProcesses.vue';
+import { convertProcessToLatestSpec } from './utils.js';
 
 export default {
 	name: 'DocGen',
@@ -100,36 +101,7 @@ export default {
 
 		prepare(processes) {
 			// Compatibility for openEO API v0.3 and v0.4
-			processes = processes.map(proc => {
-				if (typeof proc.id === 'undefined') {
-					// name => id
-					proc.id = proc.name;
-					delete proc.name;
-					// mime_type => media_type
-					if (typeof proc.parameters === 'object') {
-						for(var key in proc.parameters) {
-							var param = proc.parameters[key];
-							if (typeof param.mime_type !== 'undefined') {
-								param.media_type = param.mime_type;
-								delete param.mime_type;
-							}
-						}
-					}
-					if (typeof proc.returns.mime_type !== 'undefined') {
-						proc.returns.media_type = proc.returns.mime_type;
-						delete proc.returns.mime_type;
-					}
-					// exception object
-					if (proc.exceptions) {
-						for(var key in proc.exceptions) {
-							if (typeof proc.exceptions[key].message === 'undefined') {
-								proc.exceptions[key].message = proc.exceptions[key].description;
-							}
-						}
-					}
-				}
-				return proc;
-			});
+			processes = processes.map(convertProcessToLatestSpec);
 			if (this.sortProcessesById === true) {
 				processes.sort((a, b) => {
 					var s1 = a.id.toLowerCase();

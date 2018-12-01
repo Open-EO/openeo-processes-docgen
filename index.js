@@ -12,4 +12,6 @@ module.exports = {
     ProcessExampleElement: require('./src/components/ProcessExampleElement.vue').default,
     ProcessPanel: require('./src/components/ProcessPanel.vue').default,
     SchemaElement: require('./src/components/SchemaElement.vue').default,
+
+    utils: require('./src/utils.js')
 }
