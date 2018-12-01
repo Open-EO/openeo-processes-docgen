@@ -24,9 +24,7 @@ import ProcessesList from './components/ProcessesList.vue';
 import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
 import ProcessPanel from './components/ProcessPanel.vue';
 import LinkList from './components/LinkList.vue';
-import {fs} from 'fs';
 import axios from 'axios';
-import refParser from 'json-schema-ref-parser';
 import Config from './config.js';
 
 export default {
@@ -84,9 +82,7 @@ export default {
 
 		changeDocument(uri) {
 			axios.get(uri)
-				.then(response => {
-					return refParser.dereference(response.data);
-				})
+				.then(response => response.data)
 				.then(schema => {
 					if (Array.isArray(schema)) {
 						// Plain array with processes, convert to openEO API response object.
