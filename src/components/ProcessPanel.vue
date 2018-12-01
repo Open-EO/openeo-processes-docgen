@@ -1,10 +1,13 @@
 <template>
 	<div class="processPanel">
-		<a class="anchor" :name="process.name"></a><!-- ToDo: Replace name with id -->
-		<h2>{{ process.name }}</h2>
+		<a class="anchor" :name="process.id"></a><!-- ToDo: Replace name with id -->
+		<h2>{{ process.id }}</h2>
 
-		<div class="summary" v-if="process.summary || process.deprecated">
-			<code :class="{ deprecated: process.deprecated }">{{ process.name }}</code><!-- ToDo: Replace name with id -->
+		<div class="summary" v-if="process.summary || process.deprecated || process.categories">
+			<ul class="categories" v-if="process.categories">
+				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
+			</ul>
+			<code :class="{ deprecated: process.deprecated }">{{ process.id }}</code><!-- ToDo: Replace name with id -->
 			 — {{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
 		</div>
@@ -26,8 +29,10 @@
 				<div class="details">
 					<!-- ToDo: Dependencies -->
 					<DescriptionElement v-if="param.description" :description="param.description"></DescriptionElement>
-					<p class="mimeType" v-if="param.mime_type"><strong>Media type: </strong>{{ param.mime_type }}</p><!-- ToDo: Replace with media_type -->
-					<SchemaPanel :schema="param.schema"></SchemaPanel>
+					<p class="mediaType" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
+					<div class="schemaContainer">
+						<SchemaElement :schema="param.schema"></SchemaElement>
+					</div>
 				</div>
 			</div>
 			<p v-if="Object.keys(process.parameters).length === 0">This process has no parameters.</p>
@@ -36,8 +41,10 @@
 		<div class="returns">
 			<h3>Return Value</h3>
 			<DescriptionElement v-if="process.returns.description" :description="process.returns.description"></DescriptionElement>
-			<p class="mimeType" v-if="process.returns.mime_type"><strong>MIME type: </strong>{{ process.returns.mime_type }}</p><!-- ToDo: Replace with media_type -->
-			<SchemaPanel :schema="process.returns.schema"></SchemaPanel>
+			<p class="mediaType" v-if="process.returns.media_type"><strong>Media (MIME) type: </strong>{{ process.returns.media_type }}</p>
+			<div class="schemaContainer">
+				<SchemaElement :schema="process.returns.schema"></SchemaElement>
+			</div>
 		</div>
 
 		<div class="exceptions" v-if="process.exceptions">
@@ -66,7 +73,7 @@
 
 <script>
 import EventBus from '../eventbus.js';
-import SchemaPanel from './SchemaPanel.vue';
+import SchemaElement from './SchemaElement.vue';
 import DescriptionElement from './DescriptionElement.vue';
 import ProcessExampleElement from './ProcessExampleElement.vue';
 import LinkList from './LinkList.vue';
@@ -75,10 +82,15 @@ export default {
 	name: 'ProcessPanel',
 	props: ['process'],
 	components: {
-		SchemaPanel,
+		SchemaElement,
 		DescriptionElement,
 		ProcessExampleElement,
 		LinkList
+	},
+	methods: {
+		formatCategory(name) {
+			return name.replace('_', ' ');
+		}
 	}
 }
 </script>
@@ -102,6 +114,25 @@ export default {
 		margin-bottom: 15rem;
 	}
 }
+.categories {
+	margin: 0 0 0.75rem 0;
+	padding: 0;
+	list-style-type: none;
+}
+.categories .category {
+	display: inline-block;
+	padding: 0.3rem 0.5rem;
+	margin: 0 0.5rem 0.5rem 0;
+	font-size: 0.8em;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	text-transform: uppercase;
+	vertical-align: baseline;
+	border-radius: 3px;
+	color: #fff;
+	background-color: #6c757d;
+}
 code.deprecated {
 	text-decoration: line-through;
 }
@@ -122,5 +153,12 @@ h2 .deprecated {
 }
 .exception code {
 	font-weight: bold;
+}
+.schemaContainer th {
+	padding: 0.5rem;
+	text-align: left;
+}
+.schemaContainer td {
+	padding: 0.5rem;
 }
 </style>

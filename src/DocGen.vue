@@ -1,58 +1,49 @@
 <template>
 	<div id="docgen">
-		<div id="toc">
-			<h2>Processes</h2>
-			<ul>
-				<li v-for="(process, key) in processes" :key="key">
-					<a :href="'#' + process.name">{{ process.name }}</a>
-					<span>{{ process.summary }}</span>
-				</li>
-			</ul>
-			<div id="doclinks" v-if="links.length > 0">
-				<h2>Related links</h2>
-				<LinkList :links="links" />
-			</div>
+		<div id="docgen-toc-and-links-container">
+			<DocGenTOC :processes="processes" :categorize="categorize"></DocGenTOC>
+			<DocGenLinks :links="links"></DocGenLinks>
 		</div>
-		<div id="processes">
-			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
+		<div id="docgen-processes-container">
+			<DocGenProcesses :processes="processes"></DocGenProcesses>
 		</div>
 	</div>
 </template>
 
 <script>
 import EventBus from './eventbus.js';
-import ProcessPanel from './components/ProcessPanel.vue';
-import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
 import Config from './config.js';
+import DocGenTOC from './components/DocGenTOC.vue';
+import DocGenLinks from './components/DocGenLinks.vue';
+import DocGenProcesses from './components/DocGenProcesses.vue';
 
 export default {
 	name: 'DocGen',
 	components: {
-		ProcessPanel,
-		LinkList
+		DocGenTOC,
+		DocGenLinks,
+		DocGenProcesses
+	},
+	props: {
+		document: {
+			// window variable for backward compatability
+			default: Config.document || window.processesDocument || null
+		},
+		sortProcessesById: {
+			default: Config.sortProcessesByName || true
+		},
+		categorize: {
+			default: Config.categorize || false
+		}
 	},
 	data() {
-		var baseData = {
-			document: null,
-			sortProcessesByName: true,
+		return {
 			processes: null,
 			links: []
 		};
-		var instanceData = {};
-		for (var key in baseData) {
-			if (typeof this.$parent.$options[key] !== 'undefined') {
-				instanceData[key] = this.$parent.$options[key];
-			}
-		}
-		var data = Object.assign(baseData, Config, instanceData);
-		// For backward compatibility
-		if (typeof window.processesDocument === 'string') {
-			data.document = window.processesDocument;
-		}
-		return data;
 	},
 	created() {
 		EventBus.$on('changeDocument', this.changeDocument);
@@ -108,11 +99,42 @@ export default {
 		},
 
 		prepare(processes) {
-			if (this.sortProcessesByName === true) {
+			// Compatibility for openEO API v0.3 and v0.4
+			processes = processes.map(proc => {
+				if (typeof proc.id === 'undefined') {
+					// name => id
+					proc.id = proc.name;
+					delete proc.name;
+					// mime_type => media_type
+					if (typeof proc.parameters === 'object') {
+						for(var key in proc.parameters) {
+							var param = proc.parameters[key];
+							if (typeof param.mime_type !== 'undefined') {
+								param.media_type = param.mime_type;
+								delete param.mime_type;
+							}
+						}
+					}
+					if (typeof proc.returns.mime_type !== 'undefined') {
+						proc.returns.media_type = proc.returns.mime_type;
+						delete proc.returns.mime_type;
+					}
+					// exception object
+					if (proc.exceptions) {
+						for(var key in proc.exceptions) {
+							if (typeof proc.exceptions[key].message === 'undefined') {
+								proc.exceptions[key].message = proc.exceptions[key].description;
+							}
+						}
+					}
+				}
+				return proc;
+			});
+			if (this.sortProcessesById === true) {
 				processes.sort((a, b) => {
-					var s1 = a.name.toLowerCase();
-					var s2 = b.name.toLowerCase();
-					return (s1 < s1 ? -1 : s1 > s2 ? 1 : 0);
+					var s1 = a.id.toLowerCase();
+					var s2 = b.id.toLowerCase();
+					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
 				});
 			}
 			return processes;
@@ -123,27 +145,19 @@ export default {
 </script>
 
 <style>
-html, body {
-	height: 100%;
-}
-html {
-	font-size: 62.5%;
-}
-body {
-	margin: 0;
-}
 #docgen {
 	font-family: sans-serif;
 	font-size: 1.5rem;
 	margin: 0;
 	padding: 0;
+	display: flex;
 }
 #docgen table {
 	font-size: 1.5rem;
 }
 #docgen h2 {
 	font-size: 2.5rem;
-	padding: 0 0 0.75rem 0;
+	padding: 0.5rem 0 0.5rem 0;
 	margin: 0 0 1.5rem 0;
 	border-bottom: 1px dotted #ccc;
 }
@@ -189,83 +203,93 @@ body {
 	padding-bottom: 0;
 	padding-top: 0;
 }
-#toc {
+#docgen-toc-and-links-container {
 	border-right: 1px dotted #ccc;
 }
-#toc h2 {
+#docgen-toc-and-links-container .navBlock {
 	margin: 1.5rem;
 }
-#toc ul {
-	list-style-type: circle;
+#docgen-toc .noProcessesFound {
+	text-align: center;
 	display: block;
-	margin: 1.5rem;
-	margin-bottom: 6rem;
+	margin: 1rem;
+}
+#docgen-toc #searchBox input, #docgen-toc #searchBox button {
+	height: 1.9rem;
+	font-size: 1.3rem;
+	margin: 0;
+	padding: 0.3rem;
+	vertical-align: bottom;
+	display: inline-block;
+	border: 1px solid #cccc;
+	box-sizing: content-box;
+	background-color: #fff;
+
+}
+#docgen-toc #searchBox input {
+	width: calc(100% - 3.4rem);
+}
+#docgen-toc #searchBox button {
+	width: 1.9rem;
+	border-left: 0;
+}
+#docgen-toc-and-links-container ul {
+	list-style-type: square;
+	display: block;
 	padding: 0;
 }
-#toc li {
+#docgen-toc-and-links-container li {
 	margin-left: 1.75rem;
 }
-#toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#toc li span {
+#docgen-toc-and-links-container li span {
 	display: block;
 	margin-bottom: 0.75rem;
 	font-size: 1.2rem;
 }
 
 @media only screen and (min-width: 64em) {
-	#docgen, #toc {
+	#docgen, #docgen-toc-and-links-container {
 		height: 100%;
 	}
-
-	#processes {
-		float: right;
-		width: 80%;
-	}
-	#toc {
+	#docgen-toc-and-links-container, #docgen-processes-container {
+		height: 100vh;
 		overflow-y: auto;
-		width: 20%;
-		float: left;
-		position: fixed;
-		z-index: 10;
+	}
+	#docgen-processes-container {
+		flex: 4;
+	}
+	#docgen-toc-and-links-container {
+		flex: 1;
+		height: 100vh;
 		border-right: 1px dotted #ccc;
 	}
-	#toc ul {
-		margin-bottom: 1.5em;
+	#docgen-toc-and-links-container #docgen-links {
+		margin-top: 6rem;
 	}
 }
 
-@media only screen and (min-width: 100em) {
-	html {
-		font-size: 68.75%;
-	}
-}
-
-@media only screen and (min-width: 125em) {
-    html {
-		font-size: 75%;
-	}
-}
-.csList {
+#docgen .csList {
   display: inline;
   list-style: none;
   padding: 0;
 }
-.csList li {
+#docgen .csList li {
   display: inline;
   padding: 0;
 }
-.csList li:after {
+#docgen .csList li:after {
   content: ", ";
 }
-.csList li:last-child:after {
+#docgen .csList li:last-child:after {
     content: "";
 }
-.required {
+#docgen .required {
 	color: blue;
 	font-weight: bold;
 }
