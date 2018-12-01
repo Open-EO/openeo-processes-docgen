@@ -1,8 +1,16 @@
 <template>
 	<div id="docgen">
 		<div id="docgen-toc-and-links-container">
-			<DocGenTOC :processes="processes"></DocGenTOC>
-			<DocGenLinks :links="links"></DocGenLinks>
+			<h2 class="navBlock">Processes</h2>
+			<div id="searchBox" class="navBlock">
+				<input type="search" v-model="searchTerm" placeholder="Search in process names" /><button>🔎</button>
+			</div>
+			<ProcessesListCategorized v-if="categorize" :processes="processes" :searchTerm="searchTerm" />
+			<ProcessesList v-else :processes="processes" :searchTerm="searchTerm" />
+			<div id="docLinks" class="navBlock" v-if="links.length > 0">
+				<h2>Related links</h2>
+				<LinkList :links="links" />
+			</div>
 		</div>
 		<div id="docgen-processes-container">
 			<DocGenProcesses :processes="processes"></DocGenProcesses>
@@ -12,6 +20,10 @@
 
 <script>
 import EventBus from './eventbus.js';
+import ProcessesList from './components/ProcessesList.vue';
+import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
+import ProcessPanel from './components/ProcessPanel.vue';
+import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
@@ -23,6 +35,10 @@ import DocGenProcesses from './components/DocGenProcesses.vue';
 export default {
 	name: 'DocGen',
 	components: {
+		ProcessesList,
+		ProcessesListCategorized,
+		ProcessPanel,
+		LinkList
 		DocGenTOC,
 		DocGenLinks,
 		DocGenProcesses
@@ -38,6 +54,9 @@ export default {
 	},
 	data() {
 		return {
+			searchTerm: '',
+			sortProcessesById: true,
+			categorize: false,
 			processes: null,
 			links: []
 		};
@@ -96,11 +115,42 @@ export default {
 		},
 
 		prepare(processes) {
-			if (this.sortProcessesByName === true) {
+			// Compatibility for openEO API v0.3 and v0.4
+			processes = processes.map(proc => {
+				if (typeof proc.id === 'undefined') {
+					// name => id
+					proc.id = proc.name;
+					delete proc.name;
+					// mime_type => media_type
+					if (typeof proc.parameters === 'object') {
+						for(var key in proc.parameters) {
+							var param = proc.parameters[key];
+							if (typeof param.mime_type !== 'undefined') {
+								param.media_type = param.mime_type;
+								delete param.mime_type;
+							}
+						}
+					}
+					if (typeof proc.returns.mime_type !== 'undefined') {
+						proc.returns.media_type = proc.returns.mime_type;
+						delete proc.returns.mime_type;
+					}
+					// exception object
+					if (proc.exceptions) {
+						for(var key in proc.exceptions) {
+							if (typeof proc.exceptions[key].message === 'undefined') {
+								proc.exceptions[key].message = proc.exceptions[key].description;
+							}
+						}
+					}
+				}
+				return proc;
+			});
+			if (this.sortProcessesById === true) {
 				processes.sort((a, b) => {
-					var s1 = a.name.toLowerCase();
-					var s2 = b.name.toLowerCase();
-					return (s1 < s1 ? -1 : s1 > s2 ? 1 : 0);
+					var s1 = a.id.toLowerCase();
+					var s2 = b.id.toLowerCase();
+					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
 				});
 			}
 			return processes;
@@ -123,7 +173,7 @@ export default {
 }
 #docgen h2 {
 	font-size: 2.5rem;
-	padding: 0 0 0.75rem 0;
+	padding: 0.5rem 0 0.5rem 0;
 	margin: 0 0 1.5rem 0;
 	border-bottom: 1px dotted #ccc;
 }
@@ -175,11 +225,33 @@ export default {
 #docgen-toc-and-links-container h2 {
 	margin: 1.5rem;
 }
-#docgen-toc-and-links-container ul {
-	list-style-type: circle;
+#toc .noProcessesFound {
+	text-align: center;
 	display: block;
-	margin: 1.5rem;
-	margin-bottom: 6rem;
+	margin: 1rem;
+}
+#toc #searchBox input, #toc #searchBox button {
+	height: 1.9rem;
+	font-size: 1.3rem;
+	margin: 0;
+	padding: 0.3rem;
+	vertical-align: bottom;
+	display: inline-block;
+	border: 1px solid #cccc;
+	box-sizing: content-box;
+	background-color: #fff;
+
+}
+#toc #searchBox input {
+	width: calc(100% - 3.4rem);
+}
+#toc #searchBox button {
+	width: 1.9rem;
+	border-left: 0;
+}
+#docgen-toc-and-links-container ul {
+	list-style-type: square;
+	display: block;
 	padding: 0;
 }
 #docgen-toc-and-links-container li {
@@ -214,8 +286,8 @@ export default {
 		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
-	#docgen-toc-and-links-container ul {
-		margin-bottom: 1.5em;
+	#toc #docLinks {
+		margin-top: 6rem;
 	}
 }
 

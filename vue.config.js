@@ -11,5 +11,8 @@ module.exports = {
 	baseUrl: process.env.CLIENT_URL || Config.clientPath,
 	devServer: {
 		port: Config.devPort
+	},
+	configureWebpack: {
+//		mode: 'production'
 	}
 }
