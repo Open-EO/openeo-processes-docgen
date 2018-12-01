@@ -52,12 +52,12 @@ export default {
 #docgen .expanded h3 .toggle {
 	transform: rotate(90deg);
 }
-#toc ul {
+#docgen-toc ul {
 	display: none;
 	margin-left: 1.5rem;
     margin-top: 0em;
 }
-#toc .expanded ul {
+#docgen-toc .expanded ul {
 	display: block;
 }
 </style>

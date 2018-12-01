@@ -1,16 +1,8 @@
 <template>
 	<div id="docgen">
 		<div id="docgen-toc-and-links-container">
-			<h2 class="navBlock">Processes</h2>
-			<div id="searchBox" class="navBlock">
-				<input type="search" v-model="searchTerm" placeholder="Search in process names" /><button>🔎</button>
-			</div>
-			<ProcessesListCategorized v-if="categorize" :processes="processes" :searchTerm="searchTerm" />
-			<ProcessesList v-else :processes="processes" :searchTerm="searchTerm" />
-			<div id="docLinks" class="navBlock" v-if="links.length > 0">
-				<h2>Related links</h2>
-				<LinkList :links="links" />
-			</div>
+			<DocGenTOC :processes="processes" :categorize="categorize"></DocGenTOC>
+			<DocGenLinks :links="links"></DocGenLinks>
 		</div>
 		<div id="docgen-processes-container">
 			<DocGenProcesses :processes="processes"></DocGenProcesses>
@@ -20,10 +12,6 @@
 
 <script>
 import EventBus from './eventbus.js';
-import ProcessesList from './components/ProcessesList.vue';
-import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
-import ProcessPanel from './components/ProcessPanel.vue';
-import LinkList from './components/LinkList.vue';
 import {fs} from 'fs';
 import axios from 'axios';
 import refParser from 'json-schema-ref-parser';
@@ -35,10 +23,6 @@ import DocGenProcesses from './components/DocGenProcesses.vue';
 export default {
 	name: 'DocGen',
 	components: {
-		ProcessesList,
-		ProcessesListCategorized,
-		ProcessPanel,
-		LinkList
 		DocGenTOC,
 		DocGenLinks,
 		DocGenProcesses
@@ -48,15 +32,15 @@ export default {
 			// window variable for backward compatability
 			default: Config.document || window.processesDocument || null
 		},
-		sortProcessesByName: {
+		sortProcessesById: {
 			default: Config.sortProcessesByName || true
+		},
+		categorize: {
+			default: Config.categorize || false
 		}
 	},
 	data() {
 		return {
-			searchTerm: '',
-			sortProcessesById: true,
-			categorize: false,
 			processes: null,
 			links: []
 		};
@@ -222,15 +206,15 @@ export default {
 #docgen-toc-and-links-container {
 	border-right: 1px dotted #ccc;
 }
-#docgen-toc-and-links-container h2 {
+#docgen-toc-and-links-container .navBlock {
 	margin: 1.5rem;
 }
-#toc .noProcessesFound {
+#docgen-toc .noProcessesFound {
 	text-align: center;
 	display: block;
 	margin: 1rem;
 }
-#toc #searchBox input, #toc #searchBox button {
+#docgen-toc #searchBox input, #docgen-toc #searchBox button {
 	height: 1.9rem;
 	font-size: 1.3rem;
 	margin: 0;
@@ -242,10 +226,10 @@ export default {
 	background-color: #fff;
 
 }
-#toc #searchBox input {
+#docgen-toc #searchBox input {
 	width: calc(100% - 3.4rem);
 }
-#toc #searchBox button {
+#docgen-toc #searchBox button {
 	width: 1.9rem;
 	border-left: 0;
 }
@@ -283,25 +267,13 @@ export default {
 	#docgen-toc-and-links-container {
 		flex: 1;
 		height: 100vh;
-		z-index: 10;
 		border-right: 1px dotted #ccc;
 	}
-	#toc #docLinks {
+	#docgen-toc-and-links-container #docgen-links {
 		margin-top: 6rem;
 	}
 }
 
-@media only screen and (min-width: 100em) {
-	#docgen {
-		font-size: 68.75%;
-	}
-}
-
-@media only screen and (min-width: 125em) {
-    #docgen {
-		font-size: 75%;
-	}
-}
 #docgen .csList {
   display: inline;
   list-style: none;

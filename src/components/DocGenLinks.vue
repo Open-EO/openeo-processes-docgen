@@ -1,5 +1,5 @@
 <template>
-    <div id="docgen-links" v-if="links.length > 0">
+    <div id="docgen-links" class="navBlock" v-if="links.length > 0">
         <h2>Related links</h2>
         <LinkList :links="links" />
     </div>

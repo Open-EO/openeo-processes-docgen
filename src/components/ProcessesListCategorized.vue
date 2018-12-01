@@ -84,10 +84,10 @@ export default {
 </script>
 
 <style scoped>
-#doclinks h2 {
+#docgen-links h2 {
 	margin-top: 2.5rem;
 }
-#toc ul {
+#docgen-toc ul {
     margin-top: 0em;
 }
 .toggleAllControls {
