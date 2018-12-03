@@ -7,9 +7,12 @@
 			<ul class="categories" v-if="process.categories">
 				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
 			</ul>
-			<code :class="{ deprecated: process.deprecated }">{{ process.id }}</code><!-- ToDo: Replace name with id -->
-			 — {{ process.summary }}
+			{{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
+		</div>
+
+		<div v-if="process.backend" class="backendname">
+			<em>{{process.backend}}</em>
 		</div>
 
 		<div class="description" v-if="process.description">
@@ -66,6 +69,10 @@
 		<div class="links" v-if="process.links">
 			<h3>See Also</h3>
 			<LinkList :links="process.links" />
+		</div>
+
+		<div class="retrieved" v-if="process.retrieved">
+			<em>This data was retrieved from the backend server at {{process.retrieved}}.</em>
 		</div>
 
 	</div>
