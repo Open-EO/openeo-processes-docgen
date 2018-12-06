@@ -7,10 +7,17 @@
 			<ul class="categories" v-if="process.categories">
 				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
 			</ul>
-			<code :class="{ deprecated: process.deprecated }">{{ process.id }}</code><!-- ToDo: Replace name with id -->
-			 — {{ process.summary }}
+			{{ process.summary }}
 			<template v-if="process.deprecated === true"> — <strong class="deprecated">deprecated</strong></template>
 		</div>
+
+		<div v-if="process.backend" class="backendname">
+			<em>{{process.backend}}</em>
+		</div>
+
+		<button v-if="initiallyCollapsed != undefined" class="showMoreButton" @click="collapsed = !collapsed">Show {{collapsed ? 'more' : 'less'}}</button>
+
+		<div v-show="!collapsed">
 
 		<div class="description" v-if="process.description">
 			<h3>Description</h3>
@@ -68,6 +75,12 @@
 			<LinkList :links="process.links" />
 		</div>
 
+		<div class="retrieved" v-if="process.retrieved">
+			<em>This data was retrieved from the backend server at {{process.retrieved}}.</em>
+		</div>
+
+		</div>
+
 	</div>
 </template>
 
@@ -80,12 +93,17 @@ import LinkList from './LinkList.vue';
 
 export default {
 	name: 'ProcessPanel',
-	props: ['process'],
+	props: ['process', 'initiallyCollapsed'],
 	components: {
 		SchemaElement,
 		DescriptionElement,
 		ProcessExampleElement,
 		LinkList
+	},
+	data() {
+		return {
+			collapsed: this.initiallyCollapsed || false
+		}
 	},
 	methods: {
 		formatCategory(name) {

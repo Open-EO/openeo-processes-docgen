@@ -1,61 +1,47 @@
 <template>
 	<div id="docgen">
-		<div id="toc">
-			<h2 class="navBlock">Processes</h2>
-			<div id="searchBox" class="navBlock">
-				<input type="search" v-model="searchTerm" placeholder="Search in process names" /><button>🔎</button>
-			</div>
-			<ProcessesListCategorized v-if="categorize" :processes="processes" :searchTerm="searchTerm" />
-			<ProcessesList v-else :processes="processes" :searchTerm="searchTerm" />
-			<div id="docLinks" class="navBlock" v-if="links.length > 0">
-				<h2>Related links</h2>
-				<LinkList :links="links" />
-			</div>
+		<div id="docgen-toc-and-links-container">
+			<DocGenTOC :processes="processes" :categorize="categorize"></DocGenTOC>
+			<DocGenLinks :links="links"></DocGenLinks>
 		</div>
-		<div id="processes">
-			<ProcessPanel v-for="(process, key) in processes" :key="key" :process="process" />
+		<div id="docgen-processes-container">
+			<DocGenProcesses :processes="processes"></DocGenProcesses>
 		</div>
 	</div>
 </template>
 
 <script>
 import EventBus from './eventbus.js';
-import ProcessesList from './components/ProcessesList.vue';
-import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
-import ProcessPanel from './components/ProcessPanel.vue';
-import LinkList from './components/LinkList.vue';
 import axios from 'axios';
 import Config from './config.js';
+import DocGenTOC from './components/DocGenTOC.vue';
+import DocGenLinks from './components/DocGenLinks.vue';
+import DocGenProcesses from './components/DocGenProcesses.vue';
+import { convertProcessToLatestSpec } from './utils.js';
 
 export default {
 	name: 'DocGen',
 	components: {
-		ProcessesList,
-		ProcessesListCategorized,
-		ProcessPanel,
-		LinkList
+		DocGenTOC,
+		DocGenLinks,
+		DocGenProcesses
+	},
+	props: {
+		document: {
+			default: function() { return this.$parent.$options.document || Config.document || null; }
+		},
+		sortProcessesById: {
+			default: function() { return this.$parent.$options.sortProcessesById || Config.sortProcessesById || true; }
+		},
+		categorize: {
+			default: function() { return this.$parent.$options.categorize || Config.categorize || false; }
+		}
 	},
 	data() {
-		var baseData = {
-			searchTerm: '',
-			document: null,
-			sortProcessesById: true,
-			categorize: false,
+		return {
 			processes: null,
 			links: []
 		};
-		var instanceData = {};
-		for (var key in baseData) {
-			if (typeof this.$parent.$options[key] !== 'undefined') {
-				instanceData[key] = this.$parent.$options[key];
-			}
-		}
-		var data = Object.assign(baseData, Config, instanceData);
-		// For backward compatibility
-		if (typeof window.processesDocument === 'string') {
-			data.document = window.processesDocument;
-		}
-		return data;
 	},
 	created() {
 		EventBus.$on('changeDocument', this.changeDocument);
@@ -110,36 +96,7 @@ export default {
 
 		prepare(processes) {
 			// Compatibility for openEO API v0.3 and v0.4
-			processes = processes.map(proc => {
-				if (typeof proc.id === 'undefined') {
-					// name => id
-					proc.id = proc.name;
-					delete proc.name;
-					// mime_type => media_type
-					if (typeof proc.parameters === 'object') {
-						for(var key in proc.parameters) {
-							var param = proc.parameters[key];
-							if (typeof param.mime_type !== 'undefined') {
-								param.media_type = param.mime_type;
-								delete param.mime_type;
-							}
-						}
-					}
-					if (typeof proc.returns.mime_type !== 'undefined') {
-						proc.returns.media_type = proc.returns.mime_type;
-						delete proc.returns.mime_type;
-					}
-					// exception object
-					if (proc.exceptions) {
-						for(var key in proc.exceptions) {
-							if (typeof proc.exceptions[key].message === 'undefined') {
-								proc.exceptions[key].message = proc.exceptions[key].description;
-							}
-						}
-					}
-				}
-				return proc;
-			});
+			processes = processes.map(convertProcessToLatestSpec);
 			if (this.sortProcessesById === true) {
 				processes.sort((a, b) => {
 					var s1 = a.id.toLowerCase();
@@ -155,15 +112,6 @@ export default {
 </script>
 
 <style>
-html, body {
-	height: 100%;
-}
-html {
-	font-size: 62.5%;
-}
-body {
-	margin: 0;
-}
 #docgen {
 	font-family: sans-serif;
 	font-size: 1.5rem;
@@ -221,18 +169,18 @@ body {
 	padding-bottom: 0;
 	padding-top: 0;
 }
-#toc {
+#docgen-toc-and-links-container {
 	border-right: 1px dotted #ccc;
 }
-#toc .navBlock {
+#docgen-toc-and-links-container .navBlock {
 	margin: 1.5rem;
 }
-#toc .noProcessesFound {
+#docgen-toc .noProcessesFound {
 	text-align: center;
 	display: block;
 	margin: 1rem;
 }
-#toc #searchBox input, #toc #searchBox button {
+#docgen-toc #searchBox input, #docgen-toc #searchBox button {
 	height: 1.9rem;
 	font-size: 1.3rem;
 	margin: 0;
@@ -244,81 +192,73 @@ body {
 	background-color: #fff;
 
 }
-#toc #searchBox input {
+#docgen-toc #searchBox input {
 	width: calc(100% - 3.4rem);
 }
-#toc #searchBox button {
+#docgen-toc #searchBox button {
 	width: 1.9rem;
 	border-left: 0;
 }
-#toc ul {
+#docgen-toc-and-links-container ul {
 	list-style-type: square;
 	display: block;
 	padding: 0;
 }
-#toc li {
+#docgen-toc-and-links-container li {
 	margin-left: 1.75rem;
 }
-#toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#toc li a {
+#docgen-toc-and-links-container li a {
 	font-weight: bold;
 }
-#toc li span {
+#docgen-toc-and-links-container li span {
 	display: block;
 	margin-bottom: 0.75rem;
 	font-size: 1.2rem;
 }
 
 @media only screen and (min-width: 64em) {
-	#docgen, #toc {
+	#docgen {
+		display: flex;
+	}
+	#docgen, #docgen-toc-and-links-container {
 		height: 100%;
 	}
-
-	#processes {
-		float: right;
-		width: 80%;
-	}
-	#toc {
+	#docgen-toc-and-links-container, #docgen-processes-container {
+		height: 100vh;
 		overflow-y: auto;
-		width: 20%;
-		float: left;
-		position: fixed;
+	}
+	#docgen-processes-container {
+		flex: 4;
+	}
+	#docgen-toc-and-links-container {
+		flex: 1;
+		height: 100vh;
 		border-right: 1px dotted #ccc;
 	}
-	#toc #docLinks {
+	#docgen-toc-and-links-container #docgen-links {
 		margin-top: 6rem;
 	}
 }
 
-@media only screen and (min-width: 100em) {
-	html {
-		font-size: 68.75%;
-	}
-}
-
-@media only screen and (min-width: 125em) {
-    html {
-		font-size: 75%;
-	}
-}
-.csList {
+#docgen .csList {
   display: inline;
   list-style: none;
   padding: 0;
 }
-.csList li {
+#docgen .csList li {
   display: inline;
   padding: 0;
 }
-.csList li:after {
+#docgen .csList li:after {
   content: ", ";
 }
-.csList li:last-child:after {
+#docgen .csList li:last-child:after {
     content: "";
 }
-.required {
+#docgen .required {
 	color: blue;
 	font-weight: bold;
 }

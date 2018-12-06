@@ -5,6 +5,9 @@ Vue.config.productionTip = false;
 
 new Vue({
 	el: '#app',
-	document: 'processes.json',
-	render: h => h(DocGen)
+	render: h => h(DocGen, { 
+		props: {
+			document: 'processes.json'
+		}
+	})
 });
