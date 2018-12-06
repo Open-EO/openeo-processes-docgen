@@ -1,11 +1,11 @@
 # openEO Processes DocGen
-Library to generate a humen-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
+Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
 
 * [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
 ## Getting Started
 
-You can simply create an HTML file and modify the `document` option to a URL of a document you'd like to show:
+You can simply create an HTML file and modify the `document` prop to a URL of a document you'd like to show:
 ```
 <!DOCTYPE html>
 <html>
@@ -25,8 +25,11 @@ You can simply create an HTML file and modify the `document` option to a URL of 
 		<script>
 			new Vue({
 				el: '#app',
-				document: 'processes.json',
-				render: h => h(DocGen)
+				render: h => h(DocGen, { 
+					props: {
+						document: 'processes.json'
+					}
+				})
 			});
 		</script>
 		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>

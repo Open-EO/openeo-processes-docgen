@@ -30,14 +30,13 @@ export default {
 	},
 	props: {
 		document: {
-			// window variable for backward compatability
-			default: Config.document || window.processesDocument || null
+			default: function() { return this.$parent.$options.document || Config.document || null; }
 		},
 		sortProcessesById: {
-			default: Config.sortProcessesByName || true
+			default: function() { return this.$parent.$options.sortProcessesById || Config.sortProcessesById || true; }
 		},
 		categorize: {
-			default: Config.categorize || false
+			default: function() { return this.$parent.$options.categorize || Config.categorize || false; }
 		}
 	},
 	data() {
