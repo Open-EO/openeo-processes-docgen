@@ -117,7 +117,6 @@ export default {
 	font-size: 1.5rem;
 	margin: 0;
 	padding: 0;
-	display: flex;
 }
 #docgen table {
 	font-size: 1.5rem;
@@ -221,6 +220,9 @@ export default {
 }
 
 @media only screen and (min-width: 64em) {
+	#docgen {
+		display: flex;
+	}
 	#docgen, #docgen-toc-and-links-container {
 		height: 100%;
 	}
