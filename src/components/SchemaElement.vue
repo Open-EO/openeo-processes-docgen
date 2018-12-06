@@ -146,8 +146,7 @@ export default {
 			return type;
 		},
 		showRow(key) {
-			
-			if (key == 'format' && typeof this.schema.type !== 'undefined' && ['object', 'array'].includes(this.schema.type.toLowerCase())) {
+			if (key == 'format' && typeof this.schema.type === 'string' && ['object', 'array'].includes(this.schema.type.toLowerCase())) {
 				// If format has been added to the type, don't show again
 				return false;
 			}
