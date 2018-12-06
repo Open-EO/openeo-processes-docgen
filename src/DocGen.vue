@@ -12,9 +12,7 @@
 
 <script>
 import EventBus from './eventbus.js';
-import {fs} from 'fs';
 import axios from 'axios';
-import refParser from 'json-schema-ref-parser';
 import Config from './config.js';
 import DocGenTOC from './components/DocGenTOC.vue';
 import DocGenLinks from './components/DocGenLinks.vue';
@@ -70,9 +68,7 @@ export default {
 
 		changeDocument(uri) {
 			axios.get(uri)
-				.then(response => {
-					return refParser.dereference(response.data);
-				})
+				.then(response => response.data)
 				.then(schema => {
 					if (Array.isArray(schema)) {
 						// Plain array with processes, convert to openEO API response object.

@@ -12,7 +12,5 @@ module.exports = {
 	devServer: {
 		port: Config.devPort
 	},
-	configureWebpack: {
-//		mode: 'production'
-	}
+	productionSourceMap: false
 }
