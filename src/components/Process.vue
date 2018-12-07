@@ -114,8 +114,11 @@ export default {
 	},
 	data() {
 		return {
-			collapsed: Utils.setDefaults(this.baseConfig).processesInitiallyCollapsed
+			collapsed: false
 		}
+	},
+	beforeMount() {
+		this.collapsed = this.config.processesInitiallyCollapsed;
 	},
 	methods: {
 		toggle() {

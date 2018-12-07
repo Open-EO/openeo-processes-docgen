@@ -118,7 +118,7 @@ var Utils = {
     },
 
     setDefaults(config) {
-        if (typeof config !== 'objec') {
+        if (typeof config !== 'object') {
             return BaseConfig;
         }
         for(var key in BaseConfig) {
