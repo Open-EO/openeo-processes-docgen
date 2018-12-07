@@ -89,12 +89,21 @@ export default {
 		overflow-y: scroll;
 	}
 	.content-container {
-		flex: 4;
+		flex: 6;
 		padding-top: 0;
 	}
 	.menu-container {
-		flex: 1;
+		flex: 2;
 		border-right: 1px dotted #ccc;
+	}
+}
+
+@media only screen and (min-width: 100em) {
+	.content-container {
+		flex: 4;
+	}
+	.menu-container {
+		flex: 1;
 	}
 }
 </style>
