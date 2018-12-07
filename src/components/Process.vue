@@ -23,7 +23,7 @@
 
 		<button v-if="config.processesInitiallyCollapsed" class="show-more-button" @click="toggle()">Show {{collapsed ? 'more' : 'less'}}</button>
 
-		<template v-show="!collapsed">
+		<div v-show="!collapsed">
 
 			<slot name="process-before-details"></slot>
 
@@ -86,7 +86,7 @@
 
 			<slot name="process-after-details"></slot>
 
-		</template>
+		</div>
 
 	</article>
 </template>

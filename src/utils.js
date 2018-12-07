@@ -58,14 +58,24 @@ var Utils = {
     },
 
     dataType: function(schema, short = false, level = 0, type = undefined) {
-        level++;
         if (this.isAnyType(schema)) {
-            schema.type = 'any';
+            type = 'any';
         }
         if (typeof type === 'undefined') {
             type = schema.type;
         }
-        if (Array.isArray(type)) {
+        if (typeof schema.oneOf !== 'undefined' || typeof schema.allOf !== 'undefined' || typeof schema.anyOf !== 'undefined') {
+            if (short) {
+                return 'mixed';
+            }
+            var choice = schema.oneOf || schema.allOf || schema.anyOf;
+            var types = [];
+            for(var i in choice) {
+                types.push(this.dataType(choice[i], short, level));
+            }
+            return types.join(', ');
+        }
+        else if (Array.isArray(type)) {
             var types = [];
             for(var i in type) {
                 types.push(this.dataType(schema, short, level, type[i]));
@@ -73,7 +83,7 @@ var Utils = {
             return types.join(short ? '|' : ', ');
         }
         else if (typeof type === 'string' && type.toLowerCase() === 'array' && typeof schema.items === 'object' && typeof schema.items.type !== 'undefined') {
-            var arrType = "array<"+this.dataType(schema.items, short, level)+">";
+            var arrType = "array<"+this.dataType(schema.items, short, level+1)+">";
             if (typeof schema.format === 'string') {
                 if (level == 0) {
                     return schema.format + (short ? ":" + arrType : " ("+arrType+")");
@@ -101,7 +111,6 @@ var Utils = {
             return str.replace('<',"&lt;").replace('>',"&gt;");
         }
         else {
-            console.log(str);
             return str;
         }
     }
