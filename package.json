@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -21,7 +21,7 @@
     "build": "vue-cli-service build",
     "build_lib": "vue-cli-service build --target lib --name DocGen src/DocGen.vue"
   },
-  "main": "dist/docgen.umd.min.js",
+  "main": "dist/DocGen.umd.min.js",
   "files": [
     "dist/DocGen.css",
     "dist/DocGen.umd.min.js"
