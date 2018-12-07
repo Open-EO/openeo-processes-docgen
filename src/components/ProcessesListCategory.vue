@@ -11,15 +11,20 @@
 </template>
 
 <script>
+import Utils from '../utils.js';
+
 export default {
 	name: 'ProcessesListCategory',
-	props: ['processes', 'name', 'processIndices', 'config'],
+	props: ['processes', 'name', 'processIndices', 'baseConfig'],
 	data() {
 		return {
 			expanded: false
 		};
 	},
 	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		},
 		sortedCategories() {
 			var c = Object.keys(this.categories);
 			return c.sort();

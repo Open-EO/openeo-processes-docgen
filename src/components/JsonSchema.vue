@@ -41,7 +41,7 @@
 						<td class="key">{{ key }}:</td>
 						<td class="value">
 							<span v-if="key == 'type'" class="data-type">{{ formatType() }}</span>
-							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schemaContainer">
+							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schema-container">
 								<JsonSchema v-for="(v, k) in val" :key="k" :schema="v" :nestingLevel="nestingLevel+1" />
 							</div>
 							<span v-else-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
@@ -63,7 +63,7 @@
 				</tr>
 			</table>
 		</template>
-		<div class="schemaExpand" v-else><a @click="show()">> ...</a></div>
+		<div class="schema-expand" v-else><a @click="show()">> ...</a></div>
 	</div>
 </template>
 

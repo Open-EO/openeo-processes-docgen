@@ -1,3 +1,5 @@
+import BaseConfig from './config.js';
+
 var Utils = {
 
     convertProcessToLatestSpec: function(proc) {
@@ -113,6 +115,18 @@ var Utils = {
         else {
             return str;
         }
+    },
+
+    setDefaults(config) {
+        if (typeof config !== 'objec') {
+            return BaseConfig;
+        }
+        for(var key in BaseConfig) {
+            if (typeof config[key] === 'undefined') {
+                config[key] = BaseConfig[key];
+            }
+        }
+        return config;
     }
 };
 

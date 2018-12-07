@@ -1,11 +1,11 @@
 <template>
 	<div class="page-container">
 		<aside class="menu-container">
-			<TableOfContents :processes="preparedProcesses" :config="config" />
-			<RelatedLinks :links="links" :config="config" />
+			<TableOfContents :processes="preparedProcesses" :baseConfig="config" />
+			<RelatedLinks :links="links" :baseConfig="config" />
 		</aside>
 		<main class="content-container">
-			<Processes :processes="preparedProcesses" :config="config" />
+			<Processes :processes="preparedProcesses" :baseConfig="config" />
 		</main>
 	</div>
 </template>
@@ -23,7 +23,12 @@ export default {
 		RelatedLinks,
 		Processes
 	},
-	props: ['processes', 'links', 'config'],
+	props: ['processes', 'links', 'baseConfig'],
+	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		}
+	},
 	data() {
 		return {
 			preparedProcesses: []

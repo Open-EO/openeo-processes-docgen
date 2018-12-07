@@ -100,16 +100,21 @@ import Utils from '../utils.js';
 
 export default {
 	name: 'Process',
-	props: ['process', 'config'],
 	components: {
 		JsonSchema,
 		Description,
 		ProcessExample,
 		LinkList
 	},
+	props: ['process', 'baseConfig'],
+	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		}
+	},
 	data() {
 		return {
-			collapsed: this.config.processesInitiallyCollapsed
+			collapsed: Utils.setDefaults(this.baseConfig).processesInitiallyCollapsed
 		}
 	},
 	methods: {
