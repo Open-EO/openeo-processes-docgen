@@ -1,11 +1,11 @@
 # openEO Processes DocGen
-Library to generate a humen-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
+Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
 
 * [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
 ## Getting Started
 
-You can simply create an HTML file and modify the `document` option to a URL of a document you'd like to show:
+You can simply create an HTML file and modify the `document` prop to a URL of a document you'd like to show:
 ```
 <!DOCTYPE html>
 <html>
@@ -18,6 +18,7 @@ You can simply create an HTML file and modify the `document` option to a URL of 
 		<script src="https://unpkg.com/vue"></script>
 		<script src="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
 		<link rel="stylesheet" href="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.css">
+		<style>html, body { height: 100%; margin: 0; }</style>
 	</head>
 
 	<body>
@@ -25,8 +26,18 @@ You can simply create an HTML file and modify the `document` option to a URL of 
 		<script>
 			new Vue({
 				el: '#app',
-				document: 'processes.json',
-				render: h => h(DocGen)
+				render: h => h(DocGen, { 
+					props: {
+						// URL or path of the document to parse
+						document: 'processes.json'
+						// Sorts the processes by id if set to true, otherwise keeps order of the document
+						// sortProcessesById: true,
+						// Categorize the processes in the menu if set to true, otherwise show a plain list
+						// categorize: true,
+						// Whether processes are initially collapsed or not
+						// processesInitiallyCollapsed: false
+					}
+				})
 			});
 		</script>
 		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>

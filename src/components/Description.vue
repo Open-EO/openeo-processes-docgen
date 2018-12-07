@@ -1,12 +1,12 @@
 <template>
-	<div class="description" v-html="markup(description)"></div>
+	<div class="styled-description" v-html="markup(description)"></div>
 </template>
 
 <script>
 import commonmark from 'commonmark';
 
 export default {
-	name: 'DescriptionElement',
+	name: 'Description',
 	props: ['description'],
 	methods: {
 		markup(text) {
@@ -18,3 +18,9 @@ export default {
 	}
 }
 </script>
+
+<style>
+.styled-description pre {
+	margin: 0.5em;
+}
+</style>

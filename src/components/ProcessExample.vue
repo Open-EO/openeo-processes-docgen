@@ -1,28 +1,28 @@
 <template>
-	<div class="processExample">
+	<div class="process-example">
 		<h4>
 			<code>{{ id }}</code>
 			<template v-if="example.summary"> — {{ example.summary }}</template>
 		</h4>
 
 		<div class="content">
-			<DescriptionElement :description="example.description"></DescriptionElement>
+			<Description :description="example.description" />
 
-			<div class="processGraph">
-				<DescriptionElement :description="toMarkdown(example.process_graph)"></DescriptionElement>
+			<div class="process-graph">
+				<Description :description="toMarkdown(example.process_graph)" />
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import DescriptionElement from './DescriptionElement.vue';
+import Description from './Description.vue';
 
 export default {
-	name: 'ProcessExampleElement',
+	name: 'ProcessExample',
 	props: ['id', 'example'],
 	components: {
-		DescriptionElement
+		Description
 	},
 	methods: {
 		toMarkdown(process_graph) {
@@ -33,20 +33,17 @@ export default {
 </script>
 
 <style scoped>
-h4 {
-	padding: 1em 0 0.25rem 0;
-}
 .content {
-	border-left: 0.5rem solid #ccc;
+	border-left: 0.5em solid #ccc;
 	border-bottom: 1px dotted #ccc;
 	padding: 0.5em;
+	margin-left: 1.5em;
 }
-.processGraph {
+.process-graph {
 	background-color: #eee; 
 	width: 100%;
 	border: 1px solid #ccc;
-	max-height: 300px;
+	max-height: 15em;
 	overflow-y: auto;
-	font-size: 1.2rem;
 }
 </style>
