@@ -65,14 +65,8 @@ export default {
 			EventBus.$emit('changeDocument', this.document);
 		}
 		else if (typeof this.processes === 'object') {
-			refParser.dereference(this.processes)
-				.then(schema => {
-					this.processes = this.prepare(schema);
-					EventBus.$emit('dataChanged');
-				})
-				.catch(error => {
-					console.log(error);
-				});
+			this.processes = this.prepare(this.processes);
+			EventBus.$emit('dataChanged');
 		}
 		else {
 			console.error('No data specified.');
