@@ -1,6 +1,6 @@
 <template>
 	<div class="docgen">
-		<Page :processes="processes" :links="links" :config="$props" />
+		<Page :processes="processes" :links="links" :baseConfig="$props" />
 	</div>
 </template>
 

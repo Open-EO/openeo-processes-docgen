@@ -24,21 +24,21 @@ You can simply create an HTML file and modify the `document` prop to a URL of a 
 	<body>
 		<div id="app"></div>
 		<script>
-			new Vue({
-				el: '#app',
-				render: h => h(DocGen, { 
-					props: {
-						// URL or path of the document to parse
-						document: 'processes.json'
-						// Sorts the processes by id if set to true, otherwise keeps order of the document
-						// sortProcessesById: true,
-						// Categorize the processes in the menu if set to true, otherwise show a plain list
-						// categorize: true,
-						// Whether processes are initially collapsed or not
-						// processesInitiallyCollapsed: false
-					}
-				})
-			});
+    new Vue({
+      el: '#app',
+      render: h => h(DocGen, { 
+        props: {
+          // URL or path of the document to parse
+          document: 'processes.json'
+          // Sorts the processes by id if set to true, otherwise keeps order of the document
+          // sortProcessesById: true,
+          // Categorize the processes in the menu if set to true, otherwise show a plain list
+          // categorize: true,
+          // Whether processes are initially collapsed or not
+          // processesInitiallyCollapsed: false
+        }
+      })
+    });
 		</script>
 		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>
 	</body>

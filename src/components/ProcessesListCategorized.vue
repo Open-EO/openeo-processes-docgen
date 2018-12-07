@@ -1,20 +1,21 @@
 <template>
 	<nav class="categories">
 		<div class="toggle-all-controls"><a @click="expandAll">Expand all</a> | <a @click="collapseAll">Collapse all</a></div>
-		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="filteredProcesses" :config="config" />
+		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="filteredProcesses" :baseConfig="config" />
 		<strong class="no-processes-found" v-if="filteredProcesses.length === 0">No processes found</strong>
 	</nav>
 </template>
 
 <script>
 import ProcessesListCategory from './ProcessesListCategory.vue';
+import Utils from '../utils.js';
 
 export default {
 	name: 'ProcessesListCategorized',
 	components: {
 		ProcessesListCategory
 	},
-	props: ['processes', 'searchTerm', 'config'],
+	props: ['processes', 'searchTerm', 'baseConfig'],
 	data() {
 		return {
 			categories: {},
@@ -23,6 +24,9 @@ export default {
 		};
 	},
 	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		},
 		sortedCategories() {
 			var c = Object.keys(this.categories);
 			return c.sort();

@@ -1,11 +1,11 @@
 <template>
 	<div class="page-container">
 		<aside class="menu-container">
-			<TableOfContents :processes="preparedProcesses" :config="config" />
-			<RelatedLinks :links="links" :config="config" />
+			<TableOfContents :processes="preparedProcesses" :baseConfig="config" />
+			<RelatedLinks :links="links" :baseConfig="config" />
 		</aside>
 		<main class="content-container">
-			<Processes :processes="preparedProcesses" :config="config" />
+			<Processes :processes="preparedProcesses" :baseConfig="config" />
 		</main>
 	</div>
 </template>
@@ -14,7 +14,7 @@
 import TableOfContents from './TableOfContents.vue';
 import RelatedLinks from './RelatedLinks.vue';
 import Processes from './Processes.vue';
-import { convertProcessToLatestSpec } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'DocGen',
@@ -23,7 +23,12 @@ export default {
 		RelatedLinks,
 		Processes
 	},
-	props: ['processes', 'links', 'config'],
+	props: ['processes', 'links', 'baseConfig'],
+	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		}
+	},
 	data() {
 		return {
 			preparedProcesses: []
@@ -37,7 +42,7 @@ export default {
 	methods: {
 		prepare(processes) {
 			// Compatibility for openEO API v0.3 and v0.4
-			processes = processes.map(convertProcessToLatestSpec);
+			processes = processes.map(Utils.convertProcessToLatestSpec);
 			if (this.config.sortProcessesById === true) {
 				processes.sort((a, b) => {
 					var s1 = a.id.toLowerCase();

@@ -5,7 +5,7 @@
 				<table class="object-properties">
 					<tr>
 						<td class="key">Type:</td>
-						<td class="value">{{ formatType() }}</td>
+						<td class="value data-type">{{ formatType() }}</td>
 					</tr>
 					<template v-if="filteredObjectSchema !== null">
 						<tr v-if="schema.properties">
@@ -34,14 +34,14 @@
 			<table v-else class="schema-attrs">
 				<tr v-if="showAnyType()">
 					<td class="key">Type:</td>
-					<td class="value"><em>Any</em></td>
+					<td class="value data-type">any</td>
 				</tr>
 				<tr v-for="(val, key) in schema" :key="key">
 					<template v-if="showRow(key)">
 						<td class="key">{{ key }}:</td>
 						<td class="value">
-							<span v-if="key == 'type'">{{ formatType() }}</span>
-							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schemaContainer">
+							<span v-if="key == 'type'" class="data-type">{{ formatType() }}</span>
+							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schema-container">
 								<JsonSchema v-for="(v, k) in val" :key="k" :schema="v" :nestingLevel="nestingLevel+1" />
 							</div>
 							<span v-else-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
@@ -63,13 +63,13 @@
 				</tr>
 			</table>
 		</template>
-		<div class="schemaExpand" v-else><a @click="show()">> ...</a></div>
+		<div class="schema-expand" v-else><a @click="show()">> ...</a></div>
 	</div>
 </template>
 
 <script>
 import Description from './Description.vue';
-import { dataType } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'JsonSchema',
@@ -118,7 +118,7 @@ export default {
 			if (typeof schema === 'undefined') {
 				schema = this.schema;
 			}
-			return dataType(schema);
+			return Utils.dataType(schema);
 		},
 		showRow(key) {
 			if (key == 'format' && typeof this.schema.type === 'string' && ['object', 'array'].includes(this.schema.type.toLowerCase())) {
@@ -133,7 +133,7 @@ export default {
 			return true;
 		},
 		showAnyType() {
-			return (typeof this.schema.type === 'undefined' && typeof this.schema.oneOf === 'undefined' && typeof this.schema.allOf === 'undefined' && typeof this.schema.anyOf === 'undefined');
+			return Utils.isAnyType(this.schema);
 		}
 	}
 }

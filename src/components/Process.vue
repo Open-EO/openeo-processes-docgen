@@ -23,7 +23,7 @@
 
 		<button v-if="config.processesInitiallyCollapsed" class="show-more-button" @click="toggle()">Show {{collapsed ? 'more' : 'less'}}</button>
 
-		<template v-show="!collapsed">
+		<div v-show="!collapsed">
 
 			<slot name="process-before-details"></slot>
 
@@ -86,7 +86,7 @@
 
 			<slot name="process-after-details"></slot>
 
-		</template>
+		</div>
 
 	</article>
 </template>
@@ -96,21 +96,29 @@ import JsonSchema from './JsonSchema.vue';
 import Description from './Description.vue';
 import ProcessExample from './ProcessExample.vue';
 import LinkList from './LinkList.vue';
-import { signature } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'Process',
-	props: ['process', 'config'],
 	components: {
 		JsonSchema,
 		Description,
 		ProcessExample,
 		LinkList
 	},
+	props: ['process', 'baseConfig'],
+	computed: {
+		config() {
+			return Utils.setDefaults(this.baseConfig);
+		}
+	},
 	data() {
 		return {
-			collapsed: this.config.processesInitiallyCollapsed
+			collapsed: false
 		}
+	},
+	beforeMount() {
+		this.collapsed = this.config.processesInitiallyCollapsed;
 	},
 	methods: {
 		toggle() {
@@ -120,7 +128,7 @@ export default {
 			return name.replace('_', ' ');
 		},
 		signature(process) {
-			return signature(process, true);
+			return Utils.signature(process, true);
 		}
 	}
 }
