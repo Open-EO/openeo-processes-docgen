@@ -36,7 +36,6 @@ export default {
 	},
 	methods: {
 		prepare(processes) {
-			console.log(Utils.convertProcessToLatestSpec);
 			// Compatibility for openEO API v0.3 and v0.4
 			processes = processes.map(Utils.convertProcessToLatestSpec);
 			if (this.config.sortProcessesById === true) {

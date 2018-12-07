@@ -5,7 +5,7 @@
 				<table class="object-properties">
 					<tr>
 						<td class="key">Type:</td>
-						<td class="value">{{ formatType() }}</td>
+						<td class="value data-type">{{ formatType() }}</td>
 					</tr>
 					<template v-if="filteredObjectSchema !== null">
 						<tr v-if="schema.properties">
@@ -34,13 +34,13 @@
 			<table v-else class="schema-attrs">
 				<tr v-if="showAnyType()">
 					<td class="key">Type:</td>
-					<td class="value"><em>Any</em></td>
+					<td class="value data-type">any</td>
 				</tr>
 				<tr v-for="(val, key) in schema" :key="key">
 					<template v-if="showRow(key)">
 						<td class="key">{{ key }}:</td>
 						<td class="value">
-							<span v-if="key == 'type'">{{ formatType() }}</span>
+							<span v-if="key == 'type'" class="data-type">{{ formatType() }}</span>
 							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schemaContainer">
 								<JsonSchema v-for="(v, k) in val" :key="k" :schema="v" :nestingLevel="nestingLevel+1" />
 							</div>
@@ -133,7 +133,7 @@ export default {
 			return true;
 		},
 		showAnyType() {
-			return (typeof this.schema.type === 'undefined' && typeof this.schema.oneOf === 'undefined' && typeof this.schema.allOf === 'undefined' && typeof this.schema.anyOf === 'undefined');
+			return Utils.isAnyType(this.schema);
 		}
 	}
 }

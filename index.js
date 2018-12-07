@@ -1,6 +1,6 @@
 module.exports = {
     DocGen: require('./src/DocGen.vue').default,
-    Page: require('./src/Page.vue').default,
+    Page: require('./src/components/Page.vue').default,
     TableOfContents: require('./src/components/TableOfContents.vue').default,
     RelatedLinks: require('./src/components/RelatedLinks.vue').default,
     Processes: require('./src/components/Processes.vue').default,

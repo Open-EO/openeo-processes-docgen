@@ -59,8 +59,8 @@ var Utils = {
 
     dataType: function(schema, short = false, level = 0, type = undefined) {
         level++;
-        if (typeof schema.type === 'undefined') {
-            schema.type = 'mixed';
+        if (this.isAnyType(schema)) {
+            schema.type = 'any';
         }
         if (typeof type === 'undefined') {
             type = schema.type;
@@ -92,8 +92,18 @@ var Utils = {
         return type;
     },
 
+    isAnyType: function(schema) {
+		return (typeof schema.type === 'undefined' && typeof schema.oneOf === 'undefined' && typeof schema.allOf === 'undefined' && typeof schema.anyOf === 'undefined');
+    },
+
     htmlentities: function(str) {
-        return str.replace('<',"&lt;").replace('>',"&gt;");
+        if (typeof str === 'string') {
+            return str.replace('<',"&lt;").replace('>',"&gt;");
+        }
+        else {
+            console.log(str);
+            return str;
+        }
     }
 };
 
