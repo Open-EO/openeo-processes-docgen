@@ -24,21 +24,21 @@ You can simply create an HTML file and modify the `document` prop to a URL of a 
 	<body>
 		<div id="app"></div>
 		<script>
-    new Vue({
-      el: '#app',
-      render: h => h(DocGen, { 
-        props: {
-          // URL or path of the document to parse
-          document: 'processes.json'
-          // Sorts the processes by id if set to true, otherwise keeps order of the document
-          // sortProcessesById: true,
-          // Categorize the processes in the menu if set to true, otherwise show a plain list
-          // categorize: true,
-          // Whether processes are initially collapsed or not
-          // processesInitiallyCollapsed: false
-        }
-      })
-    });
+		new Vue({
+			el: '#app',
+			render: h => h(DocGen, { 
+				props: {
+					// URL or path of the document to parse
+					document: 'processes.json'
+					// Sorts the processes by id if set to true, otherwise keeps order of the document
+					// sortProcessesById: true,
+					// Categorize the processes in the menu if set to true, otherwise show a plain list
+					// categorize: true,
+					// Whether processes are initially collapsed or not
+					// processesInitiallyCollapsed: false
+				}
+			})
+		});
 		</script>
 		<noscript>Sorry, the documentation generator requires JavaScript to be enabled!</noscript>
 	</body>
@@ -54,10 +54,10 @@ To build the files follow these steps:
 2. Clone or download this repository.
 3. Open a command line window and go to the directory which contains the cloned/downloaded web editor files.
 4. Optionally: Configure the generator by editing `vue.config.js` and `src/config.js` to suit your needs.
-6. Install the dependencies by executing `npm install` on the command line
-7. 
-    * Development: Run the development server by executing `npm run serve`.
-    * Deployment: Build the project by executing `npm run build`. Afterwards upload the content of the `dist` folder to your server.
+5. Install the dependencies by executing `npm install` on the command line
+6. 
+	* Development: Run the development server by executing `npm run serve`.
+	* Deployment: Build the project by executing `npm run build`. Afterwards upload the content of the `dist` folder to your server.
 
 ## License
 This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.
