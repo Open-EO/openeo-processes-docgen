@@ -96,7 +96,7 @@ import JsonSchema from './JsonSchema.vue';
 import Description from './Description.vue';
 import ProcessExample from './ProcessExample.vue';
 import LinkList from './LinkList.vue';
-import { signature } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'Process',
@@ -120,7 +120,7 @@ export default {
 			return name.replace('_', ' ');
 		},
 		signature(process) {
-			return signature(process, true);
+			return Utils.signature(process, true);
 		}
 	}
 }

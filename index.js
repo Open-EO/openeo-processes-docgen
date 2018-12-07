@@ -14,5 +14,5 @@ module.exports = {
     Process: require('./src/components/Process.vue').default,
     JsonSchema: require('./src/components/JsonSchema.vue').default,
 
-    utils: require('./src/utils.js')
+    Utils: require('./src/utils.js').default
 }

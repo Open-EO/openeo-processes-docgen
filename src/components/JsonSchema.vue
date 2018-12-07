@@ -69,7 +69,7 @@
 
 <script>
 import Description from './Description.vue';
-import { dataType } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'JsonSchema',
@@ -118,7 +118,7 @@ export default {
 			if (typeof schema === 'undefined') {
 				schema = this.schema;
 			}
-			return dataType(schema);
+			return Utils.dataType(schema);
 		},
 		showRow(key) {
 			if (key == 'format' && typeof this.schema.type === 'string' && ['object', 'array'].includes(this.schema.type.toLowerCase())) {

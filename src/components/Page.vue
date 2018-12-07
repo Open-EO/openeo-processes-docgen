@@ -14,7 +14,7 @@
 import TableOfContents from './TableOfContents.vue';
 import RelatedLinks from './RelatedLinks.vue';
 import Processes from './Processes.vue';
-import { convertProcessToLatestSpec } from '../utils.js';
+import Utils from '../utils.js';
 
 export default {
 	name: 'DocGen',
@@ -36,8 +36,9 @@ export default {
 	},
 	methods: {
 		prepare(processes) {
+			console.log(Utils.convertProcessToLatestSpec);
 			// Compatibility for openEO API v0.3 and v0.4
-			processes = processes.map(convertProcessToLatestSpec);
+			processes = processes.map(Utils.convertProcessToLatestSpec);
 			if (this.config.sortProcessesById === true) {
 				processes.sort((a, b) => {
 					var s1 = a.id.toLowerCase();
