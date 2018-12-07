@@ -29,3 +29,67 @@ export function convertProcessToLatestSpec(proc) {
     }
     return proc;
 }
+
+export function signature(process, html = false) {
+    var params = [];
+    for(var name in process.parameters) {
+        var p = process.parameters[name];
+        var pType = dataType(p.schema, true);
+        var req = (p.required ? '' : '?');
+        var pStr;
+        if (html) {
+            pStr = '<span class="required">' + req + '</span><span class="data-type">' + htmlentities(pType) + '</span> <span class="param-name">' + name + "</span>";
+        }
+        else {
+            pStr = req + pType + " " + name;
+        }
+        params.push(pStr);
+    }
+    var returns = dataType(process.returns.schema, true);
+    var paramStr = "(" + params.join(", ") + ") : ";
+    if (html) {
+        return '<span class="process-name">' + process.id + '</span>' + paramStr + '<span class="data-type">' + htmlentities(returns) + "</span>";
+    }
+    else {
+        return process.id + paramStr + returns;
+    }
+}
+
+export function dataType(schema, short = false, level = 0, type = undefined) {
+    level++;
+    if (typeof schema.type === 'undefined') {
+        schema.type = 'mixed';
+    }
+    if (typeof type === 'undefined') {
+        type = schema.type;
+    }
+    if (Array.isArray(type)) {
+        var types = [];
+        for(var i in type) {
+            types.push(dataType(schema, short, level, type[i]));
+        }
+        return types.join(short ? '|' : ', ');
+    }
+    else if (typeof type === 'string' && type.toLowerCase() === 'array' && typeof schema.items === 'object' && typeof schema.items.type !== 'undefined') {
+        var arrType = "array<"+dataType(schema.items, short, level)+">";
+        if (typeof schema.format === 'string') {
+            if (level == 0) {
+                return schema.format + (short ? ":" + arrType : " ("+arrType+")");
+            }
+            else {
+                return schema.format;
+            }
+        }
+        else {
+            return arrType;
+        }
+    }
+    else if (typeof type === 'string' && type.toLowerCase() === 'object' && typeof schema.format === 'string') {
+        return schema.format + (short ? ":object" : " (object)");
+    }
+    return type;
+}
+
+function htmlentities(str) {
+    return str.replace('<',"&lt;").replace('>',"&gt;");
+}

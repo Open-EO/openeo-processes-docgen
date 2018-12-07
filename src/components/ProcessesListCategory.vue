@@ -1,10 +1,10 @@
 <template>
 	<div :class="{ category: true, expanded: expanded }">
 		<h3 @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</h3>
-		<ul class="processesList categorizedProcessesList">
+		<ul class="processes-list">
 			<li v-for="pi in processIndices" :key="pi">
 				<a :href="'#' + processes[pi].id">{{ processes[pi].id }}</a>
-				<span>{{ processes[pi].summary }}</span>
+				<summary>{{ processes[pi].summary }}</summary>
 			</li>
 		</ul>
 	</div>
@@ -13,7 +13,7 @@
 <script>
 export default {
 	name: 'ProcessesListCategory',
-	props: ['processes', 'name', 'processIndices'],
+	props: ['processes', 'name', 'processIndices', 'config'],
 	data() {
 		return {
 			expanded: false
@@ -40,24 +40,28 @@ export default {
 </script>
 
 <style scoped>
-#docgen h3 {
+.category h3 {
 	text-transform: capitalize;
-	font-size: 1.6rem;
+	margin: 0.5em 0 0.25em 0;
+	font-size: 1.1em;
 	cursor: pointer;
 }
-#docgen h3 .toggle {
+.category h3 .toggle {
 	display: inline-block;
-	width: 1rem;
+	width: 0.5em;
 }
-#docgen .expanded h3 .toggle {
+.category.expanded h3 .toggle {
 	transform: rotate(90deg);
 }
-#docgen-toc ul {
+.category .processes-list {
 	display: none;
-	margin-left: 1.5rem;
+	margin-left: 1.5em;
     margin-top: 0em;
 }
-#docgen-toc .expanded ul {
+.category.expanded .processes-list {
 	display: block;
+}
+.category li {
+	margin-left: 0.5em;
 }
 </style>

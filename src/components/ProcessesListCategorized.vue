@@ -1,9 +1,9 @@
 <template>
-	<div class="categories navBlock">
-		<div class="toggleAllControls"><a @click="expandAll">Expand all</a> | <a @click="collapseAll">Collapse all</a></div>
-		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="filteredProcesses" />
-		<strong class="noProcessesFound" v-if="filteredProcesses.length === 0">No processes found</strong>
-	</div>
+	<nav class="categories">
+		<div class="toggle-all-controls"><a @click="expandAll">Expand all</a> | <a @click="collapseAll">Collapse all</a></div>
+		<ProcessesListCategory v-for="category in sortedCategories" ref="categoryElements" :key="category" :name="category" :processIndices="categories[category]" :processes="filteredProcesses" :config="config" />
+		<strong class="no-processes-found" v-if="filteredProcesses.length === 0">No processes found</strong>
+	</nav>
 </template>
 
 <script>
@@ -14,7 +14,7 @@ export default {
 	components: {
 		ProcessesListCategory
 	},
-	props: ['processes', 'searchTerm'],
+	props: ['processes', 'searchTerm', 'config'],
 	data() {
 		return {
 			categories: {},
@@ -84,19 +84,8 @@ export default {
 </script>
 
 <style scoped>
-#docgen-links h2 {
-	margin-top: 2.5rem;
-}
-#docgen-toc ul {
-    margin-top: 0em;
-}
-.toggleAllControls {
+.toggle-all-controls {
 	text-align: center;
-}
-.categorizedProcessesList {
-	display: none;
-}
-.expanded {
-	display: block;
+	margin: 1em;
 }
 </style>

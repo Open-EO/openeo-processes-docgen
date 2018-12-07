@@ -1,24 +1,24 @@
 <template>
-	<div class="schemaElement" v-if="typeof schema === 'object' && schema !== null">
+	<div class="json-schema" v-if="typeof schema === 'object' && schema !== null && nestingLevel < 100">
 		<template v-if="visible">
 			<div v-if="schema.type == 'object' && typeof schema.properties =='object'" class="schemaObjectElement">
-				<table class="objectProperties">
+				<table class="object-properties">
 					<tr>
 						<td class="key">Type:</td>
 						<td class="value">{{ formatType() }}</td>
 					</tr>
 					<template v-if="filteredObjectSchema !== null">
 						<tr v-if="schema.properties">
-							<th colspan="2">Attributes:</th>
+							<th colspan="2" class="object-attr-heading">Attributes:</th>
 						</tr>
 						<tr>
-							<td colspan="2" class="inlineSchemaAttrs">
-								<SchemaElement :schema="filteredObjectSchema"></SchemaElement>
+							<td colspan="2" class="inline-schema-attrs">
+								<JsonSchema :schema="filteredObjectSchema" :nestingLevel="nestingLevel+1" />
 							</td>
 						</tr>
 					</template>
 					<tr v-if="schema.properties">
-						<th colspan="2" class="objectPropHeading">Object Properties:</th>
+						<th colspan="2" class="object-prop-heading">Object Properties:</th>
 					</tr>
 					<tr v-for="(val, key) in schema.properties" :key="key">
 						<td class="propKey">
@@ -26,13 +26,12 @@
 							<strong class="required" v-if="schema.required && schema.required.indexOf(key) !== -1" title="required">*</strong>
 						</td>
 						<td class="value">
-							<SchemaElement :schema="val"></SchemaElement>
+							<JsonSchema :schema="val" :nestingLevel="nestingLevel+1" />
 						</td>
 					</tr>
 				</table>
 			</div>
-			<!-- ToDo: Circular references lead to endless loop -->
-			<table v-else class="schemaAttrs">
+			<table v-else class="schema-attrs">
 				<tr v-if="showAnyType()">
 					<td class="key">Type:</td>
 					<td class="value"><em>Any</em></td>
@@ -43,21 +42,21 @@
 						<td class="value">
 							<span v-if="key == 'type'">{{ formatType() }}</span>
 							<div v-else-if="(key == 'oneOf' || key == 'anyOf' || key == 'allOf') && Array.isArray(val)" class="schemaContainer">
-								<SchemaElement v-for="(v, k) in val" :key="k" :schema="v" />
+								<JsonSchema v-for="(v, k) in val" :key="k" :schema="v" :nestingLevel="nestingLevel+1" />
 							</div>
 							<span v-else-if="key != 'default' && key != 'examples' && val === true" title="true">✓ Yes</span>
 							<span v-else-if="key != 'default' && key != 'examples' && val === false" title="false">✕ No</span>
-							<ul v-else-if="key != 'examples' && Array.isArray(val)" class="csList">
+							<ul v-else-if="key != 'examples' && Array.isArray(val)" class="comma-separated-list">
 								<li v-for="(v, k) in val" :key="k">{{ v }}</li>
 							</ul>
 							<ul v-else-if="key == 'examples' && Array.isArray(val) && val.length > 1">
 								<li v-for="(v, k) in val" :key="k"><code>{{ v }}</code></li>
 							</ul>
 							<code v-else-if="key == 'examples' && Array.isArray(val) && val.length === 1">{{ val[0] }}</code>
-							<DescriptionElement v-else-if="key == 'description'" :description="val"></DescriptionElement>
+							<Description v-else-if="key == 'description'" :description="val" />
 							<code v-else-if="key == 'default' && (typeof val === 'object' || typeof val === 'boolean')">{{ JSON.stringify(val) }}</code>
 							<code v-else-if="key == 'pattern'">{{ val }}</code>
-							<SchemaElement v-else-if="typeof val === 'object'" :schema="val" :initShown="false"></SchemaElement>
+							<JsonSchema v-else-if="typeof val === 'object'" :schema="val" :initShown="false" :nestingLevel="nestingLevel+1" />
 							<span v-else>{{ val }}</span>
 						</td>
 					</template>
@@ -69,15 +68,18 @@
 </template>
 
 <script>
-import EventBus from '../eventbus.js';
-import DescriptionElement from './DescriptionElement.vue';
+import Description from './Description.vue';
+import { dataType } from '../utils.js';
 
 export default {
-	name: 'SchemaElement',
+	name: 'JsonSchema',
 	props: {
 		schema: {},
 		initShown: {
 			default: true
+		},
+		nestingLevel: {
+			default: 1
 		}
 	},
 	data() {
@@ -91,7 +93,7 @@ export default {
 		}
 	},
 	components: {
-		DescriptionElement
+		Description
 	},
 	computed: {
 		filteredObjectSchema() {
@@ -112,38 +114,11 @@ export default {
 		show() {
 			this.visible = true;
 		},
-		formatType(schema, type, level = 0) {
+		formatType(schema) {
 			if (typeof schema === 'undefined') {
 				schema = this.schema;
 			}
-			if (typeof type === 'undefined') {
-				type = schema.type;
-			}
-			if (Array.isArray(type)) {
-				var types = [];
-				for(var i in type) {
-					types.push(this.formatType(schema, type[i], level+1));
-				}
-				return types.join(', ');
-			}
-			else if (type.toLowerCase() === 'array' && typeof schema.items === 'object' && typeof schema.items.type !== 'undefined') {
-				var arrType = "array<"+this.formatType(schema.items, undefined, level+1)+">";
-				if (typeof schema.format === 'string') {
-					if (level == 0) {
-						return schema.format + " ("+arrType+")";
-					}
-					else {
-						return schema.format;
-					}
-				}
-				else {
-					return arrType;
-				}
-			}
-			else if (type.toLowerCase() === 'object' && typeof schema.format === 'string') {
-				return schema.format + " (object)";
-			}
-			return type;
+			return dataType(schema);
 		},
 		showRow(key) {
 			if (key == 'format' && typeof this.schema.type === 'string' && ['object', 'array'].includes(this.schema.type.toLowerCase())) {
@@ -164,49 +139,72 @@ export default {
 }
 </script>
 
-<style>
-.schemaElement {
-	border-left: 0.5rem solid #ccc;
+<style scoped>
+.required {
+	color: red;
+	font-weight: bold;
+}
+.json-schema {
+	border-left: 7px solid #ccc;
 	border-bottom: 1px dotted #ccc;
 	padding: 0.25%;
 	width: 99%;
 }
-.inlineSchemaAttrs .schemaElement {
+.json-schema td {
+	padding: 0.25em;
+}
+.inline-schema-attrs .json-schema {
 	border: 0;
 }
-.schemaName {
+.schema-name {
 	display: inline-block;
 	border-bottom: 1px dotted black;
 }
-.schemaAttrs {
+.schema-attrs {
 	width: 100%;
 }
-.schemaAttrs .key {
+.schema-attrs .key {
 	text-transform: capitalize;
-	min-width: 80px;
-	width: 8%;
+	min-width: 8em;
+	width: 12%;
 }
-.schemaAttrs .value {
-	width: 90%;
+.schema-attrs .value {
+	width: 88%;
 }
 
-.inlineSchemaAttrs .schemaElement {
+.inline-schema-attrs .json-schema {
 	background-color: transparent;
 }
-.objectPropHeading {
+.object-prop-heading, .object-attr-heading {
+	padding: 0.5em;
 	text-align: left;
 }
-.objectProperties {
+.object-properties {
 	margin: 0.5% 0.5% 0.5% 1%;
 	width: 99%;
 }
-.objectProperties .propKey {
+.object-properties .propKey {
 	font-style: italic;
 	font-weight: bold;
 	min-width: 80px;
 	width: 8%;
 }
-.objectProperties th {
-	padding-top: 1.5rem;
+.object-properties th {
+	padding-top: 1.5em;
+}
+.comma-separated-list {
+  display: inline;
+  list-style: none;
+  padding: 0;
+}
+.comma-separated-list li {
+  display: inline;
+  padding: 0;
+}
+.comma-separated-list li:after {
+  content: ", ";
+}
+.comma-separated-list li:last-child:after {
+    content: "";
 }
 </style>

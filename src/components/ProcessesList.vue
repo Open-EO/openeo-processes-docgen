@@ -1,13 +1,13 @@
 <template>
-	<div class="list navBlock">
-		<ul class="processesList uncategorizedProcessesList">
+	<nav class="list">
+		<ul class="processes-list">
 			<li v-for="(process, key) in filteredProcesses" :key="key">
 				<a :href="'#' + process.id">{{ process.id }}</a>
-				<span>{{ process.summary }}</span>
+				<summary>{{ process.summary }}</summary>
 			</li>
 		</ul>
-		<strong class="noProcessesFound" v-if="filteredProcesses.length === 0">No processes found.</strong>
-	</div>
+		<strong class="no-processes-found" v-if="filteredProcesses.length === 0">No processes found.</strong>
+	</nav>
 </template>
 
 <script>
