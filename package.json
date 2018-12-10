@@ -21,10 +21,14 @@
     "build": "vue-cli-service build",
     "build_lib": "vue-cli-service build --target lib --name DocGen src/DocGen.vue"
   },
-  "main": "dist/DocGen.umd.min.js",
+  "main": "dist/DocGen.umd.js",
   "files": [
     "dist/DocGen.css",
-    "dist/DocGen.umd.min.js"
+    "dist/DocGen.common.js",
+    "dist/DocGen.umd.js",
+    "dist/DocGen.umd.min.js",
+    "src/components/*",
+    "src/*"
   ],
   "dependencies": {
     "axios": "^0.18.0",
