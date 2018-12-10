@@ -9,7 +9,37 @@ import axios from 'axios';
 import BaseConfig from './config.js';
 import Page from './components/Page.vue';
 
+import Description from './components/Description.vue';
+import JsonSchema from './components/JsonSchema.vue';
+import LinkList from './components/LinkList.vue';
+import Process from './components/Process.vue';
+import Processes from './components/Processes.vue';
+import ProcessesList from './components/ProcessesList.vue';
+import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
+import ProcessesListCategory from './components/ProcessesListCategory.vue';
+import ProcessExample from './components/ProcessExample.vue';
+import RelatedLinks from './components/RelatedLinks.vue';
+import TableOfContents from './components/TableOfContents.vue';
+
+import Utils from './utils.js';
+
 export default {
+	// Export the Components for standalone use of components
+	Description,
+	JsonSchema,
+	LinkList,
+	Page,
+	Process,
+	Processes,
+	ProcessesList,
+	ProcessesListCategorized,
+	ProcessesListCategory,
+	ProcessExample,
+	RelatedLinks,
+	TableOfContents,
+	Utils,
+
+	// Export the default component for browser use
 	name: 'DocGen',
 	components: {
 		Page
