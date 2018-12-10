@@ -33,12 +33,12 @@
   "dependencies": {
     "axios": "^0.18.0",
     "commonmark": "^0.28.1",
-    "vue": "^2.5.18"
+    "vue": "^2.5.19"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0",
     "@vue/cli-service": "^3.0.0",
-    "vue-template-compiler": "^2.5.18"
+    "vue-template-compiler": "^2.5.19"
   },
   "browserslist": [
     "> 3%",

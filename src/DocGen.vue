@@ -16,9 +16,9 @@ import Process from './components/Process.vue';
 import Processes from './components/Processes.vue';
 import ProcessesList from './components/ProcessesList.vue';
 import ProcessesListCategorized from './components/ProcessesListCategorized.vue';
-import RelatedLinks from './components/RelatedLinks.vue';
 import ProcessesListCategory from './components/ProcessesListCategory.vue';
 import ProcessExample from './components/ProcessExample.vue';
+import RelatedLinks from './components/RelatedLinks.vue';
 import TableOfContents from './components/TableOfContents.vue';
 
 import Utils from './utils.js';
@@ -33,9 +33,9 @@ export default {
 	Processes,
 	ProcessesList,
 	ProcessesListCategorized,
-	RelatedLinks,
 	ProcessesListCategory,
 	ProcessExample,
+	RelatedLinks,
 	TableOfContents,
 	Utils,
 
