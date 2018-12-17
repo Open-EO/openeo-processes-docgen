@@ -61,7 +61,14 @@ export default {
 			links: []
 		};
 	},
-	mounted() {
+	watch: {
+		processes() {
+			this.$nextTick(() => {
+				this.moveToAnchor();
+			});
+		}
+	},
+	beforeMount() {
 		if (typeof this.document === 'string' && this.document.length > 0) {
 			this.changeDocument(this.document);
 		}
@@ -92,6 +99,15 @@ export default {
 				.catch(error => {
 					console.log(error);
 				});
+		},
+		moveToAnchor() {
+			if (typeof window.location.hash === 'string' && window.location.hash.length > 1) {
+				var fragment = window.location.hash.substring(1);
+				var element = this.$el.querySelector("a[name="+fragment+"]");
+				if (element) {
+					element.scrollIntoView();
+				}
+			}
 		}
 
 	}
