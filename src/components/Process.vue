@@ -76,7 +76,7 @@
 
 			<section class="examples" v-if="process.examples">
 				<h3>Examples</h3>
-				<ProcessExample v-for="(example, name) in process.examples" :key="name" :id="name" :example="example" />
+				<ProcessExample v-for="(example, key) in process.examples" :key="key" :id="key" :example="example" :process="process" />
 			</section>
 
 			<section class="links" v-if="process.links">
@@ -143,9 +143,6 @@ export default {
 	margin: 1.5em 0 0.75em 0;
 	padding: 0.25em 0 0.25em 0;
 	border-bottom: 1px dotted #ccc;
-}
-.process h4 {
-	margin: 1.5em 0 0.25em 0;
 }
 .process {
 	margin: 1em;
