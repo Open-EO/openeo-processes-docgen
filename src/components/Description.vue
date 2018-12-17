@@ -21,6 +21,14 @@ export default {
 
 <style>
 .styled-description pre {
+	background-color: #eee; 
+	width: 100%;
+	border: 1px solid #ccc;
+	max-height: 15em;
+	overflow-y: auto;
+}
+.styled-description pre code {
+	display: block;
 	margin: 0.5em;
 }
 </style>

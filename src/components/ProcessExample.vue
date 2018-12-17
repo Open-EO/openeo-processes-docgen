@@ -1,15 +1,15 @@
 <template>
 	<div class="process-example">
-		<h4>
-			<code>{{ id }}</code>
-			<template v-if="example.summary"> — {{ example.summary }}</template>
-		</h4>
+		<h4>{{ title }}</h4>
 
 		<div class="content">
-			<Description :description="example.description" />
+			<Description v-if="example.description" :description="example.description" />
 
-			<div class="process-graph">
-				<Description :description="toMarkdown(example.process_graph)" />
+			<div class="process-graph" v-if="example.process_graph">
+				<Description :description="renderedGraph()" />
+			</div>
+			<div class="arguments" v-if="example.arguments">
+				<code v-html="renderedArguments()"></code>
 			</div>
 		</div>
 	</div>
@@ -17,20 +17,54 @@
 
 <script>
 import Description from './Description.vue';
+import Utils from '../utils.js';
 
 export default {
 	name: 'ProcessExample',
-	props: ['id', 'example'],
+	props: ['id', 'process', 'example'],
 	components: {
 		Description
 	},
+	computed: {
+		identifier() {
+			return "#" + (this.id + 1);
+		},
+		title() {
+			return this.example.title ? this.example.title + " (" + this.identifier + ")" : "Example " + this.identifier;
+		}
+	},
 	methods: {
-		toMarkdown(process_graph) {
-			return "```json\n" + JSON.stringify(process_graph, null, 2) + "\n```";
+		renderedGraph() {
+			var md = "##### Process Graph\n```json\n" + JSON.stringify(this.example.process_graph, null, 2) + "\n```";
+			if (typeof this.example.returns !== 'undefined') {
+				md += "\n##### Result\n```json\n" + JSON.stringify(this.example.returns, null, 2) + "\n```";
+			}
+			return md;
+		},
+		renderedArguments() {
+			var params = [];
+			for(var name in this.example.arguments) {
+				var arg = this.example.arguments[name];
+				params.push('<span class="param-name">' + name + '</span> = <span class="argument">' + JSON.stringify(arg) + '</span>');
+			}
+			var returns = "";
+			if (typeof this.example.returns !== 'undefined') {
+				returns = ' => <span class="return-value">' + JSON.stringify(this.example.returns) + '</span>';
+			}
+			return '<span class="process-name">' + this.process.id + '</span>' + "(" + params.join(", ") + ")" + returns;
 		}
 	}
 }
 </script>
+
+<style>
+.process-example .param-name, .process-name {
+	color: #369;
+}
+.process-example .argument, .return-value {
+	color: #936;
+}
+</style>
 
 <style scoped>
 .content {
@@ -38,12 +72,5 @@ export default {
 	border-bottom: 1px dotted #ccc;
 	padding: 0.5em;
 	margin-left: 1.5em;
-}
-.process-graph {
-	background-color: #eee; 
-	width: 100%;
-	border: 1px solid #ccc;
-	max-height: 15em;
-	overflow-y: auto;
 }
 </style>

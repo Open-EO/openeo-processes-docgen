@@ -30,6 +30,22 @@ var Utils = {
                     }
                 }
             }
+            // examples object
+            if (proc.examples) {
+                var examples = [];
+                for(var key in proc.examples) {
+                    var old = proc.examples[key];
+                    var example = {
+                        title: old.summary || key,
+                        description: old.description
+                    };
+                    if (old.process_graph) {
+                        example.process_graph = old.process_graph;
+                    }
+                    examples.push(example);
+                }
+                proc.examplex = examples;
+            }
         }
         return proc;
     },

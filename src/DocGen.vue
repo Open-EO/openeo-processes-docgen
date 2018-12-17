@@ -137,7 +137,7 @@ export default {
 	font-size: 1.4em;
 }
 .docgen h4 {
-	margin: 0.5em 0 0.25em 0;
+	margin: 1.5em 0 0.25em 0;
 	font-size: 1.2em;
 }
 .docgen h5 {
