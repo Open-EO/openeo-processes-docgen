@@ -43,9 +43,12 @@ export default {
 		},
 		renderedArguments() {
 			var params = [];
-			for(var name in this.example.arguments) {
-				var arg = this.example.arguments[name];
-				params.push('<span class="param-name">' + name + '</span> = <span class="argument">' + JSON.stringify(arg) + '</span>');
+			for(var i in this.process.parameter_order) {
+				var name = this.process.parameter_order[i];
+				if (typeof this.example.arguments[name] !== 'undefined') {
+					var arg = this.example.arguments[name];
+					params.push('<span class="argument">' + JSON.stringify(arg) + '</span>');
+				}
 			}
 			var returns = "";
 			if (typeof this.example.returns !== 'undefined') {

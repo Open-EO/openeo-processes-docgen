@@ -35,10 +35,9 @@
 
 			<section class="parameters">
 				<h3>Parameters</h3>
-				<em class="min-parameters" v-if="process.min_parameters > 0">Minimum number of parameters to be used: {{ process.min_parameters }}</em>
-				<div v-for="(param, name) in process.parameters" :key="name">
+				<div v-for="(param, i) in process.parameters" :key="i">
 					<h4>
-						<code>{{ name }}</code>
+						<code>{{ param.name }}</code>
 						<strong class="required" v-if="param.required === true" title="required">*</strong>
 						<strong class="deprecated" v-if="param.deprecated === true">deprecated</strong>
 					</h4>
