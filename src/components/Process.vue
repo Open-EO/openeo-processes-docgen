@@ -44,7 +44,7 @@
 					<div class="details">
 						<Description v-if="param.description" :description="param.description" />
 						<p class="media-type" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
-						<div class="json-schema-container">
+						<div class="json-schema-container" v-if="param.schema">
 							<JsonSchema :schema="param.schema" />
 						</div>
 					</div>
@@ -56,7 +56,7 @@
 				<h3>Return Value</h3>
 				<Description v-if="process.returns.description" :description="process.returns.description" />
 				<p class="media-type" v-if="process.returns.media_type"><strong>Media (MIME) type: </strong>{{ process.returns.media_type }}</p>
-				<div class="json-schema-container">
+				<div class="json-schema-container" v-if="process.returns.schema">
 					<JsonSchema :schema="process.returns.schema" />
 				</div>
 			</section>
