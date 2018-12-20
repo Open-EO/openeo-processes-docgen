@@ -1,523 +1,5535 @@
 {
   "processes": [
     {
-      "name": "get_collection",
-      "summary": "Selects a collection.",
-      "deprecated": true,
-      "description": "Filters and selects a single collection provided by the back-end. The back-end provider decides which of the potential collections is the most relevant one to be selected.",
-      "min_parameters": 1,
+      "id": "absolute",
+      "summary": "Absolute value",
+      "description": "Computes the absolute value of a real number `x`, which is the \"unsigned\" portion of x and often denoted as *|x|*.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math"
+      ],
       "parameters": {
-        "name": {
-          "description": "Filter by collection name",
-          "schema": {
-            "type": "string",
-            "examples": [
-              "Sentinel2A-L1C"
-            ]
-          }
-        },
-        "spatial_extent": {
-          "description": "Filter by spatial extent.",
-          "schema": {
-            "type": "object",
-            "format": "spatial_extent"
-          }
-        },
-        "temporal_extent": {
-          "description": "Filter by time.",
-          "schema": {
-            "type": "array",
-            "format": "temporal_extent"
-          }
-        },
-        "bands": {
-          "description": "Filter by band id.",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "license": {
-          "description": "Filter by license.",
-          "schema": {
-            "type": "string",
-            "description": "SPDX License identifier, SPDX expression, or the string proprietary if the license is not on the SPDX license list.",
-            "examples": [
-              "Apache-2.0"
-            ]
-          }
-        }
-      },
-      "returns": {
-        "description": "Processed EO data.",
-        "schema": {
-          "type": "object",
-          "format": "eodata"
-        }
-      },
-      "examples": {
-        "Min": {
-          "description": "Loading a collection",
-          "process_graph": {
-            "process_id": "get_collection",
-            "name": "Sentinel2A-L1C"
-          }
-        },
-        "Full": {
-          "summary": "NDVI based on Sentinel 2",
-          "description": "Deriving minimum NDVI measurements over pixel time series of Sentinel 2 imagery.",
-          "process_graph": {
-            "process_id": "min_time",
-            "imagery": {
-              "process_id": "NDVI",
-              "imagery": {
-                "process_id": "filter_daterange",
-                "imagery": {
-                  "process_id": "get_collection",
-                  "name": {
-                    "variable_id": "collection",
-                    "type": "string",
-                    "default": "Sentinel2A-L1C"
-                  }
-                },
-                "extent": [
-                  "2017-01-01T00:00:00Z",
-                  "2017-01-31T23:59:59Z"
-                ]
-              },
-              "red": {
-                "variable_id": "red_band",
-                "type": "string",
-                "default": "B4"
-              },
-              "nir": {
-                "variable_id": "nir_band",
-                "type": "string",
-                "default": "B8"
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "get_results",
-      "summary": "Loads results from a job.",
-      "description": "Loads data that has been pre-processed by a batch job.",
-      "min_parameters": 1,
-      "parameters": {
-        "url": {
-          "description": "An URL to job results.",
-          "required": true,
-          "schema": {
-            "type": "string",
-            "format": "url",
-            "examples": [
-              "http://host.com/api/v1/jobs/12345/results"
-            ]
-          }
-        }
-      },
-      "returns": {
-        "description": "Processed EO data.",
-        "schema": {
-          "type": "object",
-          "format": "eodata"
-        }
-      },
-      "exceptions": {
-        "NotFound": {
-          "code": 101,
-          "description": "Data set doesn't exist."
-        },
-        "FileFormatNotSupported": {
-          "code": 102,
-          "description": "The file format of the specified data set is not supported to be read by the back-end."
-        }
-      }
-    },
-    {
-      "name": "filter_bands",
-      "summary": "Filters by bands.",
-      "description": "Allows to extract one or multiple bands of multi-band raster image collection.\nBands can be chosen either by band id, band name or by wavelength.\n\nimagery and at one of the other arguments is required to be specified.",
-      "min_parameters": 2,
-      "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
-        },
-        "bands": {
-          "description": "string or array of strings containing band ids.",
-          "schema": {
-            "type": [
-              "string",
-              "array"
-            ],
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "names": {
-          "description": "string or array of strings containing band names.",
-          "schema": {
-            "type": [
-              "string",
-              "array"
-            ],
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "wavelengths": {
-          "description": "Either a number specifying a specific wavelength or a two-element array of numbers specifying a minimum and maximum wavelength.",
+        "x": {
+          "description": "A number.",
           "schema": {
             "type": [
               "number",
-              "array"
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed absolute value.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": 3.5
+          },
+          "returns": 3.5
+        },
+        {
+          "arguments": {
+            "x": -0.4
+          },
+          "returns": 0.4
+        },
+        {
+          "arguments": {
+            "x": -3.5
+          },
+          "returns": 3.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/AbsoluteValue.html",
+          "title": "Absolute value explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "add_dimension",
+      "summary": "Adds a new dimension with the name in `dimension`.",
+      "description": "Adds a new dimension with the name in `dimension`.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "dimension_value": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "aggregate_temporal",
+      "summary": "Temporal aggregations",
+      "description": "Computes a temporal aggregation based on a list of date/datetime ranges. Will be projected to the labels. Length of labels and groups needs to be the same. All data along the dimensions will be passed through the reducer. Calendar hierarchies such as year, month, week etc. will be transformed from the clients into groups.",
+      "categories": [
+        "core",
+        "aggregate"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "groups": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "labels": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required": true
+        },
+        "reducer": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "aggregate_zonal",
+      "summary": "Zonal statistics for polygons",
+      "description": "Aggregates zonal data/statistics for one or multiple GeoJSON polygons. For focal aggregation see `apply`. Number of valid/invalid pixels get returned together with the calculated values.",
+      "categories": [
+        "core",
+        "aggregate"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "polygons": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "format": "geojson"
+            }
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "id": "and",
+      "summary": "Are all of the values true?",
+      "description": "Checks if **all** of the values are true.",
+      "categories": [
+        "logic"
+      ],
+      "parameters": {
+        "expressions": {
+          "description": "A set of boolean values.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if at least one value is true, `null` if any of the values is `null` and `ignore_nodata` is set to `false`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              true
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              false
             ],
-            "minItems": 2,
-            "maxItems": 2,
+            "ignore_nodata": false
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              false,
+              true,
+              false
+            ]
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "expression": [
+              false,
+              false
+            ]
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              true
+            ]
+          },
+          "returns": true
+        }
+      ]
+    },
+    {
+      "id": "apply_dimension",
+      "summary": "Applies an n-ary process.",
+      "description": "Applies an n-ary process to a raster image. `dimensions` are the dimensions over which to iterate, if not set all dimensions are iterated over.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "process": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "dimensions": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "apply",
+      "summary": "Applies a local/unary process to a raster image.",
+      "description": "Applies a local non-reducer to an image collection. Focal calculations can be made by setting the kernel. For zonal apply see `aggregate_zonal`. Returns a new image collection. The kernel has to be as many dimensions as the datacube has dimensions.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "process": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "kernel": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            ],
+            "default": 1
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "arccos",
+      "summary": "Inverse cosine",
+      "description": "Computes the arcus cosine of `x`. The arcus cosine is the inverse function of the cosine so that *arccos(cos(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 1
+        },
+        {
+          "process_graph": {
+            "cos1": {
+              "process_id": "cos",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arccos1": {
+              "process_id": "arccos",
+              "arguments": {
+                "x": {
+                  "from_node": "cos1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseCosine.html",
+          "title": "Inverse cosine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "arcosh",
+      "summary": "Inverse hyperbolic cosine",
+      "description": "Computes the inverse hyperbolic cosine of `x`. It is the inverse function of the hyperbolic cosine so that *arcosh(cosh(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 1
+        },
+        {
+          "process_graph": {
+            "cosh1": {
+              "process_id": "cosh",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arccosh1": {
+              "process_id": "arcosh",
+              "arguments": {
+                "x": {
+                  "from_node": "cosh1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseHyperbolicCosine.html",
+          "title": "Inverse hyperbolic cosine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "arcsin",
+      "summary": "Inverse sine",
+      "description": "Computes the arcus sine of `x`. The arcus sine is the inverse function of the sine so that *arcsin(sin(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "process_graph": {
+            "sin1": {
+              "process_id": "sin",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arcsin1": {
+              "process_id": "arcsin",
+              "arguments": {
+                "x": {
+                  "from_node": "sin1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseSine.html",
+          "title": "Inverse sine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "arctan",
+      "summary": "Inverse tangent",
+      "description": "Computes the arcus tangent of `x`. The arcus tangent is the inverse function of the tangent so that *arctan(tan(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "process_graph": {
+            "tan1": {
+              "process_id": "tan",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arctan1": {
+              "process_id": "arctan",
+              "arguments": {
+                "x": {
+                  "from_node": "tan1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseTangent.html",
+          "title": "Inverse tangent explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "arctan2",
+      "summary": "Inverse tangent of two numbers.",
+      "description": "Computes the arcus tangent of two numbers `x` and `y`. It is similar to calculating the arcus tangent of *y / x*, except that the signs of both arguments are used to determine the quadrant of the result.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameter_order": [
+        "y",
+        "x"
+      ],
+      "parameters": {
+        "y": {
+          "description": "A number to be used as dividend.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        },
+        "x": {
+          "description": "A number to be used as divisor.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "y": 0,
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "y": null,
+            "x": 1.5
+          },
+          "returns": null
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://en.wikipedia.org/wiki/Atan2",
+          "title": "Two-argument inverse tangent explained by Wikipedia"
+        }
+      ]
+    },
+    {
+      "id": "arsinh",
+      "summary": "Inverse hyperbolic sine",
+      "description": "Computes the inverse hyperbolic sine of `x`. It is the inverse function of the hyperbolic sine so that *arsinh(sinh(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "process_graph": {
+            "sinh1": {
+              "process_id": "sinh",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arcsinh1": {
+              "process_id": "arsinh",
+              "arguments": {
+                "x": {
+                  "from_node": "sinh1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseHyperbolicSine.html",
+          "title": "Inverse hyperbolic sine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "artanh",
+      "summary": "Inverse hyperbolic tangent",
+      "description": "Computes the inverse hyperbolic tangent of `x`. It is the inverse function of the hyperbolic tangent so that *artanh(tanh(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed angle in radians.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "process_graph": {
+            "cosh1": {
+              "process_id": "tanh",
+              "arguments": {
+                "x": 0.5
+              }
+            },
+            "arctanh1": {
+              "process_id": "artanh",
+              "arguments": {
+                "x": {
+                  "from_node": "tanh1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0.5
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/InverseHyperbolicTangent.html",
+          "title": "Inverse hyperbolic tangent explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "between",
+      "summary": "data is between min and max",
+      "description": "Alias for: `and([ gte( data, min ), lte( data, max ) ])`",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "min": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "max": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "ceil",
+      "summary": "Round fractions up",
+      "description": "The least integer greater than or equal to the number `x`.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > rounding"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number to round up.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The number rounded up.",
+        "schema": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": 3.5
+          },
+          "returns": 4
+        },
+        {
+          "arguments": {
+            "x": -0.4
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": -3.5
+          },
+          "returns": -3
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/CeilingFunction.html",
+          "title": "Ceiling explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "clip",
+      "summary": "Clips values between minimum and maximum values.",
+      "description": "Clips the image values between specified min and max values. All values larger than maximal value will have the maximal value, all values lower than minimal value will have the minimal value, alias for `replace(replace(image, gt(data, max), max), lt(data, min), min)`",
+      "categories": [
+        "math",
+        "masks"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "min": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "max": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "cos",
+      "summary": "Cosine",
+      "description": "Computes the cosine of `x`.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed cosine of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 1
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Cosine.html",
+          "title": "Cosine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "cosh",
+      "summary": "Hyperbolic cosine",
+      "description": "Computes the hyperbolic cosine of `x`.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed hyperbolic cosine of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 1
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/HyperbolicCosine.html",
+          "title": "Hyperbolic cosine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "count",
+      "summary": "Number of valid elements (see is_valid).",
+      "description": "Number of valid elements (see is_valid).",
+      "categories": [
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "create_collection",
+      "summary": "Creates a new collection without dimensions.",
+      "description": "Creates a new collection without dimensions.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {},
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cummax",
+      "summary": "Cumulative maxima",
+      "description": "The length of data stays the same.",
+      "categories": [
+        "math > cumulative"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cummin",
+      "summary": "Cumulative mimuma",
+      "description": "The length of data stays the same.",
+      "categories": [
+        "math > cumulative"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cumproduct",
+      "summary": "Cumulative products",
+      "description": "The length of data stays the same.",
+      "categories": [
+        "math > cumulative"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cumsum",
+      "summary": "Cumulative sums.",
+      "description": "The length of data stays the same.",
+      "categories": [
+        "math > cumulative"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "debug",
+      "summary": "Send debugging information to the client",
+      "description": "Sends debugging information about the data to the client, who needs to be subscribed to the topic `openeo.jobs.debug`.",
+      "categories": [
+        "development"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        },
+        "identifier": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "divide",
+      "summary": "x divided all other elements",
+      "description": "x divided all other elements",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "x": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "e",
+      "summary": "Euler's number (e)",
+      "description": "The real number *e* is a mathematical constant that is the base of the natural logarithm such that *ln(e) = 1*. The numerical value is approximately *2.71828*.",
+      "categories": [
+        "math > constants",
+        "math > exponential & logarithmic"
+      ],
+      "parameters": {},
+      "returns": {
+        "description": "Returns the numerical value of Euler's number.",
+        "schema": {
+          "type": "number"
+        }
+      },
+      "examples": [
+        {
+          "title": "Test for ln(e) = 1",
+          "process_graph": {
+            "e1": {
+              "process_id": "e",
+              "arguments": {}
+            },
+            "ln1": {
+              "process_id": "ln",
+              "arguments": {
+                "data": {
+                  "from_node": "e1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 1
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/e.html",
+          "title": "Mathematical constant e explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "eq",
+      "summary": "Equal to comparison",
+      "description": "Compares whether `x` is strictly equal to `y`.\n\n**Remarks:**\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* The temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y",
+        "delta",
+        "case_sensitive"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "delta": {
+          "description": "Only applicable for comparing two numbers. If this optional parameter is set to a positive non-zero number the equality of two numbers is checked against a delta value. This is especially useful to circumvent problems with floating point inaccuracy in machine-based computation.\n\nThis option is basically an alias for the following computation: `lte(abs(minus([x, y]), delta)`",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null
+          }
+        },
+        "case_sensitive": {
+          "description": "Only applicable for comparing two strings. Case sensitive comparison can be disabled by setting this parameter to `false`.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is equal to `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": 1
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": "1"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": 1.02,
+            "y": 1,
+            "delta": 0.01
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": -1,
+            "y": -1.001,
+            "delta": 0.01
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": 115,
+            "y": 110,
+            "delta": 10
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "Test",
+            "y": "test"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "Test",
+            "y": "test",
+            "case_sensitive": false
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "Ä",
+            "y": "ä",
+            "case_sensitive": false
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "00:00:00+00:00",
+            "y": "00:00:00Z"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00Z",
+            "y": "2018-01-01T12:00:00"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T00:00:00Z",
+            "y": "2018-01-01Z01:00:00+01:00"
+          },
+          "returns": true
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "exp",
+      "summary": "Exponentiation to the base e",
+      "description": "Exponential function to the base *e* raised to the power of `p`. This process is an alias for *e^p^* / `power(e(), p)`.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > exponential & logarithmic"
+      ],
+      "parameters": {
+        "p": {
+          "description": "The numerical exponent.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed value for *e* raised to the power of `p`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "p": 0
+          },
+          "returns": 1
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/ExponentialFunction.html",
+          "title": "Exponential function explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "export",
+      "summary": "Data export, compatible to GDAL/OGR.",
+      "description": "Export process that is compatible to GDAL/OGR formats and options. Passes through the collection, so that further intermediate results can be exported and further calculations can be processes.",
+      "categories": [
+        "core",
+        "export"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "format": "image-collection"
+              },
+              {
+                "type": "object",
+                "format": "vector-collection"
+              }
+            ]
+          },
+          "required": true
+        },
+        "format": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "options": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "extrema",
+      "summary": "Minimum and maximum values",
+      "description": "Two element array containing the minimum and the maximum values of `data`. Basically an alias for `min` and `max`, but potentially faster than calling both separately.",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "filter_bands",
+      "summary": "Filters the bands in the image collection",
+      "description": "The order of the bands matters!",
+      "categories": [
+        "core",
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "bands": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "filter_bbox",
+      "summary": "Limits the data to the specified bbox.",
+      "description": "Limits the data to the specified bbox.",
+      "categories": [
+        "core",
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "format": "image-collection"
+              },
+              {
+                "type": "object",
+                "format": "vector-collection"
+              }
+            ]
+          },
+          "required": true
+        },
+        "west": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "south": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "east": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "north": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "base": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          }
+        },
+        "height": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          }
+        },
+        "crs": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "filter_geometry",
+      "summary": "Limits the data to the specified geometry",
+      "description": "Limits the data to the specified geometry",
+      "categories": [
+        "core",
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "format": "image-collection"
+              },
+              {
+                "type": "object",
+                "format": "vector-collection"
+              }
+            ]
+          },
+          "required": true
+        },
+        "geometry": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "geojson"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "filter_temporal",
+      "summary": "Limits the data to the specified date range.",
+      "description": "Alias for filter() with callbacks to between_datetime(), between_date(), between_month() and between_year().",
+      "categories": [
+        "core",
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "format": "image-collection"
+              },
+              {
+                "type": "object",
+                "format": "vector-collection"
+              }
+            ]
+          },
+          "required": true
+        },
+        "from": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "to": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "filter",
+      "summary": "Filtering / Selecting data based on a logical expression",
+      "description": "Example: Filter by `instrument_mode` from STAC properties.",
+      "categories": [
+        "core",
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "object",
+                "format": "image-collection"
+              },
+              {
+                "type": "object",
+                "format": "vector-collection"
+              }
+            ]
+          },
+          "required": true
+        },
+        "expression": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "find_collection",
+      "summary": "Select and load an internal collection by properties.",
+      "description": "Select and load an internal collection by properties.",
+      "categories": [
+        "core",
+        "import"
+      ],
+      "parameters": {
+        "expression": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "first",
+      "summary": "First element of nums.",
+      "description": "First element of nums.",
+      "categories": [
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "floor",
+      "summary": "Round fractions down",
+      "description": "The greatest integer less than or equal to the number `x`.\n\nThis process is *not* an alias for the `int` process as defined by some mathematicians, see the examples for negative numbers in both processes for differences.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > rounding"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number to round down.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The number rounded down.",
+        "schema": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": 3.5
+          },
+          "returns": 3
+        },
+        {
+          "arguments": {
+            "x": -0.4
+          },
+          "returns": -1
+        },
+        {
+          "arguments": {
+            "x": -3.5
+          },
+          "returns": -4
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/FloorFunction.html",
+          "title": "Floor explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "get_collection",
+      "summary": "Load an internal collection by id",
+      "description": "Load a collection from the current back-end by collection id",
+      "categories": [
+        "core",
+        "import"
+      ],
+      "parameters": {
+        "id": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "get_process_graph",
+      "summary": "Load an internal process graph by id",
+      "description": "Load a process graph from the current back-end by process graph id",
+      "categories": [
+        "core",
+        "import"
+      ],
+      "parameters": {
+        "id": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "variables": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "id": "get_result",
+      "summary": "Load batch job results by id",
+      "description": "Load internal batch job results by job id.",
+      "categories": [
+        "core",
+        "import"
+      ],
+      "parameters": {
+        "id": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "get_udf",
+      "summary": "Load and run an internal UDF",
+      "description": "Load and run an internal UDF to be executed in the context of reduce, aggregate, apply, ...",
+      "categories": [
+        "import",
+        "udf"
+      ],
+      "parameters": {
+        "path": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "runtime_identifier": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "options": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "callback"
+        }
+      }
+    },
+    {
+      "id": "gt",
+      "summary": "Greater than comparison",
+      "description": "Compares whether `x` is strictly greater than `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* The temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is strictly greater than `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 0,
+            "y": 0
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": 2,
+            "y": 1
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": -0.5,
+            "y": -0.6
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "00:00:00Z",
+            "y": "00:00:00+01:00"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "1950-01-01T00:00:00Z",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00+00:00",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": false
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "gte",
+      "summary": "Greater than or equal to comparison",
+      "description": "Compares whether `x` is greater than or equal to `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* The temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is greater than or equal to `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 0,
+            "y": 0
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": 2
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": -0.5,
+            "y": -0.6
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "00:00:00Z",
+            "y": "00:00:00+01:00"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "1950-01-01T00:00:00Z",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00+00:00",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": true
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "if",
+      "summary": "Similar to an if-then-else construct.",
+      "description": "Similar to an if-then-else construct.",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "expression": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "param1": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        },
+        "accept": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed.",
+            "default": true
+          }
+        },
+        "reject": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed.",
+            "default": false
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "import_process_graph",
+      "summary": "Load an external process graph by url",
+      "description": "Load an external process graph by url",
+      "categories": [
+        "import"
+      ],
+      "parameters": {
+        "url": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "variables": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "id": "import_result",
+      "summary": "Load external batch job results by url",
+      "description": "Load an external batch job results by url",
+      "categories": [
+        "import"
+      ],
+      "parameters": {
+        "url": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "format": "image-collection"
+            },
+            {
+              "type": "object",
+              "format": "vector-collection"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "import_udf",
+      "summary": "Load and run an external UDF",
+      "description": "Load and run an external UDF to be executed in the context of reduce, aggregate, apply, …Examples: import_udf(‘https://hub.openeo.org/udf/wur/bfast’); Maybe also just import_udf(‘hub://bfast’)",
+      "categories": [
+        "import",
+        "udf"
+      ],
+      "parameters": {
+        "url": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "runtime_identifier": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "options": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "callback"
+        }
+      }
+    },
+    {
+      "id": "int",
+      "summary": "Integer part of a number",
+      "description": "The integer part of the real number `x`.\n\nThis process is *not* an alias for the `floor` process as defined by some mathematicians, see the examples for negative numbers in both processes for differences.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math",
+        "math > rounding"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Integer part of the number.",
+        "schema": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": 3.5
+          },
+          "returns": 3
+        },
+        {
+          "arguments": {
+            "x": -0.4
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": -3.5
+          },
+          "returns": -3
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/IntegerPart.html",
+          "title": "Integer Part explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "is_nan",
+      "summary": "Checks whether data is not a number.",
+      "description": "Checks whether data is not a number.",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "is_nodata",
+      "summary": "Checks for missing data",
+      "description": "Checks whether the specified data is missing data, i.e. equals to one of the no-data values or null.",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "is_valid",
+      "summary": "Checks for valid data",
+      "description": "Checks whether the data is a non-missing and finite number.",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "last",
+      "summary": "Last element of nums.",
+      "description": "Last element of nums.",
+      "categories": [
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "linear_scale_range",
+      "summary": "Performs a linear transformation between the input and output range.",
+      "description": "Performs a linear transformation between the input and output range.",
+      "categories": [
+        "math"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        },
+        "inputMin": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "inputMax": {
+          "description": "",
+          "schema": {
+            "type": "number"
+          },
+          "required": true
+        },
+        "outputMin": {
+          "description": "",
+          "schema": {
+            "type": "number",
+            "default": 0
+          }
+        },
+        "outputMax": {
+          "description": "",
+          "schema": {
+            "type": "number",
+            "default": 1
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "list_contains",
+      "summary": "Array contains the specified element",
+      "description": "Array contains the specified element",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "description": "Mixed values, any data type allowed."
+            }
+          },
+          "required": true
+        },
+        "element": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "list_value",
+      "summary": "Value of the element at the specified index.",
+      "description": "Value of the element at the specified index.",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "description": "Mixed values, any data type allowed."
+            }
+          },
+          "required": true
+        },
+        "index": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "description": "Mixed values, any data type allowed."
+        }
+      }
+    },
+    {
+      "id": "ln",
+      "summary": "Natural logarithm",
+      "description": "The natural logarithm is the logarithm to the base *e* of the number `x`. This process is an alias for the *log* process with the base set to *e*: `log(x, e())`. The natural logarithm is the inverse function of taking *e* to the power x.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > exponential & logarithmic"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number to compute the natural logarithm for.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed natural logarithm.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "title": "Example for ln(e) = 1",
+          "process_graph": {
+            "e1": {
+              "process_id": "e",
+              "arguments": {}
+            },
+            "ln1": {
+              "process_id": "ln",
+              "arguments": {
+                "data": {
+                  "from_node": "e1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 1
+        },
+        {
+          "arguments": {
+            "x": 1
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/NaturalLogarithm.html",
+          "title": "Natural logarithm explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "log",
+      "summary": "Logarithm to a base",
+      "description": "Logarithm to the base `base` of the number `x` is defined to be the inverse function of taking b to the power of x.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > exponential & logarithmic"
+      ],
+      "parameter_order": [
+        "x",
+        "base"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number to compute the logarithm for.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        },
+        "base": {
+          "description": "The numerical base.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed logarithm.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 10,
+            "base": 10
+          },
+          "returns": 1
+        },
+        {
+          "arguments": {
+            "x": 2,
+            "base": 2
+          },
+          "returns": 1
+        },
+        {
+          "arguments": {
+            "x": 4,
+            "base": 2
+          },
+          "returns": 2
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "base": 16
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Logarithm.html",
+          "title": "Logarithm explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "lt",
+      "summary": "Less than comparison",
+      "description": "Compares whether `x` is strictly less than `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* The temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is strictly less than `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 0,
+            "y": 0
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": 2
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": -0.5,
+            "y": -0.6
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "00:00:00+01:00",
+            "y": "00:00:00Z"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "1950-01-01T00:00:00Z",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00+00:00",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": false
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "lte",
+      "summary": "Less than or equal to comparison",
+      "description": "Compares whether `x` is less than or equal to `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* The temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is less than or equal to `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 0,
+            "y": 0
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": 2
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": -0.5,
+            "y": -0.6
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "00:00:00+01:00",
+            "y": "00:00:00Z"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "1950-01-01T00:00:00Z",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00+00:00",
+            "y": "2018-01-01T12:00:00Z"
+          },
+          "returns": true
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "mask",
+      "summary": "Apply a mask.",
+      "description": "Compares the parallel elements and replaces all non-zero or true elements with `replacement`. Defaults to null/no-data.",
+      "categories": [
+        "masks"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "mask": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "replacement": {
+          "description": "",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "max",
+      "summary": "Maximum value",
+      "description": "Maximum value",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "mean",
+      "summary": "Arithmetic mean (average)",
+      "description": "Arithmetic mean (average)",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "median",
+      "summary": "Median",
+      "description": "alias for: `quantiles(data, 0.5)`",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "merge_collections",
+      "summary": "Merging two collections",
+      "description": "The collections have to be compatible. Is the inverse of a split if there is no overlap. If data overlaps the overlap resolver must be specified to resolve the overlap. Doesn’t add dimensions.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "other": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "overlap_resolver": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "min",
+      "summary": "Minimum value",
+      "description": "Minimum value",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "minus",
+      "summary": "x minus all other elements",
+      "description": "x minus all other elements",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "x": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "mod",
+      "summary": "Modulo",
+      "description": "Remainder after division of x by y.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math"
+      ],
+      "parameters": {
+        "x": {
+          "description": "",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "NDVI",
+      "summary": "Normalized Difference Vegetation Index",
+      "description": "Alias for `normalized_difference`, which determines the bands automatically based on common_names (“red”/”nir”). Bands are replaced.",
+      "categories": [
+        "math > indices",
+        "vegetation_indices"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "neq",
+      "summary": "Not equal to comparison",
+      "description": "Compares whether `x` is *not* strictly equal to `y`. This process is an alias for: `not(eq(val1, val2))`.\n\n**Remarks:**\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* The temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
+      "categories": [
+        "filter"
+      ],
+      "parameter_order": [
+        "x",
+        "y",
+        "delta",
+        "case_sensitive"
+      ],
+      "parameters": {
+        "x": {
+          "description": "First operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "y": {
+          "description": "Second operand.",
+          "schema": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
+          },
+          "required": true
+        },
+        "delta": {
+          "description": "Only applicable for comparing two numbers. If this optional parameter is set to a positive non-zero number the non-equality of two numbers is checked against a delta value. This is especially useful to circumvent problems with floating point inaccuracy in machine-based computation.\n\nThis option is basically an alias for the following computation: `gt(abs(minus([x, y]), delta)`",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null
+          }
+        },
+        "case_sensitive": {
+          "description": "Only applicable for comparing two strings. Case sensitive comparison can be disabled by setting this parameter to `false`.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if `x` is *not* equal to `y`, `null` if any of the operands is `null`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 1,
+            "y": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": 1
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": 1,
+            "y": "1"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": 1.02,
+            "y": 1,
+            "delta": 0.01
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": -1,
+            "y": -1.001,
+            "delta": 0.01
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": 115,
+            "y": 110,
+            "delta": 10
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "Test",
+            "y": "test"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "Test",
+            "y": "test",
+            "case_sensitive": false
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "Ä",
+            "y": "ä",
+            "case_sensitive": false
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "00:00:00+00:00",
+            "y": "00:00:00Z"
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T12:00:00Z",
+            "y": "2018-01-01T12:00:00"
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "x": "2018-01-01T00:00:00Z",
+            "y": "2018-01-01Z01:00:00+01:00"
+          },
+          "returns": false
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "normalized_difference",
+      "summary": "Normalized difference between between two bands.",
+      "description": "Computes the normalized difference between two bands. The normalized difference is computed as (band1 − band2) / (band1 + band2). Bands are replaced.",
+      "categories": [
+        "math > indices",
+        "vegetation_indices"
+      ],
+      "parameters": {
+        "band1": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "band2": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "not",
+      "summary": "Inverting a boolean",
+      "description": "Inverts a single boolean so that `true` gets `false` and `false` gets `true`.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "logic"
+      ],
+      "parameters": {
+        "expression": {
+          "description": "Boolean value to invert.",
+          "schema": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "Inverted boolean value.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "expression": null
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "expression": false
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expression": true
+          },
+          "returns": false
+        }
+      ]
+    },
+    {
+      "id": "or",
+      "summary": "Is at least one value true?",
+      "description": "Checks if **at least one** of the values is true.",
+      "categories": [
+        "logic"
+      ],
+      "parameters": {
+        "expressions": {
+          "description": "A set of boolean values.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if at least one value is true, `null` if any of the values is `null` and `ignore_nodata` is set to `false`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              false
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              false
+            ],
+            "ignore_nodata": false
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              false,
+              true,
+              false
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              false
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expression": [
+              false,
+              false
+            ]
+          },
+          "returns": false
+        }
+      ]
+    },
+    {
+      "id": "order",
+      "summary": "Returns a permutation for sorting.",
+      "description": "Computes a permutation which allows rearranging the data into ascending or descending order. Ties will be left in their original ordering.",
+      "categories": [
+        "sorting"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": true
+        },
+        "asc": {
+          "description": "",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "id": "output",
+      "summary": "Output information to the client",
+      "description": "Outputs the data to the client, who needs to be subscribed to the topic `openeo.jobs.output`.",
+      "categories": [
+        "development"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        },
+        "identifier": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "pi",
+      "summary": "Pi (π)",
+      "description": "The real number Pi (π) is a mathematical constant that is the ratio of the circumference of a circle to its diameter. The numerical value is approximately *3.14159*.",
+      "categories": [
+        "math > constants",
+        "math > trigonometric"
+      ],
+      "parameters": {},
+      "returns": {
+        "description": "Returns the numerical value of Pi.",
+        "schema": {
+          "type": "number"
+        }
+      },
+      "examples": [
+        {
+          "title": "Test for sin(π) = 0",
+          "process_graph": {
+            "pi1": {
+              "process_id": "pi",
+              "arguments": {}
+            },
+            "sin1": {
+              "process_id": "sin",
+              "arguments": {
+                "data": {
+                  "from_node": "pi1"
+                }
+              },
+              "result": true
+            }
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Pi.html",
+          "title": "Mathematical constant Pi explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "power",
+      "summary": "Exponentiation",
+      "description": "Computes the exponentiation for the base `base` raised to the power of `p`.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math",
+        "math > exponential & logarithmic"
+      ],
+      "parameter_order": [
+        "base",
+        "p"
+      ],
+      "parameters": {
+        "base": {
+          "description": "The numerical base.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        },
+        "p": {
+          "description": "The numerical exponent.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed value for `base` raised to the power of `p`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "base": 0,
+            "p": 2
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "base": 2.5,
+            "p": 0
+          },
+          "returns": 1
+        },
+        {
+          "arguments": {
+            "base": 3,
+            "p": 3
+          },
+          "returns": 27
+        },
+        {
+          "arguments": {
+            "base": 5,
+            "p": -1
+          },
+          "returns": 0.2
+        },
+        {
+          "arguments": {
+            "base": 1,
+            "p": 0.5
+          },
+          "returns": 1
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Power.html",
+          "title": "Power explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "product",
+      "summary": "product of all elements",
+      "description": "product of all elements",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "property",
+      "summary": "Retrieve metadata",
+      "description": "Get information about a collection of attributes for data in a collection. Useful for filtering collections and data in collections.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "description": "Mixed values, any data type allowed."
+          },
+          "required": true
+        },
+        "name": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "description": "Mixed values, any data type allowed."
+        }
+      }
+    },
+    {
+      "id": "quantiles",
+      "summary": "Calculates quantiles",
+      "description": "Calculates quantiles for each specified `quantiles` between 0 and 1.",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "quantiles": {
+          "description": "",
+          "schema": {
+            "type": "array",
             "items": {
               "type": "number"
             }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
           }
         }
       },
       "returns": {
-        "description": "Processed EO data.",
+        "description": "",
         "schema": {
-          "type": "object",
-          "format": "eodata"
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
         }
       }
     },
     {
-      "name": "filter_daterange",
-      "summary": "Filters by temporal extent.",
+      "id": "rearrange",
+      "summary": "Rearranges a list based on a permutation.",
+      "description": "Rearranges a list based on a permutation.",
+      "categories": [
+        "sorting"
+      ],
       "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
-        },
-        "extent": {
-          "description": "Temporal extent specified by a start and an end time, each formatted as a [RFC 3339](https://www.ietf.org/rfc/rfc3339) date-time. Open date ranges are supported and can be specified by setting one of the times to null. Setting both entries to null is not allowed.",
+        "data": {
+          "description": "",
           "schema": {
             "type": "array",
-            "format": "temporal_extent",
-            "required": true,
-            "examples": [
-                [
-                "2016-01-01T00:00:00Z",
-                "2017-10-01T00:00:00Z"
-              ]
-            ],
             "items": {
-              "type": [
-                "string",
-                "null"
-              ],
-              "format": "date-time",
-              "minItems": 2,
-              "maxItems": 2
+              "description": "Mixed values, any data type allowed."
             }
-          }
+          },
+          "required": true
+        },
+        "order": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "required": true
         }
       },
       "returns": {
-        "description": "Processed EO data.",
+        "description": "",
         "schema": {
-          "type": "object",
-          "format": "eodata"
+          "type": "array",
+          "items": {
+            "description": "Mixed values, any data type allowed."
+          }
         }
       }
     },
     {
-      "name": "process_graph",
-      "summary": "Loads another process graph.",
-      "description": "Loads another process graph and applies it to the specified imagery. This can be an externally hosted process graph.",
+      "id": "reduce",
+      "summary": "reduce dimensions - lower dimensionality, same resolution.",
+      "description": "reduce dimensions - lower dimensionality, same resolution.",
+      "categories": [
+        "core",
+        "reducer"
+      ],
       "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
+        "data": {
+          "description": "",
           "schema": {
             "type": "object",
-            "format": "eodata"
-          }
+            "format": "image-collection"
+          },
+          "required": true
         },
-        "url": {
-          "description": "An URL to a process graph.",
-          "required": true,
+        "reducer": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "callback"
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "resample_spatial",
+      "summary": "Resample spatial dimension",
+      "description": "Resample spatial dimension",
+      "categories": [
+        "core",
+        "aggregate"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "method": {
+          "description": "",
           "schema": {
             "type": "string",
-            "format": "url",
-            "examples": [
-              "http://otherhost.org/api/v1/users/12345/process_graphs/abcdef"
-            ]
+            "default": null
           }
         },
-        "variables": {
-          "description": "An object holding key-value-pairs with values for variables that are defined by the process graph. The key of the pair has to be the corresponding `variable_id` for the value specified. The replacement for the variable is the value of the pair.",
+        "target": {
+          "description": "",
           "schema": {
             "type": "object",
-            "additionalProperties": true
-          }
+            "format": "image-collection"
+          },
+          "required": true
         }
       },
       "returns": {
-        "description": "Processed EO data.",
+        "description": "",
         "schema": {
           "type": "object",
-          "format": "eodata"
-        }
-      },
-      "exceptions": {
-        "NotFound": {
-          "code": 101,
-          "description": "Process graph doesn't exist."
-        },
-        "NotReadable": {
-          "code": 102,
-          "description": "Process graph can't be parsed."
+          "format": "image-collection"
         }
       }
     },
     {
-      "name": "filter_bbox",
-      "summary": "Filters by spatial extent.",
+      "id": "resample_temporal",
+      "summary": "resample temporal dimension",
+      "description": "if dimension is not set, the collection is expected to have only one temporal simension.",
+      "categories": [
+        "core",
+        "aggregate"
+      ],
       "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
+        "data": {
+          "description": "",
           "schema": {
             "type": "object",
-            "format": "eodata"
+            "format": "image-collection"
+          },
+          "required": true
+        },
+        "method": {
+          "description": "",
+          "schema": {
+            "type": "string",
+            "default": null
           }
         },
-        "extent": {
-          "description": "Spatial extent, may include a vertical axis (height or depth).",
+        "target": {
+          "description": "",
           "schema": {
             "type": "object",
-            "format": "spatial_extent",
-            "required": [
-              "west",
-              "east",
-              "north",
-              "south"
-            ],
-            "properties": {
-              "crs": {
-                "description": "Coordinate reference system. EPSG codes must be supported. In addition, proj4 strings should be supported by back-ends. Whenever possible, it is recommended to use EPSG codes instead of proj4 strings.\nDefaults to `EPSG:4326` unless the client explicitly requests a different coordinate reference system.",
-                "type": "string",
-                "default": "EPSG:4326"
-              },
-              "west": {
-                "description": "Lower left corner, coordinate axis 1 (west).",
-                "type": "number"
-              },
-              "east": {
-                "description": "Upper right corner, coordinate axis 1 (east).",
-                "type": "number"
-              },
-              "north": {
-                "description": "Lower left corner, coordinate axis 2 (north).",
-                "type": "number"
-              },
-              "south": {
-                "description": "Upper right corner, coordinate axis 2 (south).",
-                "type": "number"
-              },
-              "base": {
-                "description": "Lower left corner, coordinate axis 3 (base, optional).",
-                "type": "number"
-              },
-              "height": {
-                "description": "Upper right corner, coordinate axis 3 (height, optional).",
-                "type": "number"
-              }
-            }
-          }
-        }
-      },
-      "returns": {
-        "description": "Processed EO data.",
-        "schema": {
-          "type": "object",
-          "format": "eodata"
-        }
-      }
-    },
-    {
-      "name": "NDVI",
-      "summary": "Calculates the Normalized Difference Vegetation Index.",
-      "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
+            "format": "image-collection"
+          },
+          "required": true
         },
-        "red": {
-          "description": "Band id of the red band.",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        "nir": {
-          "description": "Band id of the near-infrared band.",
-          "required": true,
+        "dimension": {
+          "description": "",
           "schema": {
             "type": "string"
           }
         }
       },
       "returns": {
-        "description": "Processed EO data.",
+        "description": "",
         "schema": {
           "type": "object",
-          "format": "eodata"
-        }
-      },
-      "exceptions": {
-        "RedBandInvalid": {
-          "description": "The specified red band is not available or contains invalid data."
-        },
-        "NirBandInvalid": {
-          "description": "The specified nir band is not available or contains invalid data."
+          "format": "image-collection"
         }
       }
     },
     {
-      "name": "min_time",
-      "summary": "Calculates minimum values of time series.",
-      "description": "Finds the minimum value of time series for all bands of the input dataset.",
+      "id": "round",
+      "summary": "Rounds to a specified precision",
+      "description": "Rounds a real number `x` to specified precision `p`.\n\nIf the fractional part of `x` is halfway between two integers, one of which is even and the other odd, then the even number is returned.\nThis behavior follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935). This kind of rounding is also called \"rounding to nearest\" or \"banker's rounding\". It minimizes rounding errors that result from consistently rounding a midpoint value in a single direction.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > rounding"
+      ],
+      "parameter_order": [
+        "x",
+        "p"
+      ],
       "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
-        }
-      },
-      "returns": {
-        "description": "Processed EO data.",
-        "schema": {
-          "type": "object",
-          "format": "eodata"
-        }
-      }
-    },
-    {
-      "name": "max_time",
-      "summary": "Calculates maximum values of time series.",
-      "description": "Finds the maximum value of time series for all bands of the input dataset.",
-      "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
-        }
-      },
-      "returns": {
-        "description": "Processed EO data.",
-        "schema": {
-          "type": "object",
-          "format": "eodata"
-        }
-      }
-    },
-    {
-      "name": "zonal_statistics",
-      "summary": "Calculates zonal statistics.",
-      "description": "Calculates statistics for each zone specified in a file.",
-      "parameters": {
-        "imagery": {
-          "description": "EO data to process.",
-          "required": true,
-          "schema": {
-            "type": "object",
-            "format": "eodata"
-          }
-        },
-        "regions": {
-          "description": "GeoJSON or a path to a GeoJSON file containing the regions. For paths you must specify the path to a user-uploaded file without the user id in the path.",
-          "required": true,
+        "x": {
+          "description": "A number to round.",
           "schema": {
             "type": [
-              "object",
-              "string"
+              "number",
+              "null"
             ]
-          }
+          },
+          "required": true
         },
-        "func": {
-          "description": "Statistical function to calculate for the specified zones.",
-          "required": true,
+        "p": {
+          "description": "A positive number specifies the number of digits after the decimal point to round to. A negative number means rounding to a power of ten, so for example *-2* rounds to the nearest hundred. Defaults to *0*.",
           "schema": {
-            "type": "string",
-            "enum": [
-              "min",
-              "max",
-              "mean",
-              "median",
-              "mod"
-            ]
-          }
-        },
-        "scale": {
-          "description": "A nominal scale in meters of the projection to work in.",
-          "schema": {
-            "type": "number",
-            "default": 1000
-          }
-        },
-        "interval": {
-          "description": "Interval to group the time series.",
-          "schema": {
-            "type": "string",
-            "enum": [
-              "day",
-              "week",
-              "month",
-              "year"
-            ],
-            "default": "day"
+            "type": "integer",
+            "default": 0
           }
         }
       },
       "returns": {
-        "description": "Processed EO data.",
+        "description": "The rounded number.",
         "schema": {
-          "type": "object",
-          "format": "eodata"
+          "type": [
+            "number",
+            "null"
+          ]
         }
       },
-      "exceptions": {
-        "FileNotFound": {
-          "description": "The specified file does not exist."
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
         },
-        "GeoJsonInvalid": {
-          "description": "The GeoJSON object is invalid."
+        {
+          "arguments": {
+            "x": 3.56,
+            "p": 1
+          },
+          "returns": 3.6
+        },
+        {
+          "arguments": {
+            "x": -0.4444444,
+            "p": 2
+          },
+          "returns": -0.44
+        },
+        {
+          "arguments": {
+            "x": -2.5
+          },
+          "returns": -2
+        },
+        {
+          "arguments": {
+            "x": -3.5
+          },
+          "returns": -4
+        },
+        {
+          "arguments": {
+            "x": 1234.5,
+            "p": -2
+          },
+          "returns": 1200
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/AbsoluteValue.html",
+          "title": "Absolute value explained by Wolfram MathWorld"
+        },
+        {
+          "rel": "about",
+          "href": "https://ieeexplore.ieee.org/document/4610935",
+          "title": "IEEE Standard 754-2008 for Floating-Point Arithmetic"
+        }
+      ]
+    },
+    {
+      "id": "run_udf_container",
+      "summary": "Runs an externally hosted UDF container that follows the openEO UDF specification.",
+      "description": "Runs an externally hosted UDF container that follows the openEO UDF specification.",
+      "categories": [
+        "import",
+        "udf"
+      ],
+      "parameters": {
+        "url": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "options": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "callback"
         }
       }
+    },
+    {
+      "id": "run_udf",
+      "summary": "Runs user submitted code as UDF",
+      "description": "Runs user submitted code as UDF",
+      "categories": [
+        "import",
+        "udf"
+      ],
+      "parameters": {
+        "code": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "runtime_identifier": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        },
+        "options": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "callback"
+        }
+      }
+    },
+    {
+      "id": "sd",
+      "summary": "Calculate sample standard deviation",
+      "description": "Calculate sample standard deviation",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sgn",
+      "summary": "Signum",
+      "description": "Signum of `data`: 1 if num > 0, 0 if num = 0, -1 if num < 0.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sin",
+      "summary": "Sine",
+      "description": "Computes the sine of `x`.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed sine of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Sine.html",
+          "title": "Sine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "sinh",
+      "summary": "Hyperbolic sine",
+      "description": "Computes the hyperbolic sine of `x`.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed hyperbolic sine of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/HyperbolicSine.html",
+          "title": "Hyperbolic sine explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "sort",
+      "summary": "Sort data",
+      "description": "Sorts `data` into ascending (default) or descending order. Removes no-data values. Basically an alias to rearrange()",
+      "categories": [
+        "sorting"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "asc": {
+          "description": "",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "sqrt",
+      "summary": "Square root",
+      "description": "Computes the square root of a real number `x`. This process is an alias for `x` to the power of *0.5*: `power(x, 0.5)`.\n\nA square root of x is a number a such that *a^2^ = x*. Therefore, the square root is the inverse function of a to the power of 2, but only for *a >= 0*.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math",
+        "math > exponential & logarithmic"
+      ],
+      "parameters": {
+        "x": {
+          "description": "A number.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed square root.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        },
+        {
+          "arguments": {
+            "x": 1
+          },
+          "returns": 1
+        },
+        {
+          "arguments": {
+            "x": 9
+          },
+          "returns": 3
+        },
+        {
+          "arguments": {
+            "x": null
+          },
+          "returns": null
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/SquareRoot.html",
+          "title": "Square root explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "sum",
+      "summary": "sum of all elements",
+      "description": "sum of all elements",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tan",
+      "summary": "Tangent",
+      "description": "Computes the tangent of `x`. The tangent is defined to be the sine of x divided by the cosine of x.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed tangent of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/Tangent.html",
+          "title": "Tangent explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "tanh",
+      "summary": "Hyperbolic tangent",
+      "description": "Computes the hyperbolic tangent of `x`. The tangent is defined to be the hyperbolic sine of x divided by the hyperbolic cosine of x.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "categories": [
+        "math > trigonometric"
+      ],
+      "parameters": {
+        "x": {
+          "description": "An angle in radians.",
+          "schema": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The computed hyperbolic tangent of `x`.",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "x": 0
+          },
+          "returns": 0
+        }
+      ],
+      "links": [
+        {
+          "rel": "about",
+          "href": "http://mathworld.wolfram.com/HyperbolicTangent.html",
+          "title": "Hyperbolic tangent explained by Wolfram MathWorld"
+        }
+      ]
+    },
+    {
+      "id": "text_begins",
+      "summary": "Text begins with another text",
+      "description": "Text begins with another text",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "pattern": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "case_sensitive": {
+          "description": "",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "text_contains",
+      "summary": "Text contains another text",
+      "description": "Text contains another text",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "pattern": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "case_sensitive": {
+          "description": "",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "text_ends",
+      "summary": "Text ends with another text",
+      "description": "Text ends with another text",
+      "categories": [
+        "filter"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "pattern": {
+          "description": "",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "case_sensitive": {
+          "description": "",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "id": "trim",
+      "summary": "Removes slices with no-data.",
+      "description": "Alias. If the dimension is irregular categorical then slices in the middle can be removed.",
+      "categories": [
+        "core"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "object",
+            "format": "image-collection"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": "object",
+          "format": "image-collection"
+        }
+      }
+    },
+    {
+      "id": "var",
+      "summary": "Calculate sample variance",
+      "description": "Calculate sample variance",
+      "categories": [
+        "math",
+        "reducer"
+      ],
+      "parameters": {
+        "data": {
+          "description": "",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "",
+        "schema": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "id": "xor",
+      "summary": "Is exactly one value true?",
+      "description": "Checks if **exactly one** of the values is true.",
+      "categories": [
+        "logic"
+      ],
+      "parameters": {
+        "expressions": {
+          "description": "A set of boolean values.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": true
+        },
+        "ignore_nodata": {
+          "description": "Indicates whether no-data values are ignored or not. Ignores them by default. Setting this flag to `false` considers no-data values so that `null` is returned if any value is such a value.",
+          "schema": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "returns": {
+        "description": "Returns `true` if at least one value is true, `null` if any of the values is `null` and `ignore_nodata` is set to `false`, otherwise `false`.",
+        "schema": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              false
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expressions": [
+              true,
+              null,
+              false
+            ],
+            "ignore_nodata": false
+          },
+          "returns": null
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              false,
+              true,
+              false
+            ]
+          },
+          "returns": false
+        },
+        {
+          "arguments": {
+            "expression": [
+              true,
+              false
+            ]
+          },
+          "returns": true
+        },
+        {
+          "arguments": {
+            "expression": [
+              false,
+              false
+            ]
+          },
+          "returns": false
+        }
+      ]
     }
   ],
   "links": [
