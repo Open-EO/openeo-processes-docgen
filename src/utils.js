@@ -88,7 +88,7 @@ var Utils = {
                     }
                     examples.push(example);
                 }
-                process.examplex = examples;
+                process.examples = examples;
             }
         }
         return process;
