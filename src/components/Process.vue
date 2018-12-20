@@ -35,17 +35,16 @@
 
 			<section class="parameters">
 				<h3>Parameters</h3>
-				<em class="min-parameters" v-if="process.min_parameters > 0">Minimum number of parameters to be used: {{ process.min_parameters }}</em>
-				<div v-for="(param, name) in process.parameters" :key="name">
+				<div v-for="(param, i) in process.parameters" :key="i">
 					<h4>
-						<code>{{ name }}</code>
+						<code>{{ param.name }}</code>
 						<strong class="required" v-if="param.required === true" title="required">*</strong>
 						<strong class="deprecated" v-if="param.deprecated === true">deprecated</strong>
 					</h4>
 					<div class="details">
 						<Description v-if="param.description" :description="param.description" />
 						<p class="media-type" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
-						<div class="json-schema-container">
+						<div class="json-schema-container" v-if="param.schema">
 							<JsonSchema :schema="param.schema" />
 						</div>
 					</div>
@@ -57,7 +56,7 @@
 				<h3>Return Value</h3>
 				<Description v-if="process.returns.description" :description="process.returns.description" />
 				<p class="media-type" v-if="process.returns.media_type"><strong>Media (MIME) type: </strong>{{ process.returns.media_type }}</p>
-				<div class="json-schema-container">
+				<div class="json-schema-container" v-if="process.returns.schema">
 					<JsonSchema :schema="process.returns.schema" />
 				</div>
 			</section>

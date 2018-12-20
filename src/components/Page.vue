@@ -36,21 +36,7 @@ export default {
 	},
 	watch: {
 		processes() {
-			this.preparedProcesses = this.prepare(this.processes);
-		}
-	},
-	methods: {
-		prepare(processes) {
-			// Compatibility for openEO API v0.3 and v0.4
-			processes = processes.map(Utils.convertProcessToLatestSpec);
-			if (this.config.sortProcessesById === true) {
-				processes.sort((a, b) => {
-					var s1 = a.id.toLowerCase();
-					var s2 = b.id.toLowerCase();
-					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
-				});
-			}
-			return processes;
+			this.preparedProcesses = Utils.normalizeProcesses(this.processes, this.config.sortProcessesById);
 		}
 	}
 }
