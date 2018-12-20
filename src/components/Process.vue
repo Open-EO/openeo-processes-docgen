@@ -69,6 +69,7 @@
 						<span class="http-code" v-if="exception.http"> — HTTP {{ exception.http }}</span>
 						<span class="error-code" v-if="exception.code"> — {{ exception.code }}</span>
 						<Description v-if="exception.description" :description="exception.description" />
+						<div v-if="exception.message" class="message">Message: <em>{{ exception.message }}</em></div>
 					</li>
 				</ul>
 			</section>
@@ -196,5 +197,12 @@ strong.deprecated {
 }
 .exception code {
 	font-weight: bold;
+}
+.exception .styled-description {
+	margin: 0.5em 0;
+}
+.exception .message {
+	margin: 0.5em 0;
+	font-size: 0.8em;
 }
 </style>
