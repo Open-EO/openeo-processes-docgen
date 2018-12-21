@@ -20,15 +20,24 @@ export default {
 </script>
 
 <style>
+.styled-description {
+	line-height: 1.25em;
+}
 .styled-description pre {
-	background-color: #eee; 
+	background-color: #eee;
 	width: 100%;
 	border: 1px solid #ccc;
 	max-height: 15em;
 	overflow-y: auto;
 }
 .styled-description pre code {
+	background-color: transparent; 
 	display: block;
 	margin: 0.5em;
+}
+.styled-description code {
+	color: maroon;
+	display: inline-block;
+	padding: 0 0.1em;
 }
 </style>
