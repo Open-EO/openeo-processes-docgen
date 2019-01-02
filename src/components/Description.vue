@@ -10,25 +10,37 @@ export default {
 	props: ['description'],
 	methods: {
 		markup(text) {
+			// Parse our extension to CommonMark, which allows linking to other processes.
+			text = text.replace(/(?<!\b)@(\w+)\b/g, '<a href="#$1">$1</a>');
+			// Parse CommonMark
 			var reader = new commonmark.Parser();
 			var writer = new commonmark.HtmlRenderer();
 			var parsed = reader.parse(text);
 			return writer.render(parsed);
-		},
+		}
 	}
 }
 </script>
 
 <style>
+.styled-description {
+	line-height: 1.25em;
+}
 .styled-description pre {
-	background-color: #eee; 
+	background-color: #eee;
 	width: 100%;
 	border: 1px solid #ccc;
 	max-height: 15em;
 	overflow-y: auto;
 }
 .styled-description pre code {
+	background-color: transparent; 
 	display: block;
 	margin: 0.5em;
+}
+.styled-description code {
+	color: maroon;
+	display: inline-block;
+	padding: 0 0.1em;
 }
 </style>

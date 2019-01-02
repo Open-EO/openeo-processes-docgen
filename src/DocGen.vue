@@ -155,7 +155,7 @@ export default {
 	margin: 0.25em 0;
 }
 .docgen li p {
-	margin: 0;
+	margin: 0 0 0.25em 0;
 }
 .docgen a {
 	color: #2F649A;

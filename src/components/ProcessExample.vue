@@ -47,7 +47,7 @@ export default {
 				var name = this.process.parameter_order[i];
 				if (typeof this.example.arguments[name] !== 'undefined') {
 					var arg = this.example.arguments[name];
-					params.push('<span class="argument">' + JSON.stringify(arg) + '</span>');
+					params.push('<span class="param-name">' + name + '</span> = <span class="argument">' + JSON.stringify(arg) + '</span>');
 				}
 			}
 			var returns = "";

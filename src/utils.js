@@ -88,7 +88,7 @@ var Utils = {
                     }
                     examples.push(example);
                 }
-                process.examplex = examples;
+                process.examples = examples;
             }
         }
         return process;
@@ -96,6 +96,9 @@ var Utils = {
 
     signature: function(process, html = false) {
         var params = [];
+        if (!Array.isArray(process.parameters)) {
+            process.parameters = [];
+        }
         for(var i in process.parameters) {
             var p = process.parameters[i];
             var pType = this.dataType(p.schema, true);
@@ -126,7 +129,7 @@ var Utils = {
         if (typeof type === 'undefined') {
             type = schema.type;
         }
-        if (typeof schema.oneOf !== 'undefined' || typeof schema.allOf !== 'undefined' || typeof schema.anyOf !== 'undefined') {
+        if (typeof schema === 'object' && (typeof schema.oneOf !== 'undefined' || typeof schema.allOf !== 'undefined' || typeof schema.anyOf !== 'undefined')) {
             if (short) {
                 return 'mixed';
             }
@@ -165,7 +168,7 @@ var Utils = {
     },
 
     isAnyType: function(schema) {
-		return (typeof schema.type === 'undefined' && typeof schema.oneOf === 'undefined' && typeof schema.allOf === 'undefined' && typeof schema.anyOf === 'undefined');
+		return (typeof schema !== 'object' || (typeof schema.type === 'undefined' && typeof schema.oneOf === 'undefined' && typeof schema.allOf === 'undefined' && typeof schema.anyOf === 'undefined'));
     },
 
     htmlentities: function(str) {
