@@ -10,11 +10,14 @@ export default {
 	props: ['description'],
 	methods: {
 		markup(text) {
+			// Parse our extension to CommonMark, which allows linking to other processes.
+			text = text.replace(/(?<!\b)@(\w+)\b/g, '<a href="#$1">$1</a>');
+			// Parse CommonMark
 			var reader = new commonmark.Parser();
 			var writer = new commonmark.HtmlRenderer();
 			var parsed = reader.parse(text);
 			return writer.render(parsed);
-		},
+		}
 	}
 }
 </script>
