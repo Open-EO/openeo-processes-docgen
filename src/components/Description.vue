@@ -10,8 +10,8 @@ export default {
 	props: ['description'],
 	methods: {
 		markup(text) {
-			// Parse our extension to CommonMark, which allows linking to other processes.
-			text = text.replace(/(?<!\b)@(\w+)\b/g, '<a href="#$1">$1</a>');
+			// Parse our extension to CommonMark, which allows linking to other processes with ``process()``
+			text = text.replace(/(?<!\b)``(\w+)\(\)``(?<!\b)/g, '<code><a class="process-link" href="#$1">$1</a></code>');
 			// Parse CommonMark
 			var reader = new commonmark.Parser();
 			var writer = new commonmark.HtmlRenderer();
