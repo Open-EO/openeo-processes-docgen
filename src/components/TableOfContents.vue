@@ -45,12 +45,12 @@ export default {
 	padding: 0.3em;
 	vertical-align: bottom;
 	display: inline-block;
-	border: 1px solid #cccc;
+	border: 1px solid #ccc;
 	box-sizing: content-box;
 	background-color: #fff;
 }
 .search-box input {
-	width: calc(100% - 2.8em);
+	width: calc(100% - 3em);
 }
 .search-box button {
 	width: 1.4em;
