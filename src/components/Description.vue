@@ -11,7 +11,7 @@ export default {
 	methods: {
 		markup(text) {
 			// Parse our extension to CommonMark, which allows linking to other processes with ``process()``
-			text = text.replace(/(?<!\b)``(\w+)\(\)``(?<!\b)/g, '<code><a class="process-link" href="#$1">$1</a></code>');
+			text = text.replace(/(^|[^\w`])``(\w+)\(\)``(?![\w`])/g, '$1<code><a class="process-link" href="#$2">$2</a></code>');
 			// Parse CommonMark
 			var reader = new commonmark.Parser();
 			var writer = new commonmark.HtmlRenderer();
