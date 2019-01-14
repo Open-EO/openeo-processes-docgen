@@ -2,7 +2,7 @@
 	<nav class="list">
 		<ul class="processes-list">
 			<li v-for="(process, key) in filteredProcesses" :key="key">
-				<a :href="'#' + process.id">{{ process.id }}</a>
+				<a :href="'#' + process.id" :class="{experimental: processes[pi].experimental, deprecated: processes[pi].deprecated}">{{ process.id }}</a>
 				<summary>{{ process.summary }}</summary>
 			</li>
 		</ul>
@@ -34,3 +34,12 @@ export default {
 	}
 }
 </script>
+
+<style scoped>
+.experimental {
+	color: blueviolet;
+}
+.deprecated {
+	text-decoration: line-through;
+}
+</style>

@@ -3,7 +3,7 @@
 		<h3 @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</h3>
 		<ul class="processes-list">
 			<li v-for="pi in processIndices" :key="pi">
-				<a :href="'#' + processes[pi].id">{{ processes[pi].id }}</a>
+				<a :href="'#' + processes[pi].id" :class="{experimental: processes[pi].experimental, deprecated: processes[pi].deprecated}">{{ processes[pi].id }}</a>
 				<summary>{{ processes[pi].summary }}</summary>
 			</li>
 		</ul>
@@ -69,4 +69,12 @@ export default {
 .category li {
 	margin-left: 0.5em;
 }
+
+.experimental {
+	color: blueviolet;
+}
+.deprecated {
+	text-decoration: line-through;
+}
+
 </style>
