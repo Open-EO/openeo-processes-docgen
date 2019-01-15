@@ -2,19 +2,20 @@
 	<article class="process">
 
 		<a class="anchor" :name="process.id"></a>
-		<h2 :class="{deprecated: process.deprecated}">{{ process.id }}</h2>
+		<h2>{{ process.id }}</h2>
 
 		<slot name="process-before-summary"></slot>
 
-		<div class="summary" v-if="process.summary || process.deprecated || process.categories">
+		<div class="summary" v-if="process.summary || process.deprecated || process.experimental || process.categories">
 			<ul class="categories" v-if="process.categories">
 				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
 			</ul>
 			<summary>
 				{{ process.summary }}
-				<template v-if="process.deprecated === true">
+				<template v-if="process.deprecated === true || process.experimental === true">
 					<template v-if="process.summary"> — </template>
-					<strong class="deprecated">deprecated</strong>
+					<strong class="deprecated" v-if="process.deprecated === true">deprecated</strong>
+					<strong class="experimental" v-if="process.experimental === true">experimental</strong>
 				</template>
 			</summary>
 		</div>
@@ -31,6 +32,8 @@
 				<h3>Description</h3>
 				<code class="signature" v-html="signature(process)"></code>
 				<Description :description="process.description" />
+				<DeprecationNotice v-if="process.deprecated === true" :process="process" />
+				<ExperimentalNotice v-if="process.experimental === true" :process="process" />
 			</section>
 
 			<section class="parameters">
@@ -39,10 +42,11 @@
 					<h4>
 						<code>{{ param.name }}</code>
 						<strong class="required" v-if="param.required === true" title="required">*</strong>
-						<strong class="deprecated" v-if="param.deprecated === true">deprecated</strong>
 					</h4>
 					<div class="details">
 						<Description v-if="param.description" :description="param.description" />
+						<DeprecationNotice v-if="param.deprecated === true" :param="param" />
+						<ExperimentalNotice v-if="param.experimental === true" :param="param" />
 						<p class="media-type" v-if="param.media_type"><strong>Media type: </strong>{{ param.media_type }}</p>
 						<div class="json-schema-container" v-if="param.schema">
 							<JsonSchema :schema="param.schema" />
@@ -93,7 +97,9 @@
 
 <script>
 import JsonSchema from './JsonSchema.vue';
+import DeprecationNotice from './DeprecationNotice.vue';
 import Description from './Description.vue';
+import ExperimentalNotice from './ExperimentalNotice.vue';
 import ProcessExample from './ProcessExample.vue';
 import LinkList from './LinkList.vue';
 import Utils from '../utils.js';
@@ -102,7 +108,9 @@ export default {
 	name: 'Process',
 	components: {
 		JsonSchema,
+		DeprecationNotice,
 		Description,
+		ExperimentalNotice,
 		ProcessExample,
 		LinkList
 	},
@@ -176,18 +184,15 @@ export default {
 	color: #fff;
 	background-color: #6c757d;
 }
-h2.deprecated {
-	text-decoration: line-through;
-}
 strong.deprecated {
 	color: red;
+}
+strong.experimental {
+	color: blueviolet;
 }
 .signature {
 	display: block;
 	margin: 1em 0;
-}
-.parameters .deprecated {
-	margin-left: 1.5em;
 }
 .parameters .details {
 	margin-left: 1.5em;

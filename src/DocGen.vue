@@ -20,7 +20,8 @@ import ProcessesListCategory from './components/ProcessesListCategory.vue';
 import ProcessExample from './components/ProcessExample.vue';
 import RelatedLinks from './components/RelatedLinks.vue';
 import TableOfContents from './components/TableOfContents.vue';
-
+import DeprecationNotice from './components/DeprecationNotice.vue';
+import ExperimentalNotice from './components/ExperimentalNotice.vue';
 import Utils from './utils.js';
 
 export default {
@@ -37,6 +38,8 @@ export default {
 	ProcessExample,
 	RelatedLinks,
 	TableOfContents,
+	DeprecationNotice,
+	ExperimentalNotice,
 	Utils,
 
 	// Export the default component for browser use
