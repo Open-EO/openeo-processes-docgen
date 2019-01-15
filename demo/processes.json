@@ -115,14 +115,21 @@
     {
       "id": "aggregate_temporal",
       "summary": "Temporal aggregations",
-      "description": "Computes a temporal aggregation based on an array of date/datetime ranges. Will be projected to the labels. Length of labels and groups needs to be the same. All data along the dimensions will be passed through the reducer. Calendar hierarchies such as year, month, week etc. will be transformed from the clients into groups. Same dimensionality, lower resolution. ",
+      "description": "Computes a temporal aggregation based on an array of date or date and time ranges. Will be projected to the labels. Length of labels and groups needs to be the same. All data along the dimensions will be passed through the reducer. Calendar hierarchies such as year, month, week etc. will be transformed from the clients into groups.",
       "categories": [
         "cubes",
         "aggregate"
       ],
+      "parameter_order": [
+        "data",
+        "groups",
+        "labels",
+        "reducer",
+        "dimension"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -156,12 +163,21 @@
           "description": "",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "callback",
+            "properties": {
+              "data": {
+                "description": "An array with elements of any type.",
+                "type": "array",
+                "items": {
+                  "description": "Any data type."
+                }
+              }
+            }
           },
           "required": true
         },
         "dimension": {
-          "description": "",
+          "description": "The temporal dimension for aggregation.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": "string"
           },
@@ -169,7 +185,7 @@
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with potentially lower resolution and potentially lower cardinality, but the same number of dimensions as the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -179,14 +195,20 @@
     {
       "id": "aggregate_zonal",
       "summary": "Zonal statistics for polygons",
-      "description": "Aggregates zonal data/statistics for one or multiple GeoJSON features. For focal aggregation see ``apply()``. Number of valid/invalid pixels get returned together with the calculated values. Same dimensionality, lower resolution. ",
+      "description": "Aggregates zonal data/statistics for one or multiple GeoJSON features. For focal aggregation see ``apply()``. Number of valid/invalid pixels get returned together with the calculated values.",
       "categories": [
         "cubes",
         "aggregate"
       ],
+      "experimental": true,
+      "parameter_order": [
+        "data",
+        "polygons",
+        "dimension"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -196,7 +218,7 @@
         "polygons": {
           "description": "",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "object",
                 "format": "geojson"
@@ -210,7 +232,7 @@
           "required": true
         },
         "dimension": {
-          "description": "",
+          "description": "The dimension name.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": "string"
           },
@@ -218,22 +240,39 @@
         }
       },
       "returns": {
-        "description": "",
+        "description": "A vector data cube or a GeoJSON object, depending on the input for `polygons` parameter.",
         "schema": {
-          "type": "array",
-          "items": {
-            "type": "object"
-          }
+          "anyOf": [
+            {
+              "type": "object",
+              "format": "geojson"
+            },
+            {
+              "type": "object",
+              "format": "vector-cube"
+            }
+          ]
         }
-      }
+      },
+      "links": [
+        {
+          "href": "https://github.com/Open-EO/openeo-processes/issues/2",
+          "rel": "experimental",
+          "title": "More information about the experimental status of the process"
+        }
+      ]
     },
     {
       "id": "and",
       "summary": "Are all of the values true?",
-      "description": "Checks if **all** of the values are true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if all other values are true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n```\n      || null  | false | true\n----- || ----- | ----- | -----\nnull  || null  | false | null\nfalse || false | false | false\ntrue  || null  | false | true\n```",
+      "description": "Checks if **all** of the values are true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if all other values are true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n\n```\n      || null  | false | true\n----- || ----- | ----- | -----\nnull  || null  | false | null\nfalse || false | false | false\ntrue  || null  | false | true\n```",
       "categories": [
         "logic",
         "reducer"
+      ],
+      "parameter_order": [
+        "expressions",
+        "ignore_nodata"
       ],
       "parameters": {
         "expressions": {
@@ -307,7 +346,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false,
               true,
@@ -318,7 +357,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false
             ]
@@ -327,7 +366,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               true
             ]
@@ -352,7 +391,7 @@
     },
     {
       "id": "apply_dimension",
-      "summary": "Applies a process to one or more dimensions",
+      "summary": "Applies an n-ary process to one or more dimensions",
       "description": "Applies an n-ary process (i.e. takes an array of values instead of a single value) to a raster data cube. The n-ary process must return as many elements in the returned array as there are in the input array.\n\nThe dimensions over which to iterate with the parameter `dimensions` can be specified. The specified callback is applied to each of them individually. If the `dimensions` parameter is not set or an empty array, the process applies the callback to all dimensions.",
       "categories": [
         "cubes"
@@ -364,7 +403,7 @@
       ],
       "parameters": {
         "data": {
-          "description": "A raster data cube.",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -389,7 +428,7 @@
           "required": true
         },
         "dimensions": {
-          "description": "The names of the dimensions to use the callback on. Defaults to an empty array so that all dimensions are used.",
+          "description": "The names of the dimensions to apply the process on. Defaults to an empty array so that all dimensions are used.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": "array",
             "items": {
@@ -400,7 +439,54 @@
         }
       },
       "returns": {
-        "description": "A raster data cube with the newly computed values in the specified dimensions.",
+        "description": "A data cube with the newly computed values for the specified dimensions. The resolution, cardinality and the number of dimensions are the same as for the original data cube.",
+        "schema": {
+          "type": "object",
+          "format": "raster-cube"
+        }
+      }
+    },
+    {
+      "id": "apply_kernel",
+      "summary": "Applies a kernel to compute pixel-wise values",
+      "description": "Applies a focal operation based on a weighted kernel to each value of the specified dimensions in the data cube.",
+      "categories": [
+        "math > image filter"
+      ],
+      "parameter_order": [
+        "data",
+        "kernel",
+        "factor"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "kernel": {
+          "description": "The kernel to be applied on the data cube. The kernel has to be as many dimensions as the data cube has dimensions.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "description": "Usually a multi-dimensional array of numbers."
+            }
+          },
+          "required": true
+        },
+        "factor": {
+          "description": "A factor that is multiplied to each value computed by the focal operation.\n\nThis is a shortcut for explicitly multiplying each value by a factor afterwards, which is often required for some kernel-based algorithms such as the Gaussian blur.",
+          "schema": {
+            "type": "number",
+            "default": 1
+          }
+        }
+      },
+      "returns": {
+        "description": "A data cube with the newly computed values. The resolution, cardinality and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -409,14 +495,19 @@
     },
     {
       "id": "apply",
-      "summary": "Applies a local/unary process to a raster data cube.",
-      "description": "Applies a local non-reducer to a raster data cube. Focal calculations can be made by setting the kernel. For zonal apply see ``aggregate_zonal()``. Returns a new raster data cube. The kernel has to be as many dimensions as the datacube has dimensions.",
+      "summary": "Applies a process to each pixel",
+      "description": "Applies a unary process (a local operation) to each value of the specified or all dimensions in the data cube.",
       "categories": [
         "cubes"
       ],
+      "parameter_order": [
+        "data",
+        "process",
+        "dimensions"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -424,42 +515,31 @@
           "required": true
         },
         "process": {
-          "description": "",
+          "description": "A process (callback) to be applied on each value. The specified process must be unary meaning that it must work on a single value.",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "callback",
+            "properties": {
+              "x": {
+                "description": "A value of any data type could be passed."
+              }
+            }
           },
           "required": true
         },
-        "kernel": {
-          "description": "",
+        "dimensions": {
+          "description": "The names of the dimensions to apply the process on. Defaults to an empty array so that all dimensions are used.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`..",
           "schema": {
-            "oneOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              }
-            ],
-            "default": 1
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
           }
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with the newly computed values. The resolution, cardinality and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -469,7 +549,7 @@
     {
       "id": "arccos",
       "summary": "Inverse cosine",
-      "description": "Computes the arcus cosine of `x`. The arcus cosine is the inverse function of the cosine so that *arccos(cos(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "Computes the arc cosine of `x`. The arc cosine is the inverse function of the cosine so that *arccos(cos(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math > trigonometric"
       ],
@@ -597,7 +677,7 @@
     {
       "id": "arcsin",
       "summary": "Inverse sine",
-      "description": "Computes the arcus sine of `x`. The arcus sine is the inverse function of the sine so that *arcsin(sin(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "Computes the arc sine of `x`. The arc sine is the inverse function of the sine so that *arcsin(sin(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math > trigonometric"
       ],
@@ -661,7 +741,7 @@
     {
       "id": "arctan",
       "summary": "Inverse tangent",
-      "description": "Computes the arcus tangent of `x`. The arcus tangent is the inverse function of the tangent so that *arctan(tan(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "Computes the arc tangent of `x`. The arc tangent is the inverse function of the tangent so that *arctan(tan(x)) = x*.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math > trigonometric"
       ],
@@ -725,7 +805,7 @@
     {
       "id": "arctan2",
       "summary": "Inverse tangent of two numbers.",
-      "description": "Computes the arcus tangent of two numbers `x` and `y`. It is similar to calculating the arcus tangent of *y / x*, except that the signs of both arguments are used to determine the quadrant of the result.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated if any of the arguments is `null`.",
+      "description": "Computes the arc tangent of two numbers `x` and `y`. It is similar to calculating the arc tangent of *y / x*, except that the signs of both arguments are used to determine the quadrant of the result.\n\nWorks on radians only.\nThe no-data value `null` is passed through and therefore gets propagated if any of the arguments is `null`.",
       "categories": [
         "math > trigonometric"
       ],
@@ -791,7 +871,7 @@
     {
       "id": "array_contains",
       "summary": "List contains an element",
-      "description": "Checks whether the list (also known as *array*) specified for `data` contains the value specified in `element`.\n\n**Remarks:**\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*.\n* An integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`. Still, this process may return unexpectedly `false` when comparing floating point numbers due to floating point inaccuracy in machine-based computation.\n* Temporal strings are treated as normal strings and MUST NOT be interpreted.",
+      "description": "Checks whether the list (also known as *array*) specified for `data` contains the value specified in `element`.\n\n**Remarks:**\n\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*.\n* An integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`. Still, this process may return unexpectedly `false` when comparing floating point numbers due to floating point inaccuracy in machine-based computation.\n* Temporal strings are treated as normal strings and MUST NOT be interpreted.",
       "categories": [
         "arrays",
         "comparison"
@@ -1162,7 +1242,7 @@
         "x": {
           "description": "",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -1188,7 +1268,7 @@
         "min": {
           "description": "Lower boundary (inclusive) to check against.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -1211,7 +1291,7 @@
         "max": {
           "description": "Upper boundary (inclusive) to check against.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -1248,7 +1328,7 @@
           "returns": null
         },
         {
-          "description": "Swapped bounds (min is greather than max) MUST always return `false`.",
+          "description": "Swapped bounds (min is greater than max) MUST always return `false`.",
           "arguments": {
             "x": 0.5,
             "min": 1,
@@ -1394,7 +1474,7 @@
           "required": true
         },
         "max": {
-          "description": "Maxmimum value. All values greater than this value will be set to the value of this parameter.",
+          "description": "Maximum value. All values greater than this value will be set to the value of this parameter.",
           "schema": {
             "type": "number"
           },
@@ -1553,7 +1633,7 @@
     {
       "id": "count",
       "summary": "Count the number of elements",
-      "description": "Gives the number of elements in an array that matches a certain criterion / expression.\n\n**Remarks:**\n* By default counts the number of valid elements. A valid element is every element for which ``is_valid()`` returns `true`.\n* To count all elements in a list set the `expression` parameter to boolean `true`.",
+      "description": "Gives the number of elements in an array that matches a certain criterion / expression.\n\n**Remarks:**\n\n* By default counts the number of valid elements. A valid element is every element for which ``is_valid()`` returns `true`.\n* To count all elements in a list set the `expression` parameter to boolean `true`.",
       "categories": [
         "arrays",
         "reducer"
@@ -1574,16 +1654,16 @@
           "required": true
         },
         "expression": {
-          "description": "An expression that is evaluated against each element in the array. An element is counted only if the expression returns `true`. Defaults to ``is_valid()`` so that valid elements in a list are counted. Setting this parameter to boolean `true` counts all elements in the list.",
+          "description": "An expression that is evaluated against each element in the array. An element is counted only if the expression returns `true`. Defaults to count valid elements in a list (see ``is_valid()``). Setting this parameter to boolean `true` counts all elements in the list.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "description": "An expression that is evaluated against each element in the array.",
                 "type": "object",
                 "format": "callback",
                 "properties": {
-                  "element": {
-                    "description": "A single element from the array. Any data type could be passed."
+                  "x": {
+                    "description": "A single value from the array. Any data type could be passed."
                   }
                 }
               },
@@ -1591,8 +1671,13 @@
                 "description": "Boolean `true` counts all elements in the list.",
                 "type": "boolean",
                 "const": true
+              },
+              {
+                "description": "`null` counts valid elements in the list.",
+                "type": "null"
               }
-            ]
+            ],
+            "default": null
           }
         }
       },
@@ -1699,7 +1784,7 @@
         "data": {
           "description": "A data cube.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "object",
                 "format": "raster-cube"
@@ -1720,7 +1805,7 @@
           "required": true
         },
         "dimension": {
-          "description": "If required, a dimension name of the data cube.",
+          "description": "If required, a dimension name of the data cube.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": [
               "string",
@@ -2160,6 +2245,7 @@
       "categories": [
         "development"
       ],
+      "experimental": true,
       "parameter_order": [
         "data",
         "id"
@@ -2175,7 +2261,8 @@
         "id": {
           "description": "An identifier to help identify the message in a bunch of other messages.",
           "schema": {
-            "type": "string"
+            "type": "string",
+            "default": ""
           }
         }
       },
@@ -2196,7 +2283,7 @@
     {
       "id": "divide",
       "summary": "Division of a sequence of numbers",
-      "description": "Divides the first element in a sequential array of numbers by all other elements.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example a division by zero should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
+      "description": "Divides the first element in a sequential array of numbers by all other elements.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example a division by zero should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
       "categories": [
         "math",
         "reducer"
@@ -2333,7 +2420,7 @@
     {
       "id": "eq",
       "summary": "Equal to comparison",
-      "description": "Compares whether `x` is strictly equal to `y`.\n\n**Remarks:**\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
+      "description": "Compares whether `x` is strictly equal to `y`.\n\n**Remarks:**\n\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
       "categories": [
         "texts",
         "comparison"
@@ -2348,7 +2435,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -2380,7 +2467,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -2569,6 +2656,12 @@
             "p": 0
           },
           "returns": 1
+        },
+        {
+          "arguments": {
+            "p": null
+          },
+          "returns": null
         }
       ],
       "links": [
@@ -2616,7 +2709,7 @@
       "returns": {
         "description": "An array containing the minimum and maximum values for the specified numbers. The first element is the minimum, the second element is the maximum. If the input array is empty both elements are set to `null`.",
         "schema": {
-          "oneOf": [
+          "anyOf": [
             {
               "type": "array",
               "minItems": 2,
@@ -2699,14 +2792,20 @@
     },
     {
       "id": "filter_bands",
-      "summary": "Filters the bands in the raster data cube.",
-      "description": "The order of the bands matters!",
+      "summary": "Filter the bands by name",
+      "description": "Filters the bands in the data cube so that bands that don't match any of the criteria are dropped from the data cube.\n\nThe following criteria can be used to select bands:\n\n* `bands`: band name (e.g. `B01` or `B8A`)\n* `common_names`: common band names (e.g. `red` or `nir`)\n* `wavelengths`: ranges of wavelengths in micrometres (μm) (e.g. 0.5 - 0.6)\n\nTo keep algorithms interoperable it is recommended to prefer the common bands names or the wavelengths over collection and/or back-end specific band names.\n\nIf multiple criteria are specified, any of them must match and not all of them, i.e. they are combined with an OR-operation. If no criteria is specified, the `BandFilterParameterMissing` exception must be thrown.",
       "categories": [
         "filter"
       ],
+      "parameter_order": [
+        "data",
+        "bands",
+        "common_names",
+        "wavelengths"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube with bands.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -2714,41 +2813,90 @@
           "required": true
         },
         "bands": {
-          "description": "",
+          "description": "A list of band names.",
           "schema": {
-            "oneOf": [
-              {
-                "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "common_names": {
+          "description": "A list of common band names.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "wavelengths": {
+          "description": "A list of sub-lists with each sub-list consisting of two elements. The first element is the minimum wavelength and the second element is the maximum wavelength. Wavelengths are specified in micrometres (μm).",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number"
               },
-              {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            ]
-          },
-          "required": true
+              "examples": [
+                [
+                  [
+                    0.45,
+                    0.5
+                  ],
+                  [
+                    0.6,
+                    0.7
+                  ]
+                ]
+              ]
+            }
+          }
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube limited to a subset of its original bands. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
         }
-      }
+      },
+      "exceptions": {
+        "BandFilterParameterMissing": {
+          "message": "The process 'filter_bands' requires any of the parameters 'bands', 'common_names' or 'wavelengths' to be set."
+        }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://github.com/radiantearth/stac-spec/tree/master/extensions/eo#common-band-names",
+          "title": "List of common band names as specified by the STAC specification"
+        }
+      ]
     },
     {
       "id": "filter_bbox",
-      "summary": "Limits the data to the specified bbox.",
-      "description": "Limits the data to the specified bbox.",
+      "summary": "Spatial filter using a bounding box",
+      "description": "Limits the data cube to the specified bounding box.\n\nThe bounding box may include a vertical axis (see `base` and `height`).",
       "categories": [
         "filter"
       ],
+      "parameter_order": [
+        "data",
+        "west",
+        "south",
+        "east",
+        "north",
+        "base",
+        "height",
+        "crs"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -2756,72 +2904,73 @@
           "required": true
         },
         "west": {
-          "description": "",
+          "description": "West (lower left corner, coordinate axis 1).",
           "schema": {
             "type": "number"
           },
           "required": true
         },
         "south": {
-          "description": "",
+          "description": "South (lower left corner, coordinate axis 2).",
           "schema": {
             "type": "number"
           },
           "required": true
         },
         "east": {
-          "description": "",
+          "description": "East (upper right corner, coordinate axis 1).",
           "schema": {
             "type": "number"
           },
           "required": true
         },
         "north": {
-          "description": "",
+          "description": "North (upper right corner, coordinate axis 2).",
           "schema": {
             "type": "number"
           },
           "required": true
         },
         "base": {
-          "description": "",
+          "description": "Base (optional, lower left corner, coordinate axis 3).",
           "schema": {
-            "type": "number"
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null
           }
         },
         "height": {
-          "description": "",
+          "description": "Height (optional, upper right corner, coordinate axis 3).",
           "schema": {
-            "type": "number"
+            "type": [
+              "number",
+              "null"
+            ],
+            "default": null
           }
         },
         "crs": {
-          "description": "",
+          "description": "Coordinate reference system. EPSG codes must be supported. In addition, proj4 strings should be supported by back-ends. Whenever possible, it is recommended to use EPSG codes instead of proj4 strings. Defaults to EPSG:4326 unless the client explicitly requests a different coordinate reference system.",
           "schema": {
-            "type": "string"
+            "type": "string",
+            "default": "EPSG:4326"
           }
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube restricted to the bounding box. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
-          "oneOf": [
-            {
-              "type": "object",
-              "format": "raster-cube"
-            },
-            {
-              "type": "object",
-              "format": "vector-cube"
-            }
-          ]
+          "type": "object",
+          "format": "raster-cube"
         }
       }
     },
     {
       "id": "filter_geometry",
-      "summary": "Limits the data to the specified geometry",
-      "description": "Limits the data to the specified geometry",
+      "summary": "Spatial filter using a geometry",
+      "description": "Limits the data cube to the specified geometry..",
       "categories": [
         "filter"
       ],
@@ -2831,7 +2980,7 @@
       ],
       "parameters": {
         "data": {
-          "description": "A data cube",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -2839,9 +2988,9 @@
           "required": true
         },
         "geometry": {
-          "description": "",
+          "description": "A geometry, either a GeoJSON or a vector data cube.\n\nIf multiple geometries are passed, the intersection of all geometries is used as geometry.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "object",
                 "format": "geojson"
@@ -2856,31 +3005,29 @@
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube restricted to the specified geometry (or the intersection of geometries). Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
-          "oneOf": [
-            {
-              "type": "object",
-              "format": "raster-cube"
-            },
-            {
-              "type": "object",
-              "format": "vector-cube"
-            }
-          ]
+          "type": "object",
+          "format": "raster-cube"
         }
       }
     },
     {
       "id": "filter_property",
-      "summary": "Filter based on metadata properties",
-      "description": "Filters the data based on the specified property. Example: Filter by `instrument_mode` from STAC properties.",
+      "summary": "Filter by metadata attributes",
+      "description": "Limits the data cube to contain only data whose attributes match against the specified expression. The attribute to match against is specified with the parameter `name`. See the *Collection Discovery* for available attributes.",
       "categories": [
         "filter"
       ],
+      "experimental": true,
+      "parameter_order": [
+        "data",
+        "name",
+        "expression"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -2888,23 +3035,28 @@
           "required": true
         },
         "name": {
-          "description": "",
+          "description": "Name of the attribute to filter on.",
           "schema": {
             "type": "string"
           },
           "required": true
         },
         "expression": {
-          "description": "",
+          "description": "Expression to evaluate against the attribute values.",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "callback",
+            "properties": {
+              "x": {
+                "description": "A value of any data type could be passed."
+              }
+            }
           },
           "required": true
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with values restricted by a filter on its value's metadata attributes. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -2913,121 +3065,167 @@
     },
     {
       "id": "filter_temporal",
-      "summary": "Limits the data to the specified date range.",
-      "description": "Alias for filter() with callbacks to between_datetime(), between_date(), between_month() and between_year().",
+      "summary": "Temporal filter for a date and/or time range",
+      "description": "Limits the data cube to the specified range (or interval) of dates and/or times.\n\nAlso supports open intervals by setting either `start` or `end` to `null`, but never both.\n\nMore precisely, the filter checks checks whether the end of the exposure time is greater than or equal to the value of `start` and the start of the exposure time is less than the value of `end`. This corresponds to a left-closed interval, which contains the `start` but not the `end`.",
       "categories": [
         "filter"
       ],
+      "parameter_order": [
+        "data",
+        "start",
+        "end"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
           },
           "required": true
         },
-        "from": {
-          "description": "",
+        "start": {
+          "description": "The start of the date and/or time range. The specified instance in time is included in the interval.",
           "schema": {
-            "type": "string"
-          },
-          "required": true
-        },
-        "to": {
-          "description": "",
-          "schema": {
-            "type": "string"
-          }
-        }
-      },
-      "returns": {
-        "description": "",
-        "schema": {
-          "oneOf": [
-            {
-              "type": "object",
-              "format": "raster-cube"
-            },
-            {
-              "type": "object",
-              "format": "vector-cube"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "filter",
-      "summary": "Filtering data based on a logical expression.",
-      "description": "Same dimensionality, same resolution, limited extents.",
-      "categories": [
-        "cubes",
-        "filter"
-      ],
-      "parameters": {
-        "data": {
-          "description": "",
-          "schema": {
-            "oneOf": [
+            "anyOf": [
               {
-                "type": "object",
-                "format": "raster-cube"
+                "type": "string",
+                "format": "date-time"
               },
               {
-                "type": "object",
-                "format": "vector-cube"
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
               }
             ]
           },
           "required": true
         },
-        "expression": {
-          "description": "",
+        "end": {
+          "description": "The end of the date and/or time range. The specified instance in time is excluded from the interval.",
+          "schema": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        }
+      },
+      "returns": {
+        "description": "A data cube restricted to the specified temporal extent. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
+        "schema": {
+          "type": "object",
+          "format": "raster-cube"
+        }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
+          "title": "Information about the supported temporal formats."
+        }
+      ]
+    },
+    {
+      "id": "filter",
+      "summary": "Filter based on a logical expression.",
+      "description": "Filters the data based on a logical expression so that afterwards each value in the data cube conforms to the expression.",
+      "categories": [
+        "cubes",
+        "filter"
+      ],
+      "parameter_order": [
+        "data",
+        "expression",
+        "dimensions"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "raster-cube"
           },
           "required": true
         },
-        "dimension": {
-          "description": "",
+        "expression": {
+          "description": "An expression that is evaluated against each value in the data cube. For each dimension specified a parameter is passed to the expression callback with the name of the parameter being the dimension name. The data type of the parameter depends on the values stored in the dimension.",
           "schema": {
-            "type": "string"
+            "type": "object",
+            "format": "callback",
+            "additionalProperties": true
+          },
+          "required": true
+        },
+        "dimensions": {
+          "description": "The names of the dimensions to filter on. The values for each of these dimensions will be passed to the expression with the parameter name being the dimension name.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "required": true
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube restricted by the specified expression. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
-          "oneOf": [
-            {
-              "type": "object",
-              "format": "raster-cube"
-            },
-            {
-              "type": "object",
-              "format": "vector-cube"
-            }
-          ]
+          "type": "object",
+          "format": "raster-cube"
         }
       }
     },
     {
       "id": "find_collections",
       "summary": "Search for collections by metadata properties",
-      "description": "**EXPERIMENTAL.** Searches for collections available on the current back-end by metadata properties and returns ids of collections that match all criteria.\n\nA single collection can be selected using array operations such as ``first()``, ``last()`` and ``array_element()`` and afterwards be loaded using ``load_collection()``.",
+      "description": "Searches for collections available on the current back-end by metadata properties and returns ids of collections that match all criteria. ``cube_property()`` can be used to get property values.\n\nA single collection can be selected using array operations such as ``first()``, ``last()`` and ``array_element()`` and afterwards be loaded using ``load_collection()``.",
       "categories": [
         "cubes",
         "import"
       ],
+      "experimental": true,
       "parameters": {
         "expression": {
           "description": "An expression that is evaluated against each collection the back-end offers.",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "callback",
+            "properties": {
+              "data": {
+                "description": "A data cube.",
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "format": "raster-cube"
+                  },
+                  {
+                    "type": "object",
+                    "format": "vector-cube"
+                  }
+                ]
+              }
+            }
           },
           "required": true
         }
@@ -3188,7 +3386,7 @@
     {
       "id": "gt",
       "summary": "Greater than comparison",
-      "description": "Compares whether `x` is strictly greater than `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "description": "Compares whether `x` is strictly greater than `y`.\n\n**Remarks:**\n\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the time zone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
       "categories": [
         "comparison"
       ],
@@ -3200,7 +3398,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -3226,7 +3424,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -3321,7 +3519,7 @@
     {
       "id": "gte",
       "summary": "Greater than or equal to comparison",
-      "description": "Compares whether `x` is greater than or equal to `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "description": "Compares whether `x` is greater than or equal to `y`.\n\n**Remarks:**\n\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the time zone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
       "categories": [
         "comparison"
       ],
@@ -3333,7 +3531,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -3359,7 +3557,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -3460,6 +3658,11 @@
         "comparison",
         "masks"
       ],
+      "parameter_order": [
+        "expression",
+        "accept",
+        "reject"
+      ],
       "parameters": {
         "expression": {
           "description": "A boolean value.",
@@ -3507,7 +3710,7 @@
         },
         {
           "arguments": {
-            "expressions": false
+            "expression": false
           },
           "returns": false
         },
@@ -3650,7 +3853,7 @@
     {
       "id": "is_nodata",
       "summary": "Value is not a no-data value",
-      "description": "Checks whether the specified data is a missing data, i.e. equals to one of the no-data values / `null`.",
+      "description": "Checks whether the specified data is a missing data, i.e. equals to any of the no-data values / `null`.",
       "categories": [
         "comparison"
       ],
@@ -3693,7 +3896,7 @@
     {
       "id": "is_valid",
       "summary": "Value is valid data",
-      "description": "Checks whether the specified value `x` is valid. A value is considered valid if it is \n1. not a no-data value (`null`) and \n2. a finite number (only if `x` is a number). The definition of finite and infinite numbers follows the [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935).",
+      "description": "Checks whether the specified value `x` is valid. A value is considered valid if it is\n\n1. not a no-data value (`null`) and\n2. a finite number (only if `x` is a number). The definition of finite and infinite numbers follows the [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935).",
       "categories": [
         "comparison"
       ],
@@ -3707,7 +3910,7 @@
         }
       },
       "returns": {
-        "description": "`true` if the data is valid, otherwise `false`",
+        "description": "`true` if the data is valid, otherwise `false`.",
         "schema": {
           "type": "boolean"
         }
@@ -3758,10 +3961,7 @@
           "schema": {
             "type": "array",
             "items": {
-              "type": [
-                "number",
-                "null"
-              ]
+              "description": "Any data type is allowed."
             }
           },
           "required": true
@@ -3825,7 +4025,7 @@
     {
       "id": "linear_scale_range",
       "summary": "Linear transformation between two ranges",
-      "description": "Performs a linear transformation between the input and output range.\n\nThe underlying formula is: `((x - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin`.\n\nPotential use case include\n* scaling values to the 8-bit range (0 - 255) often used for numeric represention of values in one of the channels of the [RGB color model](https://en.wikipedia.org/wiki/RGB_color_model#Numeric_representations) or\n* calculating percentages (0 - 100).\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "Performs a linear transformation between the input and output range.\n\nThe underlying formula is: `((x - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin`.\n\nPotential use case include\n\n* scaling values to the 8-bit range (0 - 255) often used for numeric representation of values in one of the channels of the [RGB colour model](https://en.wikipedia.org/wiki/RGB_color_model#Numeric_representations) or\n* calculating percentages (0 - 100).\n\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math"
       ],
@@ -3917,7 +4117,7 @@
     {
       "id": "ln",
       "summary": "Natural logarithm",
-      "description": "The natural logarithm is the logarithm to the base *e* of the number `x`. This process is an alias for the *log* process with the base set to *e*: `log(x, e())`. The natural logarithm is the inverse function of taking *e* to the power x.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example `ln(0)` should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "The natural logarithm is the logarithm to the base *e* of the number `x`. This process is an alias for the *log* process with the base set to *e*: `log(x, e())`. The natural logarithm is the inverse function of taking *e* to the power x.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example `ln(0)` should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math > exponential & logarithmic"
       ],
@@ -4003,7 +4203,7 @@
       "returns": {
         "description": "A data cube for further processing.",
         "schema": {
-          "oneOf": [
+          "anyOf": [
             {
               "type": "object",
               "format": "raster-cube"
@@ -4024,6 +4224,7 @@
         "cubes",
         "import"
       ],
+      "experimental": true,
       "parameters": {
         "id": {
           "description": "The id of a batch job with results.",
@@ -4037,7 +4238,7 @@
       "returns": {
         "description": "A data cube for further processing.",
         "schema": {
-          "oneOf": [
+          "anyOf": [
             {
               "type": "object",
               "format": "raster-cube"
@@ -4053,7 +4254,7 @@
     {
       "id": "log",
       "summary": "Logarithm to a base",
-      "description": "Logarithm to the base `base` of the number `x` is defined to be the inverse function of taking b to the power of x.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example `log(0, 2)` should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nThe no-data value `null` is passed through and therefore gets propagated if any of the arguments is `null`.",
+      "description": "Logarithm to the base `base` of the number `x` is defined to be the inverse function of taking b to the power of x.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) so that for example `log(0, 2)` should result in ±infinity if the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nThe no-data value `null` is passed through and therefore gets propagated if any of the arguments is `null`.",
       "categories": [
         "math > exponential & logarithmic"
       ],
@@ -4138,7 +4339,7 @@
     {
       "id": "lt",
       "summary": "Less than comparison",
-      "description": "Compares whether `x` is strictly less than `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "description": "Compares whether `x` is strictly less than `y`.\n\n**Remarks:**\n\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the time zone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
       "categories": [
         "comparison"
       ],
@@ -4150,7 +4351,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -4176,7 +4377,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -4271,7 +4472,7 @@
     {
       "id": "lte",
       "summary": "Less than or equal to comparison",
-      "description": "Compares whether `x` is less than or equal to `y`.\n\n**Remarks:**\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
+      "description": "Compares whether `x` is less than or equal to `y`.\n\n**Remarks:**\n\n* If any of the operands is `null`, the return value is `null`.\n* Temporal strings can *not* be compared based on their string representation due to the time zone / time-offset representations.\n* Comparing strings is currently not supported, but is planned to be added in the future.",
       "categories": [
         "comparison"
       ],
@@ -4283,7 +4484,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -4309,7 +4510,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -4404,7 +4605,7 @@
     {
       "id": "mask",
       "summary": "Apply a mask",
-      "description": "Applies a mask to a raster data cube. Therefore, compares the parallel elements of the raster data cubes specified for `data` and `mask` and replaces all elements in `data` that are non-zero (for numbers) or `true` (for booleans) in `mask`. These elements are replaced with the value specified for `replacement`, which defaults to `null` (no data). No data values will be left untouched.",
+      "description": "Applies a mask to a raster data cube. Therefore, compares the parallel elements of the raster data cubes specified for `data` and `mask` and replaces all elements in `data` that are non-zero (for numbers) or `true` (for boolean values) in `mask`. These elements are replaced with the value specified for `replacement`, which defaults to `null` (no data). No data values will be left untouched.",
       "categories": [
         "masks"
       ],
@@ -4433,7 +4634,7 @@
         "replacement": {
           "description": "The value used to replace non-zero and `true` values with.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -4650,7 +4851,7 @@
     {
       "id": "median",
       "summary": "Statistical median",
-      "description": "The statistical median of an array of numbers is the value separating the higher half from the lower half of the data.\n\n**Remarks:**\n* For a symmetric arrays, the result is equal to the ``mean()``.\n* The median can also be calculated by computing the quantile (see process ``quantiles()``) with the probability of *0.5*: `quantiles(data, [0.5])`.\n* An empty input array returns `null`.",
+      "description": "The statistical median of an array of numbers is the value separating the higher half from the lower half of the data.\n\n**Remarks:**\n\n* For a symmetric arrays, the result is equal to the ``mean()``.\n* The median can also be calculated by computing the quantile (see process ``quantiles()``) with the probability of *0.5*: `quantiles(data, [0.5])`.\n* An empty input array returns `null`.",
       "categories": [
         "math",
         "reducer"
@@ -4766,6 +4967,7 @@
       "categories": [
         "cubes"
       ],
+      "experimental": true,
       "parameter_order": [
         "cube1",
         "cube2",
@@ -5030,7 +5232,7 @@
     {
       "id": "multiply",
       "summary": "Multiplication of a sequence of numbers",
-      "description": "Multiplies all elements in a sequential array of numbers and returns the computed product.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
+      "description": "Multiplies all elements in a sequential array of numbers and returns the computed product.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
       "categories": [
         "math",
         "reducer"
@@ -5123,10 +5325,14 @@
     {
       "id": "NDVI",
       "summary": "Normalized Difference Vegetation Index",
-      "description": "Computes the Normalized Difference Vegetation Index (NDVI). The NDVI is computed as *(nir - red) / (nir + red)*.\n\nThe `data` parameter expects a raster data cube with two bands that have the common names `red` and `nir` assigned. The process returns a raster data cube with two bands being replaced with a new band that holds the computed values. The newly created band is named `ndvi` by default. This name can be changed with thd `name` parameter.\n\nThis process is very similar to the process ``normalized_difference()``, but determines the bands automatically based on the common name (`red`/`nir`) specified in the metadata.",
+      "description": "Computes the Normalized Difference Vegetation Index (NDVI). The NDVI is computed as *(nir - red) / (nir + red)*.\n\nThe `data` parameter expects a raster data cube with two bands that have the common names `red` and `nir` assigned. The process returns a raster data cube with two bands being replaced with a new band that holds the computed values. The newly created band is named `ndvi` by default. This name can be changed with the `name` parameter.\n\nThis process is very similar to the process ``normalized_difference()``, but determines the bands automatically based on the common name (`red`/`nir`) specified in the metadata.",
       "categories": [
         "math > indices",
         "vegetation indices"
+      ],
+      "parameter_order": [
+        "data",
+        "name"
       ],
       "parameters": {
         "data": {
@@ -5169,7 +5375,7 @@
     {
       "id": "neq",
       "summary": "Not equal to comparison",
-      "description": "Compares whether `x` is *not* strictly equal to `y`. This process is an alias for: `not(eq(val1, val2))`.\n\n**Remarks:**\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
+      "description": "Compares whether `x` is *not* strictly equal to `y`. This process is an alias for: `not(eq(val1, val2))`.\n\n**Remarks:**\n\n* Data types MUST be checked strictly, for example a string with the content *1* is not equal to the number *1*. Nevertheless, an integer *1* is equal to a floating point number *1.0* as `integer` is a sub-type of `number`.\n* If any of the operands is `null`, the return value is `null`.\n* Strings are expected to be encoded in UTF-8 by default.\n* Temporal strings MUST be compared differently than other strings and MUST NOT be compared based on their string representation due to different possible representations. For example, the UTC time zone representation `Z` has the same meaning as `+00:00`.",
       "categories": [
         "texts",
         "comparison"
@@ -5184,7 +5390,7 @@
         "x": {
           "description": "First operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -5216,7 +5422,7 @@
         "y": {
           "description": "Second operand.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -5374,14 +5580,15 @@
     {
       "id": "normalized_difference",
       "summary": "Normalized difference for two bands",
-      "description": "Computes the normalized difference for two bands. The normalized difference is computed as *(band1 - band2) / (band1 + band2)*.\n\nEach of the parameters expects a raster data cube with exactly one band. The process returns a raster data cube with exactly one band that holds the computed values. The newly created band is named `normalized_difference` by default. This name can be changed with thd `name` parameter.\n\nThis process could be used for a number of remote sensing indices such as:\n\n* [NDVI](https://eos.com/ndvi/)\n* [NDWI](https://eos.com/ndwi/)\n* [NDSI](https://eos.com/ndsi/)\n\nPlease note that some back-ends may have native processes available for convenience such as the ``NDVI()``.",
+      "description": "Computes the normalized difference for two bands. The normalized difference is computed as *(band1 - band2) / (band1 + band2)*.\n\nEach of the parameters expects a raster data cube with exactly one band. The process returns a raster data cube with exactly one band that holds the computed values. The newly created band is named `normalized_difference` by default. This name can be changed with the `name` parameter.\n\nThis process could be used for a number of remote sensing indices such as:\n\n* [NDVI](https://eos.com/ndvi/)\n* [NDWI](https://eos.com/ndwi/)\n* [NDSI](https://eos.com/ndsi/)\n\nPlease note that some back-ends may have native processes available for convenience such as the ``NDVI()``.",
       "categories": [
         "math > indices",
         "vegetation indices"
       ],
       "parameter_order": [
         "band1",
-        "band2"
+        "band2",
+        "name"
       ],
       "parameters": {
         "band1": {
@@ -5486,10 +5693,14 @@
     {
       "id": "or",
       "summary": "Is at least one value true?",
-      "description": "Checks if **at least one** of the values is true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if at least one of the other values is true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n```\n      || null | false | true\n----- || ---- | ----- | ----\nnull  || null | null  | true\nfalse || null | false | true\ntrue  || true | true  | true\n```",
+      "description": "Checks if **at least one** of the values is true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if at least one of the other values is true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n\n```\n      || null | false | true\n----- || ---- | ----- | ----\nnull  || null | null  | true\nfalse || null | false | true\ntrue  || true | true  | true\n```",
       "categories": [
         "logic",
         "reducer"
+      ],
+      "parameter_order": [
+        "expressions",
+        "ignore_nodata"
       ],
       "parameters": {
         "expressions": {
@@ -5563,7 +5774,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false,
               true,
@@ -5574,7 +5785,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false
             ]
@@ -5583,7 +5794,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               false,
               false
             ]
@@ -5609,7 +5820,7 @@
     {
       "id": "order",
       "summary": "Create a permutation",
-      "description": "Computes a permutation which allows rearranging the data into ascending or descending order. In other words, this process computes the ranked (sorted) element positions in the original list.\n\n**Remarks:**\n* The positions in the result are zero-based.\n* Ties will be left in their original ordering.\n* Temporal strings can *not* be compared based on their string representation due to the timezone / time-offset representations.",
+      "description": "Computes a permutation which allows rearranging the data into ascending or descending order. In other words, this process computes the ranked (sorted) element positions in the original list.\n\n**Remarks:**\n\n* The positions in the result are zero-based.\n* Ties will be left in their original ordering.\n* Temporal strings can *not* be compared based on their string representation due to the time zone / time-offset representations.",
       "categories": [
         "arrays",
         "sorting"
@@ -5625,7 +5836,7 @@
           "schema": {
             "type": "array",
             "items": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "type": "number"
                 },
@@ -5822,6 +6033,7 @@
       "categories": [
         "development"
       ],
+      "experimental": true,
       "parameter_order": [
         "data",
         "id"
@@ -5837,7 +6049,8 @@
         "id": {
           "description": "An identifier to help identify the message in a bunch of other messages.",
           "schema": {
-            "type": "string"
+            "type": "string",
+            "default": ""
           }
         }
       },
@@ -6048,7 +6261,7 @@
     {
       "id": "quantiles",
       "summary": "Quantiles",
-      "description": "Calculates quantiles, which are cut points dividing the range of a probability distribution into either\n* intervals corresponding to the given `probabilities` or\n* (nearly) equal-sized intervals (q-quantiles based on the parameter `q`).\n\nEither the parameter `probabilites` or `q` must be specified, otherwise the `QuantilesParameterMissing` exception must be thrown. If both parameters are set the `QuantilesParameterConflict` exception must be thrown.",
+      "description": "Calculates quantiles, which are cut points dividing the range of a probability distribution into either\n\n* intervals corresponding to the given `probabilities` or\n* (nearly) equal-sized intervals (q-quantiles based on the parameter `q`).\n\nEither the parameter `probabilites` or `q` must be specified, otherwise the `QuantilesParameterMissing` exception must be thrown. If both parameters are set the `QuantilesParameterConflict` exception must be thrown.",
       "categories": [
         "math",
         "reducer"
@@ -6100,7 +6313,7 @@
         }
       },
       "returns": {
-        "description": "An array with the computed quantiles. The list has either\n* as many elements as the given list of `probabilities` had or\n* *`q`-1* elements.\n\nIf the input array is empty the resulting array is filled with as many `null` values as required according to the list above. For an example, see the 'Empty array example'.",
+        "description": "An array with the computed quantiles. The list has either\n\n* as many elements as the given list of `probabilities` had or\n* *`q`-1* elements.\n\nIf the input array is empty the resulting array is filled with as many `null` values as required according to the list above. For an example, see the 'Empty array example'.",
         "schema": {
           "type": "array",
           "items": {
@@ -6342,15 +6555,20 @@
     },
     {
       "id": "reduce",
-      "summary": "reduce dimensions - lower dimensionality, same resolution.",
-      "description": "Lower dimensionality, same resolution. Dimensions are specified in the `cube:dimensions` property of the STAC collection, e.g. `temporal` or `x`. Note that spatial dimensions could be x, y or z. Spectral is a separate dimension for MSI. Nominal values are possible and need to be mapped, e.g. band names to wavelengths, date strings to numeric timestamps since 1970 etc.",
+      "summary": "Reduce dimensions",
+      "description": "Applies a reducer to a data cube dimension by collapsing all the input values along the specified dimension into a single output value computed by the reducer.\n\nThe reducer must accept an array and return a single value (see parameter `reducer`). Nominal values are possible, but need to be mapped, e.g. band names to wavelengths, date strings to numeric timestamps since 1970 etc.",
       "categories": [
         "cubes",
         "reducer"
       ],
+      "parameter_order": [
+        "data",
+        "reducer",
+        "dimension"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -6358,15 +6576,24 @@
           "required": true
         },
         "reducer": {
-          "description": "",
+          "description": "A reducer to be applied on the specified dimension. The reducer must be a callable process that accepts an array and computes a single return value of the same type as the input values, for example ``median()``.",
           "schema": {
             "type": "object",
-            "format": "callback"
+            "format": "callback",
+            "properties": {
+              "data": {
+                "description": "An array with elements of any type.",
+                "type": "array",
+                "items": {
+                  "description": "Any data type."
+                }
+              }
+            }
           },
           "required": true
         },
         "dimension": {
-          "description": "",
+          "description": "The dimension over which to reduce.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": "string"
           },
@@ -6374,7 +6601,7 @@
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with the newly computed values. The number of dimensions is reduced, but the resolution and cardinality are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -6384,14 +6611,19 @@
     {
       "id": "resample_spatial",
       "summary": "Resample spatial dimension",
-      "description": "Resample spatial dimension. Same dimensionality, lower resolution. ",
+      "description": "Resamples the spatial dimension.",
       "categories": [
         "cubes",
         "aggregate"
       ],
+      "parameter_order": [
+        "data",
+        "method",
+        "target"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -6415,7 +6647,7 @@
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with potentially lower spatial resolution and potentially lower cardinality, but the same number of dimensions as the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -6425,14 +6657,20 @@
     {
       "id": "resample_temporal",
       "summary": "Resample the temporal dimension",
-      "description": "If dimension is not set, the data cube is expected to have only one temporal dimension. Same dimensionality, lower resolution. ",
+      "description": "Resamples the temporal dimension. If dimension is not set, the data cube is expected to have only one temporal dimension.",
       "categories": [
         "cubes",
         "aggregate"
       ],
+      "parameter_order": [
+        "data",
+        "method",
+        "target",
+        "dimension"
+      ],
       "parameters": {
         "data": {
-          "description": "",
+          "description": "A data cube.",
           "schema": {
             "type": "object",
             "format": "raster-cube"
@@ -6455,14 +6693,14 @@
           "required": true
         },
         "dimension": {
-          "description": "",
+          "description": "The temporal dimension to resample.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
           "schema": {
             "type": "string"
           }
         }
       },
       "returns": {
-        "description": "",
+        "description": "A data cube with potentially lower temporal resolution and potentially lower cardinality, but the same number of dimensions as the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
@@ -6472,7 +6710,7 @@
     {
       "id": "round",
       "summary": "Rounds to a specified precision",
-      "description": "Rounds a real number `x` to specified precision `p`.\n\nIf the fractional part of `x` is halfway between two integers, one of which is even and the other odd, then the even number is returned.\nThis behavior follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935). This kind of rounding is also called \"rounding to nearest\" or \"banker's rounding\". It minimizes rounding errors that result from consistently rounding a midpoint value in a single direction.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "Rounds a real number `x` to specified precision `p`.\n\nIf the fractional part of `x` is halfway between two integers, one of which is even and the other odd, then the even number is returned.\nThis behaviour follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935). This kind of rounding is also called \"rounding to nearest\" or \"banker's rounding\". It minimizes rounding errors that result from consistently rounding a midpoint value in a single direction.\n\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math > rounding"
       ],
@@ -6565,10 +6803,11 @@
     {
       "id": "run_process_graph",
       "summary": "Load and run a stored process graph",
-      "description": "Loads and executes a stored process graph.\n\nThe process can either load\n* a locally stored process graph by id, which is stored by the authenticated user on the back-end currently connected to or\n* a remotely stored and published process graph by absolute URI, for example from [openEO Hub](https://hub.openeo.org).",
+      "description": "Loads and executes a stored process graph.\n\nThe process can either load\n\n* a locally stored process graph by id, which is stored by the authenticated user on the back-end currently connected to or\n* a remotely stored and published process graph by absolute URI, for example from [openEO Hub](https://hub.openeo.org).",
       "categories": [
         "import"
       ],
+      "experimental": true,
       "parameter_order": [
         "id",
         "variables"
@@ -6577,7 +6816,7 @@
         "id": {
           "description": "A process graph id or an absolute URI to an externally hosted process graph.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "description": "URI",
                 "type": "string",
@@ -6605,15 +6844,27 @@
         "schema": {
           "description": "Any data type."
         }
-      }
+      },
+      "links": [
+        {
+          "href": "https://github.com/Open-EO/openeo-processes/issues/5",
+          "rel": "experimental",
+          "title": "More information about the experimental status of the process"
+        }
+      ]
     },
     {
-      "id": "run_udf_remotely",
-      "summary": "Run a remotely hosted UDF container",
-      "description": "**EXPERIMENTAL.** Runs a remotely hosted UDF container that follows the openEO UDF specification. See ``run_udf()`` for more information on usage and options.",
+      "id": "run_udf_externally",
+      "summary": "Run an externally hosted UDF container",
+      "description": "Runs a compatible UDF container that is either externally hosted by a service provider or running on a local machine of the user. The UDF container must follow the [openEO UDF specification](https://open-eo.github.io/openeo-udf/). See ``run_udf()`` for more information on usage and options.",
       "categories": [
         "import",
         "udf"
+      ],
+      "experimental": true,
+      "parameter_order": [
+        "url",
+        "options"
       ],
       "parameters": {
         "url": {
@@ -6637,26 +6888,40 @@
         "schema": {
           "description": "Any data type."
         }
-      }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://open-eo.github.io/openeo-udf/",
+          "title": "openEO UDF specification"
+        },
+        {
+          "rel": "about",
+          "href": "https://github.com/Open-EO/openeo-udf",
+          "title": "openEO UDF repository"
+        }
+      ]
     },
     {
       "id": "run_udf",
       "summary": "Run an UDF",
-      "description": "**EXPERIMENTAL.** Runs an UDF in one of the supported runtimes.\n\nThe process can either:\n1. load and run a locally stored UDF from a file in the workspace of the authenticated user. The path to the UDF file must be relative to the root directory of the user's workspace, so without the user id in the path.\n2. fetch and run a remotely stored and published UDF by absolute URI, for example from [openEO Hub](https://hub.openeo.org)).\n3. run the source code specified inline as string.\n\nThe loaded UDF can be executed as callback in several processes such as ``aggregate_temporal()``, ``apply()``, ``apply_dimension()``, ``filter()`` and ``reduce()``.",
+      "description": "Runs an UDF in one of the supported runtime environments.\n\nThe process can either:\n\n1. load and run a locally stored UDF from a file in the workspace of the authenticated user. The path to the UDF file must be relative to the root directory of the user's workspace, so without the user id in the path.\n2. fetch and run a remotely stored and published UDF by absolute URI, for example from [openEO Hub](https://hub.openeo.org)).\n3. run the source code specified inline as string.\n\nThe loaded UDF can be executed as callback in several processes such as ``aggregate_temporal()``, ``apply()``, ``apply_dimension()``, ``filter()`` and ``reduce()``.",
       "categories": [
         "import",
         "udf"
       ],
+      "experimental": true,
       "parameter_order": [
         "udf",
         "runtime",
+        "version",
         "options"
       ],
       "parameters": {
         "udf": {
-          "description": "Either source code, an absolute URL or a path to an UDF script. ",
+          "description": "Either source code, an absolute URL or a path to an UDF script.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "description": "URI to an UDF",
                 "type": "string",
@@ -6676,6 +6941,13 @@
             "type": "string"
           },
           "required": true
+        },
+        "version": {
+          "description": "An UDF runtime version. Defaults to the default runtime version specified for each runtime.",
+          "schema": {
+            "type": "string",
+            "default": "latest"
+          }
         },
         "options": {
           "description": "Options that should be passed to the UDF.",
@@ -6709,7 +6981,7 @@
         "data": {
           "description": "The data to save.",
           "schema": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "object",
                 "format": "raster-cube"
@@ -6730,7 +7002,7 @@
           "required": true
         },
         "options": {
-          "description": "The file format options to be used to creatie the file(s). Must correspond to the options that the server reports as supported options for the chosen `format`. The option names and valid values usually correspond to the GDAL/OGR format options.",
+          "description": "The file format options to be used to create the file(s). Must correspond to the options that the server reports as supported options for the chosen `format`. The option names and valid values usually correspond to the GDAL/OGR format options.",
           "schema": {
             "type": "object",
             "default": {}
@@ -6842,7 +7114,7 @@
     {
       "id": "sgn",
       "summary": "Signum",
-      "description": "The signum (also known as *sign*) of `x` is defined as:\n* *1* if *x > 0*\n* *0* if *x = 0*\n* *-1* if *x < 0*\n\nThe no-data value `null` is passed through and therefore gets propagated.",
+      "description": "The signum (also known as *sign*) of `x` is defined as:\n\n* *1* if *x > 0*\n* *0* if *x = 0*\n* *-1* if *x < 0*\n\nThe no-data value `null` is passed through and therefore gets propagated.",
       "categories": [
         "math"
       ],
@@ -7008,7 +7280,7 @@
           "schema": {
             "type": "array",
             "items": {
-              "oneOf": [
+              "anyOf": [
                 {
                   "type": "number"
                 },
@@ -7055,7 +7327,7 @@
         "schema": {
           "type": "array",
           "items": {
-            "oneOf": [
+            "anyOf": [
               {
                 "type": "number"
               },
@@ -7205,9 +7477,9 @@
       ]
     },
     {
-      "id": "substract",
-      "summary": "Substraction of a sequence of numbers",
-      "description": "Takes the first element of a sequential array of numbers and substracts all other elements from it.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
+      "id": "subtract",
+      "summary": "Subtraction of a sequence of numbers",
+      "description": "Takes the first element of a sequential array of numbers and subtracts all other elements from it.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
       "categories": [
         "math",
         "reducer"
@@ -7250,7 +7522,7 @@
       },
       "exceptions": {
         "SubtrahendMissing": {
-          "message": "Substraction requires at least two numbers (a minuend and one or more subtrahends)."
+          "message": "Subtraction requires at least two numbers (a minuend and one or more subtrahends)."
         }
       },
       "examples": [
@@ -7288,7 +7560,7 @@
         {
           "rel": "about",
           "href": "http://mathworld.wolfram.com/Subtraction.html",
-          "title": "Substraction explained by Wolfram MathWorld"
+          "title": "Subtraction explained by Wolfram MathWorld"
         },
         {
           "rel": "about",
@@ -7300,7 +7572,7 @@
     {
       "id": "sum",
       "summary": "Addition of a sequence of numbers",
-      "description": "Sums up all elements in a sequential array of numbers and returns the computed sum.\n\nThe computations should follows [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
+      "description": "Sums up all elements in a sequential array of numbers and returns the computed sum.\n\nThe computations should follow [IEEE Standard 754](https://ieeexplore.ieee.org/document/4610935) whenever the processing environment supports it. Otherwise an exception must the thrown for incomputable results.\n\nBy default no-data values are ignored. Setting `ignore_nodata` to `false` considers no-data values so that `null` is returned if any element is such a value.",
       "categories": [
         "math",
         "reducer"
@@ -7846,63 +8118,16 @@
       ]
     },
     {
-      "id": "weighted_filter",
-      "summary": "Weighted filter for imagery",
-      "description": "Weighted raster filter",
-      "categories": [
-        "math > image filter"
-      ],
-      "parameters": {
-        "data": {
-          "description": "",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "weights": {
-          "description": "",
-          "schema": {
-            "oneOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "number"
-                }
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              }
-            ]
-          },
-          "required": true
-        }
-      },
-      "returns": {
-        "description": "",
-        "schema": {
-          "type": "object",
-          "format": "raster-cube"
-        }
-      }
-    },
-    {
       "id": "xor",
       "summary": "Is exactly one value true?",
-      "description": "Checks if **exactly one** of the values is true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if exactly one of the other values is true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n```\n      || null | false | true\n----- || ---- | ----- | -----\nnull  || null | null  | null\nfalse || null | false | true\ntrue  || null | true  | false\n```",
+      "description": "Checks if **exactly one** of the values is true. Evaluates each expression from the first to the last element and stops once the outcome is unambiguous.\n\nIf only one value is given the process evaluates to the given value. If no value is given (i.e. the array is empty) the process returns `null`.\n\nBy default all no-data values are ignored so that the process returns `true` if exactly one of the other values is true and otherwise returns `false`.\nSetting the `ignore_nodata` flag to `false` considers no-data values so that `null` is a valid logical object. If a component is `null`, the result will be `null` if the outcome is ambiguous. See the following truth table:\n\n```\n      || null | false | true\n----- || ---- | ----- | -----\nnull  || null | null  | null\nfalse || null | false | true\ntrue  || null | true  | false\n```",
       "categories": [
         "logic",
         "reducer"
+      ],
+      "parameter_order": [
+        "expressions",
+        "ignore_nodata"
       ],
       "parameters": {
         "expressions": {
@@ -7976,7 +8201,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false,
               true,
@@ -7987,7 +8212,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               true,
               false
             ]
@@ -7996,7 +8221,7 @@
         },
         {
           "arguments": {
-            "expression": [
+            "expressions": [
               false,
               false
             ]
