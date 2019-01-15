@@ -7,9 +7,14 @@
 		<slot name="process-before-summary"></slot>
 
 		<div class="summary" v-if="process.summary || process.deprecated || process.experimental || process.categories">
-			<ul class="categories" v-if="process.categories">
-				<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
-			</ul>
+			<div class="process-bar">
+				<ul class="categories" v-if="process.categories">
+					<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
+				</ul>
+				<ul class="actions" v-if="process.categories">
+					<li class="action download"><a @click="download(process)">Download JSON</a></li>
+				</ul>
+			</div>
 			<summary>
 				{{ process.summary }}
 				<template v-if="process.deprecated === true || process.experimental === true">
@@ -137,6 +142,15 @@ export default {
 		},
 		signature(process) {
 			return Utils.signature(process, true);
+		},
+		download(process) {
+			var dataStr = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(process.original, null, 2));
+			var downloadAnchorNode = document.createElement('a');
+			downloadAnchorNode.setAttribute("href", dataStr);
+			downloadAnchorNode.setAttribute("download", process.id + ".json");
+			document.body.appendChild(downloadAnchorNode);
+			downloadAnchorNode.click();
+			downloadAnchorNode.remove();
 		}
 	}
 }
@@ -165,16 +179,27 @@ export default {
 		margin-top: 2em;
 	}
 }
-.categories {
+.process-bar {
+	display: flex;
+	align-items: baseline;
+}
+.categories, .actions {
 	margin: 0 0 0.75em 0;
 	padding: 0;
 	list-style-type: none;
-}
-.categories .category {
 	display: inline-block;
-	padding: 0.3em 0.5em;
-	margin: 0 0.5em 0.5em 0;
+}
+.categories {
+	flex: 3;
+}
+.actions {
+	flex: 1;
+	text-align: right;
+}
+.categories .category, .actions .action {
+	display: inline-block;
 	font-size: 0.8em;
+	margin: 0 0.5em 0.5em 0;
 	line-height: 1;
 	text-align: center;
 	white-space: nowrap;
@@ -182,7 +207,22 @@ export default {
 	vertical-align: baseline;
 	border-radius: 3px;
 	color: #fff;
+}
+.categories .category {
 	background-color: #6c757d;
+	padding: 0.3em 0.5em;
+}
+.actions .action {
+	background-color: chocolate;
+}
+.categories .category a, .actions .action a {
+	padding: 0.3em 0.5em;
+	color: #fff;
+	display: block;
+}
+.categories .category a:hover, .actions .action a:hover {
+	color: #fff;
+	display: block;
 }
 strong.deprecated {
 	color: red;

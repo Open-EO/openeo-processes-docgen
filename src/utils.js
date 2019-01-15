@@ -18,6 +18,8 @@ var Utils = {
 
 
     normalizeProcess: function(process) {
+        process.original = Object.assign({}, process);
+
         // Compatibility for openEO API v0.3 and v0.4
         process = this.convertProcessToLatestSpec(process);
 
