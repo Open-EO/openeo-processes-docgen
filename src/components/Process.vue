@@ -11,7 +11,7 @@
 				<ul class="categories" v-if="process.categories">
 					<li class="category" v-for="(value, key) in process.categories" :key="key" v-text="formatCategory(value)"></li>
 				</ul>
-				<ul class="actions" v-if="process.categories">
+				<ul class="actions" v-if="config.provideDownload">
 					<li class="action download"><a @click="download(process)">Download JSON</a></li>
 				</ul>
 			</div>
