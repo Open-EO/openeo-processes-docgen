@@ -1,6 +1,6 @@
 <template>
 	<div :class="{ category: true, expanded: expanded }">
-		<h3 @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</h3>
+		<strong @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</strong>
 		<ul class="processes-list">
 			<li v-for="pi in processIndices" :key="pi">
 				<a :href="'#' + processes[pi].id" :class="{experimental: processes[pi].experimental, deprecated: processes[pi].deprecated}">{{ processes[pi].id }}</a>
@@ -45,17 +45,20 @@ export default {
 </script>
 
 <style scoped>
-.category h3 {
+.category strong {
+	display: block;
 	text-transform: capitalize;
-	margin: 0.5em 0 0.25em 0;
-	font-size: 1.1em;
+	margin: 0.25em 0 0.25em 0;
+	padding-left: 0.6em;
+	font-size: 1em;
 	cursor: pointer;
 }
-.category h3 .toggle {
+.category strong .toggle {
 	display: inline-block;
-	width: 0.5em;
+	width: 0.6em;
+	margin-left: -0.6em;
 }
-.category.expanded h3 .toggle {
+.category.expanded strong .toggle {
 	transform: rotate(90deg);
 }
 .category .processes-list {

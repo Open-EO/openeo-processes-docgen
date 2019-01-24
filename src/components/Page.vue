@@ -27,16 +27,9 @@ export default {
 	computed: {
 		config() {
 			return Utils.setDefaults(this.baseConfig);
-		}
-	},
-	data() {
-		return {
-			preparedProcesses: []
-		};
-	},
-	watch: {
-		processes() {
-			this.preparedProcesses = Utils.normalizeProcesses(this.processes, this.config.sortProcessesById);
+		},
+		preparedProcesses() {
+			return Utils.normalizeProcesses(this.processes, this.config.sortProcessesById);
 		}
 	}
 }
