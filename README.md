@@ -15,9 +15,9 @@ You can simply create an HTML file and modify the `document` prop to a URL of a 
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="https://unpkg.com/vue"></script>
-		<script src="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
-		<link rel="stylesheet" href="https://unpkg.com/@openeo/processes-docgen/dist/DocGen.css">
+    	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.css">
 		<style>html, body { height: 100%; margin: 0; }</style>
 	</head>
 
