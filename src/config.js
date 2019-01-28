@@ -7,6 +7,8 @@ export default {
 	// Categorize the processes in the menu if set to true, otherwise show a plain list
 	categorize: true,
 	// Whether processes are initially collapsed or not
-	processesInitiallyCollapsed: false
+	processesInitiallyCollapsed: false,
+	// Whether 'Download JSON' buttons are displayed or not
+	provideDownload: true
 
 };
