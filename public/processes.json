@@ -66,14 +66,15 @@
     {
       "id": "add_dimension",
       "summary": "Add a new dimension",
-      "description": "Adds a new named dimension to the data cube.\n\nAfterwards, the dimension can be referenced with the specified `name`. If a dimension with the specified name already exists, a `DimensionExists` exception is thrown. The values of the dimension are set to the specified `value`.",
+      "description": "Adds a new named dimension to the data cube.\n\nAfterwards, the dimension can be referenced with the specified `name`. If a dimension with the specified name already exists, a `DimensionExists` exception is thrown. The dimension value of the dimension is set to the specified `value`.",
       "categories": [
         "cubes"
       ],
       "parameter_order": [
         "data",
         "name",
-        "value"
+        "value",
+        "type"
       ],
       "parameters": {
         "data": {
@@ -92,11 +93,43 @@
           "required": true
         },
         "value": {
-          "description": "Value for the dimension.",
+          "description": "A dimension value (**not** a pixel value).",
           "schema": {
-            "description": "Any data type is allowed."
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "string",
+                "format": "time"
+              }
+            ]
           },
           "required": true
+        },
+        "type": {
+          "description": "The type of dimension, defaults to `other`.",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "spatial",
+              "temporal",
+              "bands",
+              "other"
+            ],
+            "default": "other"
+          }
         }
       },
       "returns": {
@@ -113,12 +146,115 @@
       }
     },
     {
-      "id": "aggregate_temporal",
-      "summary": "Temporal aggregations",
-      "description": "Computes a temporal aggregation based on an array of date and/or time intervals.\n\nCalendar hierarchies such as year, month, week etc. must be transformed into specific intervals by the clients. For each interval, all data along the dimension will be passed through the reducer. The computed values will be projected to the labels, so the number of labels and the number of intervals need to be equal.\n\nIf the dimension is not set, the data cube is expected to only have one temporal dimension.",
+      "id": "aggregate_polygon",
+      "summary": "Compute zonal statistics for polygons",
+      "description": "Aggregates zonal statistics for one or multiple polygons over the spatial dimensions.\n\nThe process considers all pixels for which the point at the pixel center intersects with the corresponding polygon (as defined in the Simple Features standard by the OGC).\n\nThe data cube must have been reduced to only contain two raster dimensions and a third dimension the values are aggregated from, for example a single band. Otherwise this process fails with the `TooManyDimensions` error.\n\nThe number of total and valid pixels is returned together with the calculated values.",
       "categories": [
         "cubes",
-        "aggregate"
+        "aggregate & resample"
+      ],
+      "experimental": true,
+      "parameter_order": [
+        "data",
+        "polygons",
+        "reducer",
+        "name"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "polygons": {
+          "description": "One or more polygons to calculate zonal statistics for. Either specified as GeoJSON or vector data cube.\n\nFor GeoJSON this can be one of the following GeoJSON types:\n\n* A `Polygon` geometry,\n* a `GeometryCollection` containing Polygons,\n* a `Feature` with a `Polygon` geometry or\n* a `FeatureCollection` containing `Feature`s with a `Polygon` geometry.",
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "format": "geojson"
+              },
+              {
+                "type": "object",
+                "format": "vector-cube"
+              }
+            ]
+          },
+          "required": true
+        },
+        "reducer": {
+          "description": "A reducer to be applied on all values of each geometry. The reducer must be a callable process (or a set processes) that accepts an array and computes a single return value of the same type as the input values, for example ``median()``.",
+          "schema": {
+            "type": "object",
+            "format": "callback",
+            "properties": {
+              "data": {
+                "description": "An array with elements of any type.",
+                "type": "array",
+                "items": {
+                  "description": "Any data type."
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "name": {
+          "description": "The property name (for GeoJSON) or the new dimension name (for vector cubes) to be used for storing the results. Defaults to `result`.",
+          "schema": {
+            "type": "string",
+            "default": "result"
+          }
+        }
+      },
+      "returns": {
+        "description": "A vector data cube or a GeoJSON object, depending on the input of the `polygons` parameter.\n\nThe computed value is stored in a property (GeoJSON) or dimension (vector cube) with the name that was specified in the parameter `name`.\n\nThe computation also stores information about the total count of pixels (valid + invalid pixels) and the number of valid pixels (see ``is_valid()``) in each geometry. In GeoJSON these are stored as properties with the names `{name}_total_count` and `{name}_valid_count` (replace `{name}` with the value of the `name` parameter). In a vector data cube, these values are stored as attributes of the result value with the attribute names `total_count` and `valid_count`.\n\nIf the input was GeoJSON and the therefore the return value is also a GeoJSON object, the geometries (`Polygon` or `GeometryCollection`) get wrapped in a `Feature` or `FeatureCollection` respectively. The results of the computations are stored in the `properties` of each GeoJSON `Feature`.",
+        "schema": {
+          "anyOf": [
+            {
+              "type": "object",
+              "format": "geojson"
+            },
+            {
+              "type": "object",
+              "format": "vector-cube"
+            }
+          ]
+        }
+      },
+      "exceptions": {
+        "TooManyDimensions": {
+          "message": "The number of dimensions must be reduced to three for 'aggregate_polygon'."
+        }
+      },
+      "links": [
+        {
+          "href": "https://github.com/Open-EO/openeo-processes/issues/2",
+          "rel": "experimental",
+          "title": "More information about the experimental status of the process"
+        },
+        {
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
+          "rel": "about",
+          "title": "Aggregation explained in the openEO glossary"
+        },
+        {
+          "href": "http://www.opengeospatial.org/standards/sfa",
+          "rel": "about",
+          "title": "Simple Features standard by the OGC"
+        }
+      ]
+    },
+    {
+      "id": "aggregate_temporal",
+      "summary": "Temporal aggregations",
+      "description": "Computes a temporal aggregation based on an array of date and/or time intervals.\n\nCalendar hierarchies such as year, month, week etc. must be transformed into specific intervals by the clients. For each interval, all data along the dimension will be passed through the reducer. The computed values will be projected to the labels, so the number of labels and the number of intervals need to be equal.\n\nIf the dimension is not set or is set to `null`, the data cube is expected to only have one temporal dimension.",
+      "categories": [
+        "cubes",
+        "aggregate & resample"
       ],
       "experimental": true,
       "parameter_order": [
@@ -138,9 +274,10 @@
           "required": true
         },
         "intervals": {
-          "description": "Temporal left-closed intervals so that the start time is contained, but not the end time.\n\nThe specified temporal strings follow [RFC 3339](https://tools.ietf.org/html/rfc3339). Although [RFC 3339 prohibits the hour to be '24'](https://tools.ietf.org/html/rfc3339#section-5.7), **this process allows the value '24' for the hour** of an end time in order to make it possible that left-closed time intervals can fully cover the day.",
+          "description": "Temporal left-closed intervals so that the start time is contained, but not the end time. Intervals can overlap.\n\nThe specified temporal strings follow [RFC 3339](https://tools.ietf.org/html/rfc3339). Although [RFC 3339 prohibits the hour to be '24'](https://tools.ietf.org/html/rfc3339#section-5.7), **this process allows the value '24' for the hour** of an end time in order to make it possible that left-closed time intervals can fully cover the day.",
           "schema": {
             "type": "array",
+            "format": "temporal-intervals",
             "items": {
               "type": "array",
               "minItems": 2,
@@ -195,11 +332,27 @@
           "required": true
         },
         "labels": {
-          "description": "Labels for the intervals. The number of labels and the number of groups need to be equal.",
+          "description": "Labels for the intervals, which can contain dates and/or times. The number of labels and the number of groups need to be equal.",
           "schema": {
             "type": "array",
             "items": {
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "string",
+                  "format": "time"
+                },
+                {
+                  "type": "string"
+                }
+              ]
             }
           },
           "required": true
@@ -222,9 +375,13 @@
           "required": true
         },
         "dimension": {
-          "description": "The temporal dimension for aggregation. All data along the dimension will be passed through the specified reducer. If the dimension is not set, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
+          "description": "The temporal dimension for aggregation. All data along the dimension will be passed through the specified reducer. If the dimension is not set or set to `null`, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
           "schema": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         }
       },
@@ -235,112 +392,77 @@
           "format": "raster-cube"
         }
       },
+      "examples": [
+        {
+          "process_graph": {
+            "loadco1": {
+              "process_id": "load_collection",
+              "arguments": {
+                "id": "S2B"
+              }
+            },
+            "aggreg1": {
+              "process_id": "aggregate_temporal",
+              "arguments": {
+                "data": {
+                  "from_node": "loadco1"
+                },
+                "intervals": [
+                  [
+                    "2015-01-01",
+                    "2016-01-01"
+                  ],
+                  [
+                    "2016-01-01",
+                    "2017-01-01"
+                  ],
+                  [
+                    "2017-01-01",
+                    "2018-01-01"
+                  ],
+                  [
+                    "2018-01-01",
+                    "2019-01-01"
+                  ]
+                ],
+                "labels": [
+                  [
+                    "2015-01-01"
+                  ],
+                  [
+                    "2016-01-01"
+                  ],
+                  [
+                    "2017-01-01"
+                  ],
+                  [
+                    "2018-01-01"
+                  ]
+                ],
+                "reducer": {
+                  "callback": {
+                    "median1": {
+                      "process_id": "median",
+                      "arguments": {
+                        "data": {
+                          "from_argument": "data"
+                        }
+                      },
+                      "result": true
+                    }
+                  }
+                }
+              },
+              "result": true
+            }
+          }
+        }
+      ],
       "links": [
         {
           "rel": "about",
           "href": "https://open-eo.github.io/openeo-api/v/0.4.0/processes/#openeo-specific-formats",
           "title": "Information about the supported temporal formats."
-        },
-        {
-          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
-          "rel": "about",
-          "title": "Aggregation explained in the openEO glossary"
-        }
-      ]
-    },
-    {
-      "id": "aggregate_zonal",
-      "summary": "Zonal statistics for polygons",
-      "description": "Aggregates zonal statistics for one or multiple polygons over a dimension.\n\nThe number of total and valid pixels is returned together with the calculated values.",
-      "categories": [
-        "cubes",
-        "aggregate"
-      ],
-      "experimental": true,
-      "parameter_order": [
-        "data",
-        "polygons",
-        "reducer",
-        "dimension",
-        "name"
-      ],
-      "parameters": {
-        "data": {
-          "description": "A data cube.",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "polygons": {
-          "description": "One or multiple polygons to calculate zonal statistics for.\n\nFor GeoJSON this can be one of the following GeoJSON types:\n\n* A `Polygon` geometry,\n* a `GeometryCollection` containing Polygons,\n* a `Feature` with a `Polygon` geometry or\n* a `FeatureCollection` containing `Feature`s with a `Polygon` geometry.",
-          "schema": {
-            "anyOf": [
-              {
-                "type": "object",
-                "format": "geojson"
-              },
-              {
-                "type": "object",
-                "format": "vector-cube"
-              }
-            ]
-          },
-          "required": true
-        },
-        "reducer": {
-          "description": "A reducer to be applied on all values of each geometry. The reducer must be a callable process (or a set processes) that accepts an array and computes a single return value of the same type as the input values, for example ``median()``.",
-          "schema": {
-            "type": "object",
-            "format": "callback",
-            "properties": {
-              "data": {
-                "description": "An array with elements of any type.",
-                "type": "array",
-                "items": {
-                  "description": "Any data type."
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "dimension": {
-          "description": "The dimension over which to aggregate.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`. The bands must be filtered to contain only a single band otherwise the aggregation will fail.",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        },
-        "name": {
-          "description": "The property name (for GeoJSON) or the new dimension name (for vector cubes) to be used for storing the results. Defaults to `result`.",
-          "schema": {
-            "type": "string",
-            "default": "result"
-          }
-        }
-      },
-      "returns": {
-        "description": "A vector data cube or a GeoJSON object, depending on the input of the `polygons` parameter.\n\nThe computed value is stored in a property (GeoJSON) or dimension (vector cube) with the name that was specified in the parameter `name`.\n\nThe computation also stores information about the total count of pixels (valid + invalid pixels) and the number of valid pixels (see ``is_valid()``) in each geometry. In GeoJSON these are stored as properties with the names `{name}_total_count` and `{name}_valid_count` (replace `{name}` with the value of the `name` parameter). In a vector data cube, these values are stored as attributes of the result value with the attribute names `total_count` and `valid_count`.\n\nIf the input was GeoJSON and the therefore the return value is also a GeoJSON object, the geometries (`Polygon` or `GeometryCollection`) get wrapped in a `Feature` or `FeatureCollection` respectively. The results of the computations are stored in the `properties` of each GeoJSON `Feature`.",
-        "schema": {
-          "anyOf": [
-            {
-              "type": "object",
-              "format": "geojson"
-            },
-            {
-              "type": "object",
-              "format": "vector-cube"
-            }
-          ]
-        }
-      },
-      "links": [
-        {
-          "href": "https://github.com/Open-EO/openeo-processes/issues/2",
-          "rel": "experimental",
-          "title": "More information about the experimental status of the process"
         },
         {
           "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
@@ -478,15 +600,15 @@
     },
     {
       "id": "apply_dimension",
-      "summary": "Applies an n-ary process to one or more dimensions",
-      "description": "Applies an n-ary process (i.e. takes an array of values instead of a single value) to a raster data cube. The n-ary process must return as many elements in the returned array as there are in the input array.\n\nThe dimensions over which to iterate with the parameter `dimensions` can be specified. The specified callback is applied to each of them individually. If the `dimensions` parameter is not set or an empty array, the process applies the callback to all dimensions.",
+      "summary": "Applies an n-ary process to all pixels",
+      "description": "Applies an **n-ary** process (i.e. takes an array of pixel values instead of a single pixel value) to a raster data cube. In contrast, the process ``apply()`` applies an unary process to all pixel values.\n\nBy default, `apply_dimension` applies the the process on all pixel values in the data cube as ``apply()`` does, but the parameter `dimension` can be specified to work only on a particular dimension only. For example, if the temporal dimension is specified the process will work on a time series of pixel values.\n\nThe n-ary process must return as many elements in the returned array as there are in the input array. Otherwise a `CardinalityChanged` error must be returned.",
       "categories": [
         "cubes"
       ],
       "parameter_order": [
         "data",
         "process",
-        "dimensions"
+        "dimension"
       ],
       "parameters": {
         "data": {
@@ -514,22 +636,27 @@
           },
           "required": true
         },
-        "dimensions": {
-          "description": "The names of the dimensions to apply the process on. Defaults to an empty array so that all dimensions are used.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
+        "dimension": {
+          "description": "The name of the dimension to apply the process on. By default, applies the the process on all pixel values (as ``apply()`` does).",
           "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "default": []
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         }
       },
       "returns": {
-        "description": "A data cube with the newly computed values for the specified dimensions. The resolution, cardinality and the number of dimensions are the same as for the original data cube.",
+        "description": "A data cube with the newly computed values for the specified . The resolution, cardinality and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
+        }
+      },
+      "exceptions": {
+        "CardinalityChanged": {
+          "message": "The callback returned less or more elements than it received."
         }
       }
     },
@@ -582,15 +709,14 @@
     },
     {
       "id": "apply",
-      "summary": "Applies a process to each pixel",
-      "description": "Applies a unary process (a local operation) to each value of the specified or all dimensions in the data cube.",
+      "summary": "Applies a unary process to each pixel",
+      "description": "Applies a **unary** process which takes a single value such as `abs` or `sqrt` to each pixel value in the data cube (i.e. a local operation). In contrast, the process ``apply_dimension()`` applies an n-ary process to a particular dimension.",
       "categories": [
         "cubes"
       ],
       "parameter_order": [
         "data",
-        "process",
-        "dimensions"
+        "process"
       ],
       "parameters": {
         "data": {
@@ -613,16 +739,6 @@
             }
           },
           "required": true
-        },
-        "dimensions": {
-          "description": "The names of the dimensions to apply the process on. Defaults to an empty array so that all dimensions are used.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`..",
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "default": []
-          }
         }
       },
       "returns": {
@@ -1856,63 +1972,9 @@
       }
     },
     {
-      "id": "cube_property",
-      "summary": "Retrieve cube or dimension metadata",
-      "description": "Gets metadata for a data cube or a dimension in the cube. To get metadata for a dimension specify the `dimension` parameter, otherwise set it to `null`.",
-      "categories": [
-        "cubes"
-      ],
-      "parameter_order": [
-        "data",
-        "name",
-        "dimension"
-      ],
-      "parameters": {
-        "data": {
-          "description": "A data cube.",
-          "schema": {
-            "anyOf": [
-              {
-                "type": "object",
-                "format": "raster-cube"
-              },
-              {
-                "type": "object",
-                "format": "vector-cube"
-              }
-            ]
-          },
-          "required": true
-        },
-        "name": {
-          "description": "Name of the metadata property.",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        },
-        "dimension": {
-          "description": "If required, a dimension name of the data cube.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
-          "schema": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "default": null
-          }
-        }
-      },
-      "returns": {
-        "description": "The value for the metadata property or `null` if no information are available.",
-        "schema": {
-          "description": "Any data type is allowed."
-        }
-      }
-    },
-    {
       "id": "cummax",
       "summary": "Cumulative maxima",
-      "description": "Finds cumulative maxima of an array of numbers. Every computed element is equal to the bigger one between current element and previous element. The returned array and the input array have always the same length.\n\nBy default, no-data values are skipped, but stay in the result. Setting the `ignore_nodata` flag to `true` makes that once a no-data value / `null` is reached all following elements are set to `null` in the result.",
+      "description": "Finds cumulative maxima of an array of numbers. Every computed element is equal to the bigger one between current element and the previously computed element. The returned array and the input array have always the same length.\n\nBy default, no-data values are skipped, but stay in the result. Setting the `ignore_nodata` flag to `true` makes that once a no-data value / `null` is reached all following elements are set to `null` in the result.",
       "categories": [
         "math > cumulative"
       ],
@@ -2015,7 +2077,7 @@
     {
       "id": "cummin",
       "summary": "Cumulative minima",
-      "description": "Finds cumulative minima of an array of numbers. Every computed element is equal to the smaller one between current element and previous element. The returned array and the input array have always the same length.\n\nBy default, no-data values are skipped, but stay in the result. Setting the `ignore_nodata` flag to `true` makes that once a no-data value / `null` is reached all following elements are set to `null` in the result.",
+      "description": "Finds cumulative minima of an array of numbers. Every computed element is equal to the smaller one between current element and the previously computed element. The returned array and the input array have always the same length.\n\nBy default, no-data values are skipped, but stay in the result. Setting the `ignore_nodata` flag to `true` makes that once a no-data value / `null` is reached all following elements are set to `null` in the result.",
       "categories": [
         "math > cumulative"
       ],
@@ -2880,7 +2942,7 @@
     {
       "id": "filter_bands",
       "summary": "Filter the bands by name",
-      "description": "Filters the bands in the data cube so that bands that don't match any of the criteria are dropped from the data cube. The data cube is expected to have only one spectral dimension.\n\nThe following criteria can be used to select bands:\n\n* `bands`: band name (e.g. `B01` or `B8A`)\n* `common_names`: common band names (e.g. `red` or `nir`)\n* `wavelengths`: ranges of wavelengths in micrometres (μm) (e.g. 0.5 - 0.6)\n\nTo keep algorithms interoperable it is recommended to prefer the common bands names or the wavelengths over collection and/or back-end specific band names.\n\nIf multiple criteria are specified, any of them must match and not all of them, i.e. they are combined with an OR-operation. If no criteria is specified, the `BandFilterParameterMissing` exception must be thrown.",
+      "description": "Filters the bands in the data cube so that bands that don't match any of the criteria are dropped from the data cube. The data cube is expected to have only one spectral dimension.\n\nThe following criteria can be used to select bands:\n\n* `bands`: band name (e.g. `B01` or `B8A`)\n* `common_names`: common band names (e.g. `red` or `nir`)\n* `wavelengths`: ranges of wavelengths in micrometres (μm) (e.g. 0.5 - 0.6)\n\nTo keep algorithms interoperable it is recommended to prefer the common bands names or the wavelengths over collection and/or back-end specific band names.\n\nIf multiple criteria are specified, any of them must match and not all of them, i.e. they are combined with an OR-operation. If no criteria is specified, the `BandFilterParameterMissing` exception must be thrown.\n\n**Important:** The order of the specified array defines the order of the bands in the data cube, which can be important for subsequent processes.",
       "categories": [
         "filter"
       ],
@@ -2900,7 +2962,7 @@
           "required": true
         },
         "bands": {
-          "description": "A list of band names.",
+          "description": "A list of band names.\n\nThe order of the specified array defines the order of the bands in the data cube!",
           "schema": {
             "type": "array",
             "items": {
@@ -2909,7 +2971,7 @@
           }
         },
         "common_names": {
-          "description": "A list of common band names.",
+          "description": "A list of common band names.\n\nThe order of the specified array defines the order of the bands in the data cube!",
           "schema": {
             "type": "array",
             "items": {
@@ -2918,7 +2980,7 @@
           }
         },
         "wavelengths": {
-          "description": "A list of sub-lists with each sub-list consisting of two elements. The first element is the minimum wavelength and the second element is the maximum wavelength. Wavelengths are specified in micrometres (μm).",
+          "description": "A list of sub-lists with each sub-list consisting of two elements. The first element is the minimum wavelength and the second element is the maximum wavelength. Wavelengths are specified in micrometres (μm).\n\nThe order of the specified array defines the order of the bands in the data cube!",
           "schema": {
             "type": "array",
             "items": {
@@ -3039,10 +3101,23 @@
           }
         },
         "crs": {
-          "description": "Coordinate reference system. EPSG codes must be supported. In addition, proj4 strings should be supported by back-ends. Whenever possible, it is recommended to use EPSG codes instead of proj4 strings. Defaults to EPSG:4326 unless the client explicitly requests a different coordinate reference system.",
+          "description": "Coordinate reference system of the parameters specified as [EPSG](http://www.epsg.org) code or [PROJ](https://proj4.org) definition. Whenever possible, it is recommended to use EPSG codes instead of PROJ definitions. Defaults to `4326` (EPSG code 4326) unless the client explicitly requests a different coordinate reference system.",
           "schema": {
-            "type": "string",
-            "default": "EPSG:4326"
+            "oneOf": [
+              {
+                "title": "EPSG Code",
+                "type": "integer",
+                "format": "epsg-code",
+                "example": 7099
+              },
+              {
+                "title": "PROJ definition",
+                "type": "string",
+                "format": "proj-definition",
+                "example": "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+              }
+            ],
+            "default": 4326
           }
         }
       },
@@ -3052,18 +3127,35 @@
           "type": "object",
           "format": "raster-cube"
         }
-      }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://proj4.org/usage/projections.html",
+          "title": "PROJ parameters for cartographic projections"
+        },
+        {
+          "rel": "about",
+          "href": "http://www.epsg-registry.org",
+          "title": "Official EPSG code registry"
+        },
+        {
+          "rel": "about",
+          "href": "http://www.epsg.io",
+          "title": "Unofficial EPSG code database"
+        }
+      ]
     },
     {
-      "id": "filter_geometry",
-      "summary": "Spatial filter using a geometry",
-      "description": "Limits the data cube to the specified geometry.",
+      "id": "filter_polygon",
+      "summary": "Spatial filter using polygons",
+      "description": "Limits the data cube over the spatial dimensions to the specified polygons.\n\nThe filter retains a pixel in the data cube if the point at the pixel center intersects with at least one of the polygons (as defined in the Simple Features standard by the OGC).",
       "categories": [
         "filter"
       ],
       "parameter_order": [
         "data",
-        "geometry"
+        "polygons"
       ],
       "parameters": {
         "data": {
@@ -3074,8 +3166,8 @@
           },
           "required": true
         },
-        "geometry": {
-          "description": "A geometry, either a GeoJSON or a vector data cube.\n\nIf multiple geometries are passed, the intersection of all geometries is used as geometry.",
+        "polygons": {
+          "description": "One or more polygons used for filtering, either specified as GeoJSON or vector data cube.\n\nFor GeoJSON this can be one of the following GeoJSON types:\n\n* A `Polygon` geometry,\n* a `GeometryCollection` containing Polygons,\n* a `Feature` with a `Polygon` geometry or\n* a `FeatureCollection` containing `Feature`s with a `Polygon` geometry.",
           "experimental": true,
           "schema": {
             "anyOf": [
@@ -3093,68 +3185,24 @@
         }
       },
       "returns": {
-        "description": "A data cube restricted to the specified geometry (or the intersection of geometries). Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
+        "description": "A data cube restricted to the specified polygons. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
         "schema": {
           "type": "object",
           "format": "raster-cube"
-        }
-      }
-    },
-    {
-      "id": "filter_property",
-      "summary": "Filter by metadata attributes",
-      "description": "Limits the data cube over all dimensions to contain only data whose attributes match against the specified expression. The attribute to match against is specified with the parameter `name`. See the *Collection Discovery* for available attributes.",
-      "categories": [
-        "filter"
-      ],
-      "experimental": true,
-      "parameter_order": [
-        "data",
-        "name",
-        "expression"
-      ],
-      "parameters": {
-        "data": {
-          "description": "A data cube.",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "name": {
-          "description": "Name of the attribute to filter on.",
-          "schema": {
-            "type": "string"
-          },
-          "required": true
-        },
-        "expression": {
-          "description": "Expression to evaluate against the attribute values.",
-          "schema": {
-            "type": "object",
-            "format": "callback",
-            "properties": {
-              "x": {
-                "description": "A value of any data type could be passed."
-              }
-            }
-          },
-          "required": true
         }
       },
-      "returns": {
-        "description": "A data cube with values restricted by a filter on its value's metadata attributes. Therefore, the cardinality is potentially lower, but the resolution and the number of dimensions are the same as for the original data cube.",
-        "schema": {
-          "type": "object",
-          "format": "raster-cube"
+      "links": [
+        {
+          "href": "http://www.opengeospatial.org/standards/sfa",
+          "rel": "about",
+          "title": "Simple Features standard by the OGC"
         }
-      }
+      ]
     },
     {
       "id": "filter_temporal",
       "summary": "Temporal filter for a date and/or time intervals",
-      "description": "Limits the data cube to the specified interval of dates and/or times.\n\nAlso supports open intervals by setting either `start` or `end` to `null`, but never both.\n\nMore precisely, the filter checks checks whether the end of the exposure time is greater than or equal to the value of `start` and the start of the exposure time is less than the value of `end`. This corresponds to a left-closed interval, which contains the `start` but not the `end`.\n\nIf the dimension is not set, the data cube is expected to only have one temporal dimension.",
+      "description": "Limits the data cube to the specified interval of dates and/or times.\n\nAlso supports open intervals by setting either `start` or `end` to `null`, but never both.\n\nMore precisely, the filter checks checks whether the temporal dimension value is greater than or equal to the value of `start` and the temporal dimension value is less than the value of `end`. This corresponds to a left-closed interval, which contains the `start` but not the `end`.\n\nIf the dimension is not set or is set to `null`, the data cube is expected to only have one temporal dimension.",
       "categories": [
         "filter"
       ],
@@ -3220,9 +3268,13 @@
           }
         },
         "dimension": {
-          "description": "The temporal dimension to filter on. If the dimension is not set, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
+          "description": "The temporal dimension to filter on. If the dimension is not set or is set to `null`, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
           "schema": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         }
       },
@@ -3244,7 +3296,7 @@
     {
       "id": "filter",
       "summary": "Filter based on a logical expression.",
-      "description": "Filters the data based on a logical expression so that afterwards each value in the data cube conforms to the expression.",
+      "description": "Filters the dimension values based on a logical expression so that afterwards each dimension value in the data cube conforms to the expression.",
       "categories": [
         "cubes",
         "filter"
@@ -3264,11 +3316,35 @@
           "required": true
         },
         "expression": {
-          "description": "An expression that is evaluated against each value in the data cube. For each dimension specified a parameter is passed to the expression callback with the name of the parameter being the dimension name. The data type of the parameter depends on the values stored in the dimension.",
+          "description": "An expression that is evaluated against each dimension value in the data cube. For each dimension specified a parameter is passed to the expression callback with the name of the parameter being the dimension name. The data type of the parameter depends on the dimension values stored for the dimension.",
           "schema": {
             "type": "object",
             "format": "callback",
-            "additionalProperties": true
+            "properties": {
+              "value": {
+                "description": "A single dimension values to compare against.",
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  {
+                    "type": "string",
+                    "format": "time"
+                  }
+                ]
+              }
+            }
           },
           "required": true
         },
@@ -3294,7 +3370,7 @@
     {
       "id": "find_collections",
       "summary": "Search for collections by metadata properties",
-      "description": "Searches for collections available on the current back-end by metadata properties and returns ids of collections that match all criteria. ``cube_property()`` can be used to get property values.\n\nA single collection can be selected using array operations such as ``first()``, ``last()`` and ``array_element()`` and afterwards be loaded using ``load_collection()``.",
+      "description": "Searches for collections available on the current back-end by metadata properties and returns ids of collections that match all criteria. ``property()`` can be used to get metadata properties.\n\nA single collection can be selected using array operations such as ``first()``, ``last()`` and ``array_element()`` and afterwards be loaded using ``load_collection()``.",
       "categories": [
         "cubes",
         "import"
@@ -3307,18 +3383,10 @@
             "type": "object",
             "format": "callback",
             "properties": {
-              "data": {
-                "description": "A data cube.",
-                "anyOf": [
-                  {
-                    "type": "object",
-                    "format": "raster-cube"
-                  },
-                  {
-                    "type": "object",
-                    "format": "vector-cube"
-                  }
-                ]
+              "id": {
+                "description": "The collection id.",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_\\-\\.~/]+$"
               }
             }
           },
@@ -3330,7 +3398,7 @@
         "schema": {
           "type": "array",
           "items": {
-            "description": "Each element is a job id.",
+            "description": "Each element is a collection id.",
             "type": "string",
             "pattern": "^[A-Za-z0-9_\\-\\.~/]+$"
           }
@@ -4280,10 +4348,14 @@
     {
       "id": "load_collection",
       "summary": "Load a collection",
-      "description": "Loads a collection from the current back-end by its id and returns it as processable data cube.",
+      "description": "Loads a collection from the current back-end by its id and returns it as processable data cube. The data that is added to the data cube can be filtered by an expression so that every part of the data that matches the expression is included in the data cube.",
       "categories": [
         "cubes",
         "import"
+      ],
+      "parameter_order": [
+        "id",
+        "expression"
       ],
       "parameters": {
         "id": {
@@ -4293,6 +4365,20 @@
             "pattern": "^[A-Za-z0-9_\\-\\.~/]+$"
           },
           "required": true
+        },
+        "expression": {
+          "description": "Expression that filters the collection data to include only data in the data cube which matches the given expression. ``property()`` can be used to retrieve metadata properties.",
+          "schema": {
+            "type": "object",
+            "format": "callback",
+            "properties": {
+              "id": {
+                "description": "The collection id.",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_\\-\\.~/]+$"
+              }
+            }
+          }
         }
       },
       "returns": {
@@ -4314,7 +4400,7 @@
     {
       "id": "load_result",
       "summary": "Load batch job results",
-      "description": "Loads locally stored batch job results by job id. The job must have been stored by the authenticated user on the back-end currently connected to.",
+      "description": "Loads batch job results by job id from the local user workspace / data store. The job must have been stored by the authenticated user on the back-end currently connected to.",
       "categories": [
         "cubes",
         "import"
@@ -4700,7 +4786,7 @@
     {
       "id": "mask",
       "summary": "Apply a mask",
-      "description": "Applies a mask to a raster data cube. Therefore, compares the parallel elements of the raster data cubes specified for `data` and `mask` and replaces all elements in `data` that are non-zero (for numbers) or `true` (for boolean values) in `mask`. These elements are replaced with the value specified for `replacement`, which defaults to `null` (no data). No data values will be left untouched.",
+      "description": "Applies a mask to a raster data cube. A mask can either be specified as:\n\n* **Raster data cube** for which parallel pixels among `data` and `mask` are compared and those pixels in `data` are replaced, which are non-zero (for numbers) or `true` (for boolean values) in `mask`.\n* **GeoJSON or vector data cube** containing one or more polygons. All pixels for which the point at the pixel center intersects with the corresponding polygon (as defined in the Simple Features standard by the OGC) are replaced.\n\nThe pixel values are replaced with the value specified for `replacement`, which defaults to `null` (no data). No data values will be left untouched by the masking operation.",
       "categories": [
         "masks"
       ],
@@ -4719,10 +4805,23 @@
           "required": true
         },
         "mask": {
-          "description": "A compatible raster data cube so that every element in `data` has a parallel element in the data cube specified here.",
+          "description": "Either a raster data cube, a GeoJSON object or a vector data cube.\n\nFor **raster data cubes**, both data cubes must be compatible so that every pixel in `data` has a parallel element in `mask`.\n\nFor **GeoJSON** the provided types can be one of the following:\n\n* A `Polygon` geometry,\n* a `GeometryCollection` containing Polygons,\n* a `Feature` with a `Polygon` geometry or\n* a `FeatureCollection` containing `Feature`s with a `Polygon` geometry.",
+          "experimental": true,
           "schema": {
-            "type": "object",
-            "format": "raster-cube"
+            "anyOf": [
+              {
+                "type": "object",
+                "format": "geojson"
+              },
+              {
+                "type": "object",
+                "format": "vector-cube"
+              },
+              {
+                "type": "object",
+                "format": "raster-cube"
+              }
+            ]
           },
           "required": true
         },
@@ -4753,7 +4852,14 @@
           "type": "object",
           "format": "raster-cube"
         }
-      }
+      },
+      "links": [
+        {
+          "href": "http://www.opengeospatial.org/standards/sfa",
+          "rel": "about",
+          "title": "Simple Features standard by the OGC"
+        }
+      ]
     },
     {
       "id": "max",
@@ -6354,6 +6460,54 @@
       }
     },
     {
+      "id": "property",
+      "summary": "Get metadata for data cubes or collections",
+      "description": "Retrieves metadata properties for a data cube (if a `raster-cube` or `vector-cube` is passed) or a collection (if a collection id is passed).\n\nAvailable metadata properties can be retrieved with the openEO Data Discovery for Collections, but for data cubes only a subset may be available after processing.",
+      "categories": [
+        "cubes"
+      ],
+      "parameter_order": [
+        "data",
+        "name"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "format": "raster-cube"
+              },
+              {
+                "type": "object",
+                "format": "vector-cube"
+              },
+              {
+                "description": "A collection id.",
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_\\-\\.~/]+$"
+              }
+            ]
+          },
+          "required": true
+        },
+        "name": {
+          "description": "Name of the metadata property.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The value for the metadata property or `null` if no information are available.",
+        "schema": {
+          "description": "Any data type is allowed."
+        }
+      }
+    },
+    {
       "id": "quantiles",
       "summary": "Quantiles",
       "description": "Calculates quantiles, which are cut points dividing the range of a probability distribution into either\n\n* intervals corresponding to the given `probabilities` or\n* (nearly) equal-sized intervals (q-quantiles based on the parameter `q`).\n\nEither the parameter `probabilites` or `q` must be specified, otherwise the `QuantilesParameterMissing` exception must be thrown. If both parameters are set the `QuantilesParameterConflict` exception must be thrown.",
@@ -6651,7 +6805,7 @@
     {
       "id": "reduce",
       "summary": "Reduce dimensions",
-      "description": "Applies a reducer to a data cube dimension by collapsing all the input values along the specified dimension into a single output value computed by the reducer.\n\nThe reducer must accept an array and return a single value (see parameter `reducer`). Nominal values are possible, but need to be mapped, e.g. band names to wavelengths, date strings to numeric timestamps since 1970 etc.",
+      "description": "Applies a reducer to a data cube dimension by collapsing all the input values along the specified dimension into an output value computed by the reducer.\n\nThe reducer must be a callable process (or a set of processes) that accepts by default array as input. The process can also work on two values by setting `binary` to `true`. The reducer must computes a single or multiple return values of the same type as the input values. Multiple values must be wrapped in an array. An example for a process returning a single value is ``median()``. In this case the specified dimension would be removed. If a callback such as ``extrema()`` returns multiple values, a new dimension with the specified name in `target_dimension` is created (see the parameter description for more information).\n\nNominal values can be reduced too, but need to be mapped. For example date strings to numeric timestamps since 1970 etc.",
       "categories": [
         "cubes",
         "reducer"
@@ -6659,7 +6813,9 @@
       "parameter_order": [
         "data",
         "reducer",
-        "dimension"
+        "dimension",
+        "target_dimension",
+        "binary"
       ],
       "parameters": {
         "data": {
@@ -6671,7 +6827,254 @@
           "required": true
         },
         "reducer": {
-          "description": "A reducer to be applied on the specified dimension. The reducer must be a callable process (or a set processes) that accepts an array and computes a single return value of the same type as the input values, for example ``median()``.",
+          "description": "A reducer to be applied on the specified dimension (see the process description for more details).",
+          "schema": {
+            "oneOf": [
+              {
+                "title": "Unary behaviour",
+                "description": "Passes an array to the reducer.",
+                "type": "object",
+                "format": "callback",
+                "properties": {
+                  "data": {
+                    "description": "An array with elements of any type.",
+                    "type": "array",
+                    "items": {
+                      "description": "Any data type."
+                    }
+                  }
+                }
+              },
+              {
+                "title": "Binary behaviour",
+                "description": "Passes two values to the reducer.",
+                "type": "object",
+                "format": "callback",
+                "properties": {
+                  "x": {
+                    "description": "The first value. Any data type could be passed."
+                  },
+                  "y": {
+                    "description": "The second value. Any data type could be passed."
+                  }
+                }
+              }
+            ]
+          },
+          "required": true
+        },
+        "dimension": {
+          "description": "The dimension over which to reduce.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "target_dimension": {
+          "description": "The name of the target dimension. Only required if the reducer returns multiple values, otherwise ignored. By default creates a new dimension with the specified name and the type `other` (see ``add_dimension()``). If a dimension with the specified name exists, the dimension is replaced, but keeps the original type.",
+          "schema": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          }
+        },
+        "binary": {
+          "description": "Specifies whether the reducer should pass two values to the reducer or a list of values (default).\n\nIf the reducer passes two values, the reducer must be both associative and commutative as the execution may be executed in parallel and therefore the the order of execution is arbitrary.\n\nThis parameter is especially useful for UDFs passed as reducers. Back-ends may still optimize and parallelize processes that work on list of values.",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "returns": {
+        "description": "A data cube with the newly computed values. The number of dimensions is reduced for callbacks returning a single value or doesn't change if the callback returns multiple values. The resolution and cardinality are the same as for the original data cube.",
+        "schema": {
+          "type": "object",
+          "format": "raster-cube"
+        }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://en.wikipedia.org/wiki/Reduction_Operator",
+          "title": "Background information on reduction operators (binary reducers) by Wikipedia"
+        }
+      ]
+    },
+    {
+      "id": "rename_dimension",
+      "summary": "Renames a dimension",
+      "description": "Renames a dimension in the data cube.\n\nAfterwards, the dimension can be referenced with the new name. If a dimension with the specified name already exists, a `DimensionExists` exception is thrown.",
+      "categories": [
+        "cubes"
+      ],
+      "parameter_order": [
+        "data",
+        "old",
+        "new"
+      ],
+      "parameters": {
+        "data": {
+          "description": "The data cube.",
+          "schema": {
+            "anyOf": [
+              {
+                "type": "object",
+                "format": "raster-cube"
+              },
+              {
+                "type": "object",
+                "format": "vector-cube"
+              }
+            ]
+          },
+          "required": true
+        },
+        "old": {
+          "description": "The current name of the dimension.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        },
+        "new": {
+          "description": "A new Name for the dimension.",
+          "schema": {
+            "type": "string"
+          },
+          "required": true
+        }
+      },
+      "returns": {
+        "description": "The data cube with the renamed dimension. The old name can not be referenced any longer.",
+        "schema": {
+          "anyOf": [
+            {
+              "type": "object",
+              "format": "raster-cube"
+            },
+            {
+              "type": "object",
+              "format": "vector-cube"
+            }
+          ]
+        }
+      },
+      "exceptions": {
+        "DimensionExists": {
+          "message": "A dimension with the specified name already exists."
+        }
+      }
+    },
+    {
+      "id": "resample_cube_spatial",
+      "summary": "Resample the spatial dimensions to a target data cube",
+      "description": "Resamples the spatial dimensions from a source data cube to a target data cube and return the results as a new data cube.",
+      "categories": [
+        "cubes",
+        "aggregate & resample"
+      ],
+      "experimental": true,
+      "parameter_order": [
+        "data",
+        "target",
+        "method"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "target": {
+          "description": "A data cube that describes the spatial target resolution.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "method": {
+          "description": "Resampling method. Methods are inspired by GDAL, see [gdalwarp](https://www.gdal.org/gdalwarp.html) for more information.",
+          "schema": {
+            "type": "string",
+            "default": "near",
+            "enum": [
+              "near",
+              "bilinear",
+              "cubic",
+              "cubicspline",
+              "lanczos",
+              "average",
+              "mode",
+              "max",
+              "min",
+              "med",
+              "q1",
+              "q3"
+            ]
+          }
+        }
+      },
+      "returns": {
+        "description": "A data cube with potentially lower spatial resolution and potentially lower cardinality, but the same number of dimensions as the original data cube.",
+        "schema": {
+          "type": "object",
+          "format": "raster-cube"
+        }
+      },
+      "links": [
+        {
+          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
+          "rel": "about",
+          "title": "Resampling explained in the openEO glossary"
+        },
+        {
+          "href": "https://github.com/Open-EO/openeo-processes/issues/14",
+          "rel": "experimental",
+          "title": "More information about the experimental status of the process"
+        }
+      ]
+    },
+    {
+      "id": "resample_cube_temporal",
+      "summary": "Resample a temporal dimension to a target data cube",
+      "description": "Resamples a temporal dimension from a source data cube to a target data cube and return the results as a new data cube.\n\nIf the dimension is not set or is set to `null`, the data cube is expected to only have one temporal dimension.",
+      "categories": [
+        "cubes",
+        "aggregate & resample"
+      ],
+      "experimental": true,
+      "parameter_order": [
+        "data",
+        "target",
+        "method",
+        "dimension"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A data cube.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "target": {
+          "description": "A data cube that describes the temporal target resolution.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "method": {
+          "description": "A resampling method to be applied, could be a reducer for downsampling or other methods for upsampling. The method must be a callable process (or a set processes) such as ``first()``, ``last()``, ``min()``, ``max()``, ``mean()`` or ``median()``.",
           "schema": {
             "type": "object",
             "format": "callback",
@@ -6688,117 +7091,13 @@
           "required": true
         },
         "dimension": {
-          "description": "The dimension over which to reduce.\n\n**Remarks:**\n\n* The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.\n* There could be multiple spatial dimensions such as `x`, `y` or `z`.\n* For multi-spectral imagery there is usually a separate dimension for the bands such as `spectral`.",
+          "description": "The temporal dimension to resample, which must exist with this name in both data cubes. If the dimension is not set or is set to `null`, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
           "schema": {
-            "type": "string"
-          },
-          "required": true
-        }
-      },
-      "returns": {
-        "description": "A data cube with the newly computed values. The number of dimensions is reduced, but the resolution and cardinality are the same as for the original data cube.",
-        "schema": {
-          "type": "object",
-          "format": "raster-cube"
-        }
-      }
-    },
-    {
-      "id": "resample_spatial",
-      "summary": "Resample spatial dimension",
-      "description": "Resamples the spatial dimension.",
-      "categories": [
-        "cubes",
-        "aggregate"
-      ],
-      "parameter_order": [
-        "data",
-        "method",
-        "target"
-      ],
-      "parameters": {
-        "data": {
-          "description": "A data cube.",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "method": {
-          "description": "",
-          "schema": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
-          }
-        },
-        "target": {
-          "description": "",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        }
-      },
-      "returns": {
-        "description": "A data cube with potentially lower spatial resolution and potentially lower cardinality, but the same number of dimensions as the original data cube.",
-        "schema": {
-          "type": "object",
-          "format": "raster-cube"
-        }
-      },
-      "links": [
-        {
-          "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
-          "rel": "about",
-          "title": "Aggregation explained in the openEO glossary"
-        }
-      ]
-    },
-    {
-      "id": "resample_temporal",
-      "summary": "Resample the temporal dimension",
-      "description": "Resamples the temporal dimension. If the dimension is not set, the data cube is expected to only have one temporal dimension.",
-      "categories": [
-        "cubes",
-        "aggregate"
-      ],
-      "experimental": true,
-      "parameter_order": [
-        "data",
-        "method",
-        "target",
-        "dimension"
-      ],
-      "parameters": {
-        "data": {
-          "description": "A data cube.",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "method": {
-          "description": "",
-          "schema": {
-            "type": "string",
-            "default": null
-          }
-        },
-        "target": {
-          "description": "",
-          "schema": {
-            "type": "object",
-            "format": "raster-cube"
-          },
-          "required": true
-        },
-        "dimension": {
-          "description": "The temporal dimension to resample. If the dimension is not set, the data cube is expected to only have one temporal dimension.\n\n**Note:** The default dimensions a data cube provides are described in the collection's metadata field `cube:dimensions`.",
-          "schema": {
-            "type": "string"
           }
         }
       },
@@ -6819,6 +7118,113 @@
           "href": "https://open-eo.github.io/openeo-api/v/0.4.0/glossary/#aggregation-and-resampling",
           "rel": "about",
           "title": "Resampling explained in the openEO glossary"
+        },
+        {
+          "href": "https://github.com/Open-EO/openeo-processes/issues/14",
+          "rel": "experimental",
+          "title": "More information about the experimental status of the process"
+        }
+      ]
+    },
+    {
+      "id": "resample_spatial",
+      "summary": "Resample and warp the spatial dimensions",
+      "description": "Resamples the data cube to a specified resolution and/or warps the data cube to the target projection. At least `resolution` or `projection` must be specified.",
+      "categories": [
+        "cubes",
+        "aggregate & resample"
+      ],
+      "parameter_order": [
+        "data",
+        "resolution",
+        "projection",
+        "method"
+      ],
+      "parameters": {
+        "data": {
+          "description": "A raster data cube.",
+          "schema": {
+            "type": "object",
+            "format": "raster-cube"
+          },
+          "required": true
+        },
+        "resolution": {
+          "description": "Resamples the data cube to the target resolution. Specified in the units of the target projection. Doesn't change the resolution by default (`0`).",
+          "schema": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "projection": {
+          "description": "Warps the data cube to the target projection. Target projection specified as [EPSG](http://www.epsg.org) code or [PROJ](https://proj4.org) definition. Doesn't change the projection by default (`null`).",
+          "schema": {
+            "oneOf": [
+              {
+                "title": "EPSG Code",
+                "type": "integer",
+                "format": "epsg-code",
+                "example": 7099
+              },
+              {
+                "title": "PROJ definition",
+                "type": "string",
+                "format": "proj-definition",
+                "example": "+proj=moll +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+              },
+              {
+                "title": "Don't change projection",
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "method": {
+          "description": "Resampling method. Methods are inspired by GDAL, see [gdalwarp](https://www.gdal.org/gdalwarp.html) for more information.",
+          "schema": {
+            "type": "string",
+            "default": "near",
+            "enum": [
+              "near",
+              "bilinear",
+              "cubic",
+              "cubicspline",
+              "lanczos",
+              "average",
+              "mode",
+              "max",
+              "min",
+              "med",
+              "q1",
+              "q3"
+            ]
+          }
+        }
+      },
+      "returns": {
+        "description": "A raster data cube with values warped onto the new projection.",
+        "schema": {
+          "type": "object",
+          "format": "raster-cube"
+        }
+      },
+      "links": [
+        {
+          "rel": "about",
+          "href": "https://proj4.org/usage/projections.html",
+          "title": "PROJ parameters for cartographic projections"
+        },
+        {
+          "rel": "about",
+          "href": "http://www.epsg-registry.org",
+          "title": "Official EPSG code registry"
+        },
+        {
+          "rel": "about",
+          "href": "http://www.epsg.io",
+          "title": "Unofficial EPSG code database"
         }
       ]
     },
@@ -7058,10 +7464,13 @@
           "required": true
         },
         "version": {
-          "description": "An UDF runtime version. Defaults to the default runtime version specified for each runtime.",
+          "description": "An UDF runtime version. If set to `null`, the default runtime version specified for each runtime is used.",
           "schema": {
-            "type": "string",
-            "default": "latest"
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
           }
         },
         "options": {
@@ -7070,6 +7479,11 @@
             "type": "object",
             "default": {}
           }
+        }
+      },
+      "exceptions": {
+        "InvalidVersion": {
+          "message": "The specified UDF runtime version is not supported."
         }
       },
       "returns": {
@@ -7082,7 +7496,7 @@
     {
       "id": "save_result",
       "summary": "Save processed data to storage",
-      "description": "Saves processed data to the data storage. This process aims to be compatible to GDAL/OGR formats and options. STAC-compatible metadata should be stored with the processed data.\n\nCalling this process may be rejected by back-ends in the context of secondary web services.",
+      "description": "Saves processed data to the local user workspace / data store of the authenticated user. This process aims to be compatible to GDAL/OGR formats and options. STAC-compatible metadata should be stored with the processed data.\n\nCalling this process may be rejected by back-ends in the context of secondary web services.",
       "categories": [
         "cubes",
         "export"
