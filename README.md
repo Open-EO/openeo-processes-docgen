@@ -57,7 +57,9 @@ To build the files follow these steps:
 5. Install the dependencies by executing `npm install` on the command line
 6. 
 	* Development: Run the development server by executing `npm run serve`.
-	* Deployment: Build the project by executing `npm run build`. Afterwards upload the content of the `dist` folder to your server.
+	* Deployment:
+		* Standalone: Build the project by executing `npm run build_standalone`. Afterwards upload the content of the `dist` folder to your server.
+		* Library: Build the project by executing `npm run build`. Afterwards you can publish the library to npm or so.
 
 ## License
 This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.

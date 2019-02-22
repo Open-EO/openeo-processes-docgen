@@ -9,7 +9,7 @@ env:
   - CLIENT_URL="/openeo-processes-docgen/demo/"
 
 script:
-  - npm run build
+  - npm run build_standalone
   - rm -rf page
   - mkdir -p page
   - mv dist page/demo
