@@ -33,9 +33,7 @@ You can simply create an HTML file and modify the `document` prop to a URL of a 
 					// Sorts the processes by id if set to true, otherwise keeps order of the document
 					// sortProcessesById: true,
 					// Categorize the processes in the menu if set to true, otherwise show a plain list
-					// categorize: true,
-					// Whether processes are initially collapsed or not
-					// processesInitiallyCollapsed: false
+					// categorize: true
 				}
 			})
 		});
