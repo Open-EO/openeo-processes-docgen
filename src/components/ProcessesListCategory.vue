@@ -1,6 +1,6 @@
 <template>
 	<div :class="{ category: true, expanded: expanded }">
-		<strong @click="toggle()"><span class="toggle">❯</span> {{ displayName }} ({{ processCount }})</strong>
+		<strong @click="toggle()"><span class="toggle">▸</span> {{ displayName }} ({{ processCount }})</strong>
 		<ul class="processes-list">
 			<li v-for="pi in processIndices" :key="pi">
 				<a :href="'#' + processes[pi].id" :class="{experimental: processes[pi].experimental, deprecated: processes[pi].deprecated}">{{ processes[pi].id }}</a>
