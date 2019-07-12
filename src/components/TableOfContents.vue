@@ -2,7 +2,8 @@
     <section class="toc">
         <h2>Processes</h2>
         <div class="search-box">
-            <input type="search" v-model="searchTerm" placeholder="Search in process names" /><button>🔎</button>
+            <span class="icon">🔎</span>
+            <input type="search" v-model="searchTerm" placeholder="Search in process names" />
         </div>
         <ProcessesListCategorized v-if="config.categorize" :processes="processes" :searchTerm="searchTerm" :baseConfig="config" />
         <ProcessesList v-else :processes="processes" :searchTerm="searchTerm" :baseConfig="config" />
@@ -37,23 +38,32 @@ export default {
 <style scoped>
 .search-box {
     margin: 1em 0;
+    position: relative;
 }
-.search-box input, .search-box button {
-	height: 1.4em;
+.search-box input, .search-box .icon {
+	height: 1.5em;
 	font-size: 1em;
 	margin: 0;
-	padding: 0.3em;
-	vertical-align: bottom;
+}
+
+.search-box input {
+    padding: 0.25em 0.3em;
+    padding-left: 1.9em;
+    z-index: 1;
 	display: inline-block;
 	border: 1px solid #ccc;
 	box-sizing: content-box;
 	background-color: #fff;
+	width: calc(100% - 2.2em);
 }
-.search-box input {
-	width: calc(100% - 3em);
-}
-.search-box button {
-	width: 1.4em;
-	border-left: 0;
+.search-box .icon {
+    user-select: none;
+    margin-top: 0.3em;
+    margin-left: 0.3em;
+    width: 1em;
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 </style>
