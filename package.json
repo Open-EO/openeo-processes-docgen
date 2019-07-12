@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -31,14 +31,14 @@
     "src/*"
   ],
   "dependencies": {
-    "@openeo/js-commons": "^0.3.1",
-    "@openeo/vue-components": "^0.3.3",
-    "axios": "^0.18.0",
+    "@openeo/js-commons": "^0.4.0",
+    "@openeo/vue-components": "^0.3.7",
+    "axios": "^0.19.0",
     "vue": "^2.5.22"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.3.0",
-    "@vue/cli-service": "^3.3.0",
+    "@vue/cli-service": "^3.9.2",
     "vue-template-compiler": "^2.5.22"
   },
   "browserslist": [
