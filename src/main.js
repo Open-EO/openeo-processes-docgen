@@ -7,7 +7,8 @@ new Vue({
 	el: '#app',
 	render: h => h(DocGen, { 
 		props: {
-			document: 'processes.json'
+			document: 'processes.json',
+			apiVersion: '1.0.0'
 		}
 	})
 });

@@ -1,6 +1,6 @@
 <template>
     <section class="toc">
-        <h2>Processes</h2>
+        <h2>{{ config.title }}</h2>
         <div class="search-box">
             <span class="icon">🔎</span>
             <input type="search" v-model="searchTerm" placeholder="Search in process names" />

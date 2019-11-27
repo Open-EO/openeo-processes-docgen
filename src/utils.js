@@ -3,12 +3,12 @@ import { MigrateProcesses } from '@openeo/js-commons';
 
 var Utils = {
 
-    normalizeProcesses: function(processes, sort) {
+    normalizeProcesses: function(processes, apiVersion, sort) {
         if (!Array.isArray(processes) || processes.length == 0) {
             return [];
         }
         // Convert each to the latest spec version each
-        processes = processes.map(p => MigrateProcesses.convertProcessToLatestSpec(p));
+        processes = processes.map(p => MigrateProcesses.convertProcessToLatestSpec(p, apiVersion));
         // Sort processes
         if (sort === true) {
             processes.sort((a, b) => {

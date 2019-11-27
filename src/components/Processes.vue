@@ -1,6 +1,6 @@
 <template>
     <div class="processes-container">
-		<Process v-for="(process, key) in processes" :key="key" :processData="process" :provideDownload="config.provideDownload" :processReferenceBuilder="buildProcessLinks" />
+		<Process v-for="(process, key) in processes" :key="key" :processData="process" :version="config.apiVersion" :provideDownload="config.provideDownload" :processReferenceBuilder="buildProcessLinks" />
 	</div>
 </template>
 
