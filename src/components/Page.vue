@@ -24,12 +24,15 @@ export default {
 		Processes
 	},
 	props: ['processes', 'links', 'baseConfig'],
+	mounted() {
+		document.title = this.config.title;
+	},
 	computed: {
 		config() {
 			return Utils.setDefaults(this.baseConfig);
 		},
 		preparedProcesses() {
-			return Utils.normalizeProcesses(this.processes, this.config.sortProcessesById);
+			return Utils.normalizeProcesses(this.processes, this.config.apiVersion, this.config.sortProcessesById);
 		}
 	}
 }

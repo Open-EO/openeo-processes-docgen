@@ -15,8 +15,14 @@ export default {
 		Page
 	},
 	props: {
+		title: {
+			default: BaseConfig.title
+		},
 		document: {
 			default: BaseConfig.document
+		},
+		apiVersion: {
+			default: BaseConfig.apiVersion
 		},
 		sortProcessesById: {
 			default: BaseConfig.sortProcessesById
