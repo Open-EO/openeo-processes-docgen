@@ -1,5 +1,5 @@
 # openEO Processes DocGen
-Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api).
+Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api), either in version 0.4.x or 1.0.x.
 
 * [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
@@ -29,7 +29,7 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 			render: h => h(DocGen, { 
 				props: {
 					// URL or path of the document to parse
-					document: 'processes.json'
+					document: 'processes.json',
 					// The version of the openEO API
 					apiVersion: "1.0.0",
 					// Title for the table of contents
@@ -37,7 +37,7 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 					// Sorts the processes by id if set to true, otherwise keeps order of the document
 					// sortProcessesById: true,
 					// Categorize the processes in the menu if set to true, otherwise show a plain list
-					// categorize: true
+					// categorize: true,
 				}
 			})
 		});

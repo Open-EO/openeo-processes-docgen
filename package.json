@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "0.6.0-alpha.2",
+  "version": "1.0.0-beta.1",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -31,8 +31,8 @@
     "src/*"
   ],
   "dependencies": {
-    "@openeo/js-commons": "^0.5.0-alpha.1",
-    "@openeo/vue-components": "^0.5.0-alpha.1",
+    "@openeo/js-commons": "^1.0.0-rc.1",
+    "@openeo/vue-components": "^1.0.0-beta.1",
     "axios": "^0.19.0",
     "vue": "^2.6.10"
   },

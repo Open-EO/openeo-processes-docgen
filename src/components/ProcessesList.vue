@@ -2,7 +2,7 @@
 	<nav class="list">
 		<ul class="processes-list">
 			<li v-for="(process, key) in filteredProcesses" :key="key">
-				<a :href="'#' + process.id" :class="{experimental: processes[pi].experimental, deprecated: processes[pi].deprecated}">{{ process.id }}</a>
+				<a :href="'#' + process.id" :class="{experimental: process.experimental, deprecated: process.deprecated}">{{ process.id }}</a>
 				<summary>{{ process.summary }}</summary>
 			</li>
 		</ul>

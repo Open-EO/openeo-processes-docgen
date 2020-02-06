@@ -1,8 +1,7 @@
 <template>
-    <section class="related-links" v-if="links.length > 0">
-        <h3>Related links</h3>
-        <LinkList :links="links" />
-    </section>
+	<section class="related-links">
+    	<LinkList :links="links" heading="Related Links" headingTag="h3" />
+	</section>
 </template>
 
 <script>
