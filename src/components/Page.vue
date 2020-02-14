@@ -4,7 +4,7 @@
 			<TableOfContents :processes="preparedProcesses" :baseConfig="config" />
 			<RelatedLinks :links="links" :baseConfig="config" />
 		</aside>
-		<main class="content-container">
+		<main class="content-container" :class="{toc: config.showTableOfContents}">
 			<Processes :processes="preparedProcesses" :baseConfig="config" />
 		</main>
 	</div>
@@ -60,7 +60,7 @@ export default {
 .menu-container li a {
 	font-weight: bold;
 }
-.content-container {
+.content-container.toc {
 	padding-top: 3em;
 }
 </style>
