@@ -15,7 +15,7 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-    	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script src="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.css">
 		<style>html, body { height: 100%; margin: 0; }</style>
@@ -28,7 +28,8 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 			el: '#app',
 			render: h => h(DocGen, { 
 				props: {
-					// URL or path of the document to parse
+					// Either (1) a URL to the document as string
+					// or (2) an array or object containing the processes.
 					document: 'processes.json',
 					// The version of the openEO API
 					apiVersion: "1.0.0",
@@ -38,6 +39,8 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 					// sortProcessesById: true,
 					// Categorize the processes in the menu if set to true, otherwise show a plain list
 					// categorize: true,
+					// Show/Hide table of contents, links and search box
+					// showTableOfContents: true
 				}
 			})
 		});
