@@ -23,6 +23,9 @@ export default {
 			filteredProcesses: this.processes || []
 		};
 	},
+	mounted() {
+		this.filter();
+	},
 	computed: {
 		config() {
 			return Utils.setDefaults(this.baseConfig);
@@ -34,7 +37,7 @@ export default {
 	},
 	watch: {
 		processes() {
-			if (typeof this.processes !== 'object') {
+			if (!Array.isArray(this.processes)) {
 				return;
 			}
 			this.filter();

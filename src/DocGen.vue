@@ -8,6 +8,7 @@
 import axios from 'axios';
 import BaseConfig from './config.js';
 import Page from './components/Page.vue';
+import { Utils } from '@openeo/js-commons';
 
 export default {
 	name: 'DocGen',
@@ -16,19 +17,28 @@ export default {
 	},
 	props: {
 		title: {
+			type: String,
 			default: BaseConfig.title
 		},
 		document: {
+			type: String | Array | Object,
 			default: BaseConfig.document
 		},
 		apiVersion: {
+			type: String,
 			default: BaseConfig.apiVersion
 		},
 		sortProcessesById: {
+			type: Boolean,
 			default: BaseConfig.sortProcessesById
 		},
 		categorize: {
+			type: Boolean,
 			default: BaseConfig.categorize
+		},
+		showTableOfContents: {
+			type: Boolean,
+			default: BaseConfig.showTableOfContents
 		}
 	},
 	data() {
@@ -45,36 +55,37 @@ export default {
 		}
 	},
 	beforeMount() {
-		if (typeof this.document === 'string' && this.document.length > 0) {
-			this.changeDocument(this.document);
-		}
-		else if (typeof this.processes !== 'object') {
-			console.error('No data specified.');
-		}
+		this.changeDocument();
 	},
 	methods: {
-		changeDocument(uri) {
-			axios.get(uri)
-				.then(response => response.data)
-				.then(container => {
-					this.links = [];
-					if (Array.isArray(container)) {
-						// Plain array with processes, convert to openEO API response object.
-						this.processes = container;
-					}
-					else if (typeof container === 'object' && typeof container.processes === 'object') {
-						this.processes = container.processes;
-						if (Array.isArray(container.links)) {
-							this.links = container.links;
-						}
-					}
-					else {
-						throw "Invalid document specified, can't find processes.";
-					}
-				})
-				.catch(error => {
-					console.log(error);
-				});
+		changeDocument() {
+			if (typeof this.document === 'string' && this.document.length > 0) {
+				axios.get(this.document)
+					.then(response => this.setProcesses(response.data))
+					.catch(error => console.error(error));
+			}
+			else if (typeof this.document === 'object' && this.document !== null) {
+				this.setProcesses(this.document);
+			}
+			else {
+				console.error('Specified document is not a URL, array or object.');
+			}
+		},
+		setProcesses(data) {
+			this.links = [];
+			if (Array.isArray(data)) {
+				// Plain array with processes, convert to openEO API response object.
+				this.processes = data;
+			}
+			else if (Utils.isObject(data) && Array.isArray(data.processes)) {
+				this.processes = data.processes;
+				if (Array.isArray(data.links)) {
+					this.links = data.links;
+				}
+			}
+			else {
+				console.error("Invalid document specified, can't find processes.");
+			}
 		},
 		moveToAnchor() {
 			if (typeof window.location.hash === 'string' && window.location.hash.length > 1) {

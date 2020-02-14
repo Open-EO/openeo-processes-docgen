@@ -1,6 +1,6 @@
 <template>
 	<div class="page-container">
-		<aside class="menu-container">
+		<aside class="menu-container" v-if="config.showTableOfContents">
 			<TableOfContents :processes="preparedProcesses" :baseConfig="config" />
 			<RelatedLinks :links="links" :baseConfig="config" />
 		</aside>

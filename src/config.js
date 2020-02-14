@@ -1,6 +1,8 @@
 export default {
 
-	// URL or path of the document to parse (string)
+
+	// Either (1) a URL to the document as string
+	// or (2) an array or object containing the processes.
 	document: null,
 	// Version of the openEO API
 	apiVersion: null,
@@ -11,6 +13,8 @@ export default {
 	// Categorize the processes in the menu if set to true, otherwise show a plain list
 	categorize: true,
 	// Whether 'Download JSON' buttons are displayed or not
-	provideDownload: true
+	provideDownload: true,
+	// Show/Hide table of contents, links and search box
+	showTableOfContents: true
 
 };
