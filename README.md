@@ -16,8 +16,8 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-		<script src="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.umd.min.js"></script>
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen/dist/DocGen.css">
+		<script src="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen@latest/dist/DocGen.umd.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@openeo/processes-docgen@latest/dist/DocGen.css">
 		<style>html, body { height: 100%; margin: 0; }</style>
 	</head>
 
