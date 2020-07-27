@@ -1,6 +1,13 @@
 <template>
 	<div class="docgen">
-		<Page :processes="processes" :links="links" :baseConfig="$props" />
+		<div class="fileChooser" v-if="isLocalDocument && !this.processes.length && !this.links.length">
+			<p>
+				Sorry, can't automatically read files from the local file system.
+				Please specify the file to load here:
+				<input type="file" @change="loadLocalFile" />
+			</p>
+		</div>
+		<Page v-else :processes="processes" :links="links" :baseConfig="$props" />
 	</div>
 </template>
 
@@ -54,15 +61,34 @@ export default {
 			});
 		}
 	},
+	computed: {
+		isLocalDocument() {
+			return window.location.protocol === 'file:' && !this.document.match(/^https?:/i);
+		}
+	},
 	beforeMount() {
 		this.changeDocument();
 	},
 	methods: {
+		loadLocalFile(event) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				try {
+					this.setProcesses(JSON.parse(reader.result));
+				} catch (error) {
+					alert(error.message);
+					console.error(error);
+				}
+			};
+			reader.readAsText(event.target.files[0]);
+		},
 		changeDocument() {
 			if (typeof this.document === 'string' && this.document.length > 0) {
-				axios.get(this.document)
-					.then(response => this.setProcesses(response.data))
-					.catch(error => console.error(error));
+				if(!this.isLocalDocument) {
+					axios.get(this.document)
+						.then(response => this.setProcesses(response.data))
+						.catch(error => console.error(error));
+				}
 			}
 			else if (typeof this.document === 'object' && this.document !== null) {
 				this.setProcesses(this.document);
@@ -158,5 +184,20 @@ export default {
 .docgen .no-processes-found {
 	text-align: center;
 	display: block;
+}
+
+.docgen .fileChooser {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.docgen .fileChooser p {
+	width: 25%;
+}
+.docgen .fileChooser input {
+	margin-top: 0.5em;
+	width: 100%;
 }
 </style>
