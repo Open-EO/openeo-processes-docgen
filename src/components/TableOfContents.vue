@@ -5,15 +5,14 @@
             <span class="icon">🔎</span>
             <input type="search" v-model="searchTerm" placeholder="Search in process names" />
         </div>
-        <ProcessesListCategorized v-if="config.categorize" :processes="processes" :searchTerm="searchTerm" :baseConfig="config" />
-        <ProcessesList v-else :processes="processes" :searchTerm="searchTerm" :baseConfig="config" />
+        <ProcessesListCategorized v-if="config.categorize" :processes="processes" :searchTerm="searchTerm" :config="config" />
+        <ProcessesList v-else :processes="processes" :searchTerm="searchTerm" :config="config" />
     </section>
 </template>
 
 <script>
 import ProcessesList from './ProcessesList.vue';
 import ProcessesListCategorized from './ProcessesListCategorized.vue';
-import Utils from '../utils.js';
 
 export default {
     name: 'TableOfContents',
@@ -21,12 +20,7 @@ export default {
         ProcessesList,
         ProcessesListCategorized
     },
-    props: ['processes', 'baseConfig'],
-	computed: {
-		config() {
-			return Utils.setDefaults(this.baseConfig);
-		}
-	},
+    props: ['processes', 'config'],
     data() {
         return {
             searchTerm: ''

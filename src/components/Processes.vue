@@ -1,24 +1,18 @@
 <template>
     <div class="processes-container">
-		<Process v-for="(process, key) in processes" :key="key" :processData="process" :provideDownload="config.provideDownload" :processReferenceBuilder="buildProcessLinks" />
+		<Process v-for="(process, key) in processes" :key="key" :processData="process" :version="config.apiVersion" :provideDownload="config.provideDownload" :processReferenceBuilder="buildProcessLinks" />
 	</div>
 </template>
 
 <script>
 import Process from '@openeo/vue-components/components/Process.vue';
-import Utils from '../utils.js';
 
 export default {
 	name: 'Processes',
 	components: {
 		Process
 	},
-	props: ['processes', 'baseConfig'],
-	computed: {
-		config() {
-			return Utils.setDefaults(this.baseConfig);
-		}
-	},
+	props: ['processes', 'config'],
 	methods: {
 		buildProcessLinks(pid) {
 			return '<code><a class="process-link" href="#'+pid+'">'+pid+'</a></code>';
