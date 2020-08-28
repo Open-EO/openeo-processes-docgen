@@ -1,26 +1,38 @@
 <template>
 	<div class="docgen">
-		<div class="fileChooser" v-if="isLocalDocument && !this.processes.length && !this.links.length">
+		<div class="fileChooser" v-if="isLocalDocument && !processes.length && !links.length">
 			<p>
 				Sorry, can't automatically read files from the local file system.
 				Please specify the file to load here:
 				<input type="file" @change="loadLocalFile" />
 			</p>
 		</div>
-		<Page v-else :processes="processes" :links="links" :baseConfig="$props" />
+		<div v-else class="page-container">
+			<aside class="menu-container" v-if="showTableOfContents">
+				<TableOfContents :processes="processes" :config="$props" />
+				<RelatedLinks :links="links" />
+			</aside>
+			<main class="content-container" :class="{toc: showTableOfContents}">
+				<Processes :processes="processes" :config="$props" />
+			</main>
+		</div>
 	</div>
 </template>
 
 <script>
 import axios from 'axios';
-import BaseConfig from './config.js';
-import Page from './components/Page.vue';
+import TableOfContents from './components/TableOfContents.vue';
+import RelatedLinks from './components/RelatedLinks.vue';
+import Processes from './components/Processes.vue';
 import { Utils } from '@openeo/js-commons';
+import BaseConfig from './config.js';
 
 export default {
 	name: 'DocGen',
 	components: {
-		Page
+		TableOfContents,
+		RelatedLinks,
+		Processes
 	},
 	props: {
 		title: {
@@ -42,6 +54,10 @@ export default {
 		categorize: {
 			type: Boolean,
 			default: BaseConfig.categorize
+		},
+		provideDownload: {
+			type: Boolean,
+			default: BaseConfig.provideDownload
 		},
 		showTableOfContents: {
 			type: Boolean,
@@ -68,6 +84,9 @@ export default {
 	},
 	beforeMount() {
 		this.changeDocument();
+	},
+	mounted() {
+		document.title = this.title;
 	},
 	methods: {
 		loadLocalFile(event) {
@@ -111,6 +130,15 @@ export default {
 			}
 			else {
 				console.error("Invalid document specified, can't find processes.");
+			}
+
+			// Sort processes
+			if (this.sortProcessesById === true) {
+				this.processes.sort((a, b) => {
+					var s1 = a.id.toLowerCase();
+					var s2 = b.id.toLowerCase();
+					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
+				});
 			}
 		},
 		moveToAnchor() {
@@ -199,5 +227,60 @@ export default {
 .docgen .fileChooser input {
 	margin-top: 0.5em;
 	width: 100%;
+}
+
+.docgen .menu-container section {
+	margin: 1em;
+}
+.docgen .menu-container ul {
+	list-style-type: square;
+	display: block;
+	padding: 0;
+}
+.docgen .menu-container summary {
+	font-size: 0.8em;
+	margin-bottom: 0.5em;
+}
+.docgen .menu-container li {
+	margin-left: 1em;
+}
+.docgen .menu-container li a {
+	font-weight: bold;
+}
+.docgen .menu-container li a {
+	font-weight: bold;
+}
+.docgen .content-container.toc {
+	padding-top: 3em;
+}
+
+@media only screen and (min-width: 64em) {
+	.docgen .page-container {
+		display: flex;
+		height: 100%;
+	}
+	.docgen .menu-container, .docgen .content-container {
+		height: 100%;
+		overflow-y: scroll;
+	}
+	.docgen .content-container.toc {
+		flex: 6;
+	}
+	.docgen .content-container.toc {
+		padding-top: 0;
+	}
+	.docgen .menu-container {
+		flex: 2;
+		border-right: 1px dotted #ccc;
+	}
+}
+
+@media only screen and (min-width: 100em) {
+	.docgen .content-container {
+		flex: 4;
+	}
+	.docgen .menu-container {
+		flex: 1;
+	}
 }
 </style>
