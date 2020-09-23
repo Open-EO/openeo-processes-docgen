@@ -1,6 +1,6 @@
 <template>
     <div class="processes-container">
-		<Process v-for="(process, key) in processes" :key="key" :processData="process" :version="config.apiVersion" :provideDownload="config.provideDownload" :processReferenceBuilder="buildProcessLinks" />
+		<Process v-for="(process, key) in processes" :key="key" :processData="process" :version="config.apiVersion" :provideDownload="config.provideDownload" processUrl="#${}" />
 	</div>
 </template>
 
@@ -12,12 +12,7 @@ export default {
 	components: {
 		Process
 	},
-	props: ['processes', 'config'],
-	methods: {
-		buildProcessLinks(pid) {
-			return '<code><a class="process-link" href="#'+pid+'">'+pid+'</a></code>';
-		}
-	}
+	props: ['processes', 'config']
 }
 </script>
 
