@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "@openeo/js-commons": "^1.2.0",
-    "@openeo/vue-components": "^1.0.0-rc.3",
+    "@openeo/vue-components": "^1.0.0-rc.4",
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "vue": "^2.6.12"
