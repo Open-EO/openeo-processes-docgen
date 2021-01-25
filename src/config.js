@@ -12,6 +12,8 @@ export default {
 	sortProcessesById: true,
 	// Categorize the processes in the menu if set to true, otherwise show a plain list
 	categorize: true,
+	// Set the category name for all processes without a category assigned
+	uncategorizedName: 'Uncategorized',
 	// Whether 'Download JSON' buttons are displayed or not
 	provideDownload: true,
 	// Show/Hide table of contents, links and search box
