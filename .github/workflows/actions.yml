@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v1
       - uses: actions/checkout@v2
       - run: npm install
-      - run: npm run build
+      - run: npm run build_standalone
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
