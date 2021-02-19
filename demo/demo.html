@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<title>DocGen demo</title>
+<script src="https://unpkg.com/vue"></script>
+<script src="./DocGen.umd.js"></script>
+
+<link rel="stylesheet" href="./DocGen.css">
+
+
+<div id="app">
+  <demo></demo>
+</div>
+
+<script>
+new Vue({
+  components: {
+    demo: DocGen
+  }
+}).$mount('#app')
+</script>
