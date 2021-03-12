@@ -11,6 +11,5 @@ module.exports = {
 	publicPath: process.env.CLIENT_URL || Config.clientPath,
 	devServer: {
 		port: Config.devPort
-	},
-	productionSourceMap: false
+	}
 }

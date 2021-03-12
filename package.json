@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -23,6 +23,7 @@
   },
   "main": "dist/DocGen.umd.js",
   "files": [
+    "src/*",
     "dist/*.css",
     "dist/*.js"
   ],

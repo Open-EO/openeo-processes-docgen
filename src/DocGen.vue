@@ -107,15 +107,13 @@ export default {
             showCategories: this.categorize,
 			processes: [],
 			categories: [],
-			links: []
+			links: [],
+			protocol: null
 		};
 	},
 	watch: {
-		document: {
-			immediate: true,
-			handler() {
-				this.changeDocument();
-			}
+		document() {
+			this.changeDocument();
 		},
 		async processes() {
 			await this.$nextTick();
@@ -130,13 +128,34 @@ export default {
 	},
 	computed: {
 		isLocalDocument() {
-			return window.location.protocol === 'file:' && !this.document.match(/^https?:/i);
+			return this.protocol === 'file:' && !this.document.match(/^https?:/i);
 		}
 	},
 	mounted() {
 		document.title = this.title;
+		this.loadLink('https://use.fontawesome.com/releases/v5.13.0/webfonts/fa-solid-900.woff2', {
+			rel: 'preload',
+			crossorigin: true,
+			as: 'font',
+			type: 'font/woff2'
+		});
+		this.loadLink('https://use.fontawesome.com/releases/v5.13.0/css/all.css', {
+			rel: 'stylesheet',
+			media: 'all',
+			type: 'text/css'
+		});
+		this.protocol = window ? window.location.protocol : null;
+		this.changeDocument();
 	},
 	methods: {
+		loadLink(href, params = {}) {
+			params.href = href;
+			let link = document.createElement('link');
+			for (let key in params) {
+				link.setAttribute(key, params[key]);
+			}
+			document.head.appendChild(link);
+		},
 		loadLocalFile(event) {
 			const reader = new FileReader();
 			reader.onload = () => {
