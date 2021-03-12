@@ -9,11 +9,37 @@
 		</div>
 		<div v-else class="page-container">
 			<aside class="menu-container" v-if="showTableOfContents">
-				<TableOfContents :processes="processes" :config="$props" />
-				<RelatedLinks :links="links" />
+				<section class="toc">
+					<h2>{{ title }}</h2>
+					<SearchBox v-model="searchTerm" placeholder="Search in processes" />
+					<ul class="controls">
+						<li v-if="showCategories"><a @click="expandAll" title="Expand all"><i class="fas fa-angle-double-down"></i></a></li>
+						<li v-if="showCategories"><a @click="collapseAll" title="Collapse all"><i class="fas fa-angle-double-up"></i></a></li>
+						<li v-if="showCategories"><a @click="switchCategoryView" title="Hide Categories"><i class="fas fa-list-ol"></i></a></li>
+						<li v-else><a @click="switchCategoryView" title="Show Categories"><i class="fas fa-folder"></i></a></li>
+					</ul>
+					<template v-if="showCategories">
+						<Processes class="categories" v-for="category in categories" :key="category.id" ref="categories" :processes="category.processes" :searchTerm="searchTerm" :offerDetails="false" :heading="category.id" :collapsed="allCollapsedState">
+							<template #summary="{ summary }">
+								<a :href="'#' + summary.identifier"><strong>{{ summary.identifier }}</strong></a>
+								<small v-if="summary.summary">{{ summary.summary }}</small>
+							</template>
+						</Processes>
+						<p v-if="!hasResults">No search results found.</p>
+					</template>
+					<Processes v-else :processes="processes" :searchTerm="searchTerm" :offerDetails="false" :heading="null">
+						<template #summary="{ summary }">
+							<a :href="'#' + summary.identifier"><strong>{{ summary.identifier }}</strong></a>
+							<small v-if="summary.summary">{{ summary.summary }}</small>
+						</template>
+					</Processes>
+				</section>
+				<section class="related-links">
+					<LinkList :links="links" heading="Related Links" headingTag="h3" />
+				</section>
 			</aside>
 			<main class="content-container" :class="{toc: showTableOfContents}">
-				<Processes :processes="processes" :config="$props" />
+				<Process v-for="process in processes" :key="process.id" :process="process" :provideDownload="provideDownload" :sort="false" processUrl="#${}" />
 			</main>
 		</div>
 	</div>
@@ -21,18 +47,23 @@
 
 <script>
 import axios from 'axios';
-import TableOfContents from './components/TableOfContents.vue';
-import RelatedLinks from './components/RelatedLinks.vue';
-import Processes from './components/Processes.vue';
-import { Utils } from '@openeo/js-commons';
+import Utils from '@openeo/vue-components/utils';
 import BaseConfig from './config.js';
+import LinkList from '@openeo/vue-components/components/LinkList.vue';
+import Process from '@openeo/vue-components/components/Process.vue';
+import Processes from '@openeo/vue-components/components/Processes.vue';
+import SearchableList from '@openeo/vue-components/components/SearchableList.vue';
+import SearchBox from '@openeo/vue-components/components/SearchBox.vue';
+import { MigrateProcesses } from '@openeo/js-commons';
 
 export default {
 	name: 'DocGen',
 	components: {
-		TableOfContents,
-		RelatedLinks,
-		Processes
+		LinkList,
+		Process,
+		Processes,
+		SearchableList,
+		SearchBox
 	},
 	props: {
 		title: {
@@ -40,7 +71,7 @@ export default {
 			default: BaseConfig.title
 		},
 		document: {
-			type: String | Array | Object,
+			type: [String, Array, Object],
 			default: BaseConfig.document
 		},
 		apiVersion: {
@@ -62,28 +93,45 @@ export default {
 		showTableOfContents: {
 			type: Boolean,
 			default: BaseConfig.showTableOfContents
+		},
+		uncategorizedName: {
+			type: String,
+			default: BaseConfig.uncategorizedName,
 		}
 	},
 	data() {
 		return {
+			searchTerm: '',
+			allCollapsedState: true,
+			hasResults: true,
+            showCategories: this.categorize,
 			processes: [],
+			categories: [],
 			links: []
 		};
 	},
 	watch: {
-		processes() {
-			this.$nextTick(() => {
-				this.moveToAnchor();
-			});
+		document: {
+			immediate: true,
+			handler() {
+				this.changeDocument();
+			}
+		},
+		async processes() {
+			await this.$nextTick();
+			this.moveToAnchor();
+		},
+		searchTerm() {
+			this.updateCategoryView();
+		},
+		showCategories() {
+			this.updateCategoryView();
 		}
 	},
 	computed: {
 		isLocalDocument() {
 			return window.location.protocol === 'file:' && !this.document.match(/^https?:/i);
 		}
-	},
-	beforeMount() {
-		this.changeDocument();
 	},
 	mounted() {
 		document.title = this.title;
@@ -117,6 +165,8 @@ export default {
 			}
 		},
 		setProcesses(data) {
+			data = MigrateProcesses.convertProcessesToLatestSpec(data, this.apiVersion);
+
 			this.links = [];
 			if (Array.isArray(data)) {
 				// Plain array with processes, convert to openEO API response object.
@@ -134,12 +184,32 @@ export default {
 
 			// Sort processes
 			if (this.sortProcessesById === true) {
-				this.processes.sort((a, b) => {
-					var s1 = a.id.toLowerCase();
-					var s2 = b.id.toLowerCase();
-					return (s1 < s2 ? -1 : (s1 > s2 ? 1 : 0));
-				});
+				this.processes.sort((a,b) => Utils.compareStringCaseInsensitive(a.id, b.id));
 			}
+
+			// Map by categories
+			this.categories = [];
+			for(let process of this.processes) {
+				let processCategories = (Array.isArray(process.categories) && process.categories.length > 0) ? process.categories : [this.uncategorizedName];
+				for(let category of processCategories) {
+					category = category.replace('_', ' ');
+					let index = this.categories.findIndex(c => c.id === category);
+					if (index >= 0) {
+						this.categories[index].processes.push(process);
+					}
+					else {
+						this.categories.push({
+							id: category,
+							processes: [
+								process
+							]
+						});
+					}
+				}
+			}
+
+			// Sort categories
+			this.categories.sort((a,b) => Utils.compareStringCaseInsensitive(a.id, b.id));
 		},
 		moveToAnchor() {
 			if (typeof window.location.hash === 'string' && window.location.hash.length > 1) {
@@ -149,8 +219,27 @@ export default {
 					element.scrollIntoView();
 				}
 			}
+		},
+        switchCategoryView() {
+            this.showCategories = !this.showCategories;
+        },
+		expandAll() {
+			this.toggleAll(true);
+		},
+		collapseAll() {
+			this.toggleAll(false);
+		},
+		toggleAll(expand) {
+			this.allCollapsedState = !expand;
+		},
+		async updateCategoryView() {
+			await this.$nextTick();
+			this.hasResults = true;
+			this.toggleAll(this.searchTerm.length >= 2);
+			if (this.searchTerm.length >= 2 && Array.isArray(this.$refs.categories)) {
+				this.hasResults = !!this.$refs.categories.find(vm => !vm.$children[0].$el.classList.contains('noResults'));
+			}
 		}
-
 	}
 }
 </script>
@@ -209,6 +298,40 @@ export default {
 	color: black;
 }
 
+
+.docgen .categories h2 {
+	display: block;
+	text-transform: capitalize;
+	font-size: 1em;
+	cursor: pointer;
+	border: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.docgen .categories ul.list {
+	margin-left: 0.5em;
+    margin-top: 0.25em;
+}
+.docgen .categories ul.list li {
+	margin-left: 0.5em;
+}
+.docgen .categories .noResults {
+	display: none;
+}
+
+.docgen .process {
+	margin: 1em;
+	margin-bottom: 5em;
+	padding: 0em;
+}
+@media only screen and (min-width: 1280px) {
+	.docgen .process {
+		margin-bottom: 10em;
+	}
+	.docgen .process h3 {
+		margin-top: 2em;
+	}
+}
 .docgen .no-processes-found {
 	text-align: center;
 	display: block;
@@ -238,11 +361,34 @@ export default {
 	padding: 0;
 }
 .docgen .menu-container summary {
-	font-size: 0.8em;
 	margin-bottom: 0.5em;
 }
-.docgen .menu-container li {
-	margin-left: 1em;
+
+.docgen .menu-container .controls {
+	text-align: center;
+	display: block;
+	margin: 1em 0;
+	padding: 0;
+	list-style-type: none;
+}
+.docgen .menu-container .controls li {
+	display: inline-block;
+}
+.docgen .menu-container .controls li a {
+	font-weight: normal;
+	background-color: chocolate;
+	color: white;
+	display: inline-block;
+	margin: 0.25em 0.35em;
+	padding: 0.25em 0.5em;
+	border-radius: 3px;
+}
+.docgen .menu-container .controls li a:hover {
+	background-color: black;
+}
+
+.docgen .vue-component.searchable-list ul.list > li > summary {
+	line-height: inherit;
 }
 .docgen .menu-container li a {
 	font-weight: bold;
@@ -253,8 +399,16 @@ export default {
 .docgen .content-container.toc {
 	padding-top: 3em;
 }
+.docgen .related-links {
+	margin-top: 4em;
+	margin-bottom: 2em;
+}
 
-@media only screen and (min-width: 64em) {
+@media only screen and (min-width: 800px) {
+	.docgen .related-links {
+		margin-top: 3em;
+		margin-bottom: 0;
+	}
 	.docgen .page-container {
 		display: flex;
 		height: 100%;
@@ -264,23 +418,22 @@ export default {
 		overflow-y: scroll;
 	}
 	.docgen .content-container.toc {
-		flex: 6;
+		flex: 1;
 	}
 	.docgen .content-container.toc {
 		padding-top: 0;
 	}
 	.docgen .menu-container {
-		flex: 2;
+		flex: 1;
+		min-width: 250px;
+		max-width: 25%;
 		border-right: 1px dotted #ccc;
 	}
 }
 
-@media only screen and (min-width: 100em) {
-	.docgen .content-container {
-		flex: 4;
-	}
+@media only screen and (min-width: 1280px) {
 	.docgen .menu-container {
-		flex: 1;
+		max-width: 20%;
 	}
 }
 </style>
