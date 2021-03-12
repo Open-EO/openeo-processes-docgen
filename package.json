@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -23,10 +23,8 @@
   },
   "main": "dist/DocGen.umd.js",
   "files": [
-    "dist/DocGen.css",
-    "dist/DocGen.common.js",
-    "dist/DocGen.umd.js",
-    "dist/DocGen.umd.min.js"
+    "dist/*.css",
+    "dist/*.js"
   ],
   "dependencies": {
     "@openeo/js-commons": "^1.2.0",
