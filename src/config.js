@@ -17,6 +17,8 @@ export default {
 	// Whether 'Download JSON' buttons are displayed or not
 	provideDownload: true,
 	// Show/Hide table of contents, links and search box
-	showTableOfContents: true
+	showTableOfContents: true,
+	// A message that is shown to users
+	notice: ''
 
 };
