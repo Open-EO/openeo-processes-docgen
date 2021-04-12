@@ -40,7 +40,9 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 					// Categorize the processes in the menu if set to true, otherwise show a plain list
 					// categorize: true,
 					// Show/Hide table of contents, links and search box
-					// showTableOfContents: true
+					// showTableOfContents: true,
+					// A message that is shown to users
+					// notice: ''
 				}
 			})
 		});

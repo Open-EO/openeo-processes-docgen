@@ -39,6 +39,10 @@
 				</section>
 			</aside>
 			<main class="content-container" :class="{toc: showTableOfContents}">
+				<div class="notice" v-if="!hideNotice && notice">
+					<Description :description="notice" />
+					<button type="button" class="close" title="Close" @click="hideNotice = true">×</button>
+				</div>
 				<Process v-for="process in processes" :key="process.id" :process="process" :provideDownload="provideDownload" :sort="false" processUrl="#${}" />
 			</main>
 		</div>
@@ -49,6 +53,7 @@
 import axios from 'axios';
 import Utils from '@openeo/vue-components/utils';
 import BaseConfig from './config.js';
+import Description from '@openeo/vue-components/components/Description.vue';
 import LinkList from '@openeo/vue-components/components/LinkList.vue';
 import Process from '@openeo/vue-components/components/Process.vue';
 import Processes from '@openeo/vue-components/components/Processes.vue';
@@ -59,6 +64,7 @@ import { MigrateProcesses } from '@openeo/js-commons';
 export default {
 	name: 'DocGen',
 	components: {
+		Description,
 		LinkList,
 		Process,
 		Processes,
@@ -97,10 +103,15 @@ export default {
 		uncategorizedName: {
 			type: String,
 			default: BaseConfig.uncategorizedName,
+		},
+		notice: {
+			type: String,
+			default: BaseConfig.notice
 		}
 	},
 	data() {
 		return {
+			hideNotice: false,
 			searchTerm: '',
 			allCollapsedState: true,
 			hasResults: true,
@@ -317,6 +328,39 @@ export default {
 	color: black;
 }
 
+.docgen .notice {
+	margin: 0rem 3rem 1rem 2rem;
+    padding: 1rem 3.5rem 1rem 1rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+	position: fixed;
+	bottom: 0;
+	color: #856404;
+    background-color: #fff3cd;
+    border-color: #856404;
+}
+.docgen .notice p:last-of-type {
+	margin-bottom: 0;
+}
+.docgen .notice .close {
+	position: absolute;
+	top: 0;
+	right: 0;
+    font-size: 1.5em;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    font-weight: 700;
+    line-height: 1;
+    opacity: .5;
+	background-color: transparent;
+    border: 0;
+    color: inherit;
+	cursor: pointer;
+}
+.docgen .notice .close:hover {
+	opacity: 1;
+	outline: 0;
+}
 
 .docgen .categories h2 {
 	display: block;
