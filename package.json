@@ -17,7 +17,7 @@
     "url": "https://github.com/open-eo/openeo-processes-docgen.git"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "start": "vue-cli-service serve",
     "build": "vue-cli-service build --report --target lib --name DocGen src/DocGen.vue",
     "build_standalone": "vue-cli-service build"
   },

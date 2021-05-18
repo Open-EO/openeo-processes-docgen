@@ -63,7 +63,7 @@ To build the files follow these steps:
 4. Optionally: Configure the generator by editing `vue.config.js` and `src/config.js` to suit your needs.
 5. Install the dependencies by executing `npm install` on the command line
 6. 
-	* Development: Run the development server by executing `npm run serve`.
+	* Development: Run the development server by executing `npm start`.
 	* Deployment:
 		* Standalone: Build the project by executing `npm run build_standalone`. Afterwards upload the content of the `dist` folder to your server.
 		* Library: Build the project by executing `npm run build`. Afterwards you can publish the library to npm or so.
