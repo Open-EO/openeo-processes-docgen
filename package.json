@@ -1,6 +1,6 @@
 {
   "name": "@openeo/processes-docgen",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "openEO Consortium",
   "contributors": [
     {
@@ -17,7 +17,7 @@
     "url": "https://github.com/open-eo/openeo-processes-docgen.git"
   },
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "start": "vue-cli-service serve",
     "build": "vue-cli-service build --report --target lib --name DocGen src/DocGen.vue",
     "build_standalone": "vue-cli-service build"
   },
@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "@openeo/js-commons": "^1.2.0",
-    "@openeo/vue-components": "^2.0.0",
+    "@openeo/vue-components": "^2.1.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "vue": "^2.6.12"
