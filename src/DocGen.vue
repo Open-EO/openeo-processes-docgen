@@ -195,22 +195,21 @@ export default {
 			}
 		},
 		setProcesses(data) {
-			data = MigrateProcesses.convertProcessesToLatestSpec(data, this.apiVersion);
-
-			this.links = [];
+			// Plain array with processes, convert to openEO API response object.
 			if (Array.isArray(data)) {
-				// Plain array with processes, convert to openEO API response object.
-				this.processes = data;
+				data = {processes: data};
 			}
-			else if (Utils.isObject(data) && Array.isArray(data.processes)) {
-				this.processes = data.processes;
-				if (Array.isArray(data.links)) {
-					this.links = data.links;
-				}
-			}
-			else {
+
+			if (!Utils.isObject(data) || !Array.isArray(data.processes)) {
 				console.error("Invalid document specified, can't find processes.");
 			}
+
+			console.log(data.processes.find(p => p.id === 'absolute'), this.apiVersion);
+			data = MigrateProcesses.convertProcessesToLatestSpec(data, this.apiVersion);
+			console.log(data.processes.find(p => p.id === 'absolute'));
+
+			this.processes = data.processes;
+			this.links = Array.isArray(data.links) ? data.links : [];
 
 			// Sort processes
 			if (this.sortProcessesById === true) {
