@@ -204,9 +204,7 @@ export default {
 				console.error("Invalid document specified, can't find processes.");
 			}
 
-			console.log(data.processes.find(p => p.id === 'absolute'), this.apiVersion);
 			data = MigrateProcesses.convertProcessesToLatestSpec(data, this.apiVersion);
-			console.log(data.processes.find(p => p.id === 'absolute'));
 
 			this.processes = data.processes;
 			this.links = Array.isArray(data.links) ? data.links : [];
