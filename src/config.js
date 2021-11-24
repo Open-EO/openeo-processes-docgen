@@ -3,9 +3,9 @@ export default {
 
 	// Either (1) a URL to the document as string
 	// or (2) an array or object containing the processes.
-	document: null,
+	document: 'processes.json',
 	// Version of the openEO API
-	apiVersion: null,
+	apiVersion: "1.1.0",
 	// Title for the table of contents
 	title: "Processes",
 	// Sorts the processes by id if set to true, otherwise keeps order of the document
