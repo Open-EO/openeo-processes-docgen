@@ -43,7 +43,19 @@
 					<Description :description="notice" />
 					<button type="button" class="close" title="Close" @click="hideNotice = true">×</button>
 				</div>
-				<Process v-for="process in processes" :key="process.id" :process="process" :provideDownload="provideDownload" :sort="false" processUrl="#${}" />
+				<Process ref="processes" v-for="process in processes" :key="process.id" :process="process" :provideDownload="provideDownload" :sort="false" processUrl="#${}">
+					<template #title="p">
+						<a class="anchor" :name="process.id"></a>
+						<h2>
+							{{ process.id }}
+							<template v-if="canCopy">
+								<span v-if="copied === process.id" class="copy success" title="Copied to clipboard"><i class="fas fa-clipboard-check"></i></span>
+								<span v-else class="copy" @click="copyLink(process.id)" title="Copy link for this process"><i class="fas fa-clipboard"></i></span>
+							</template>
+							<span class="namespace" v-if="p.displayableNamespace"> — {{ p.displayableNamespace }}</span>
+						</h2>
+					</template>
+				</Process>
 			</main>
 		</div>
 	</div>
@@ -119,7 +131,9 @@ export default {
 			processes: [],
 			categories: [],
 			links: [],
-			protocol: null
+			protocol: null,
+			copied: null,
+			canCopy: navigator.clipboard && typeof navigator.clipboard.writeText === 'function'
 		};
 	},
 	watch: {
@@ -159,6 +173,18 @@ export default {
 		this.changeDocument();
 	},
 	methods: {
+		copyLink(process_id) {
+			if (this.canCopy) {
+				let url = new URL(window.location.href);
+				url.hash = process_id;
+				navigator.clipboard.writeText(url.toString())
+					.then(() => {
+						this.copied = process_id;
+						setTimeout(() => this.copied = null, 2000);	
+					})
+					.catch(() => canCopy = false)
+			}
+		},
 		loadLink(href, params = {}) {
 			params.href = href;
 			let link = document.createElement('link');
@@ -288,6 +314,14 @@ export default {
 	padding: 0.25em 0 0.25em 0;
 	margin: 0 0 0.75em 0;
 	border-bottom: 1px solid #ccc;
+}
+.docgen h2 .copy {
+	color: #856404;
+	cursor: pointer;
+}
+.docgen h2 .copy.success {
+	color: #008000;
+	cursor: auto;
 }
 .docgen h3 {
 	font-size: 1.4em;
