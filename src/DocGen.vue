@@ -320,6 +320,9 @@ export default {
 	color: #856404;
 	cursor: pointer;
 }
+.docgen h2 .copy:hover {
+	color: #000;
+}
 .docgen h2 .copy.success {
 	color: #008000;
 	cursor: auto;
