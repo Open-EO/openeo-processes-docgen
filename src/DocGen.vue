@@ -133,7 +133,7 @@ export default {
 			links: [],
 			protocol: null,
 			copied: null,
-			canCopy: navigator.clipboard && typeof navigator.clipboard.writeText === 'function'
+			canCopy: false
 		};
 	},
 	watch: {
@@ -171,6 +171,7 @@ export default {
 		});
 		this.protocol = window ? window.location.protocol : null;
 		this.changeDocument();
+		this.canCopy = navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function';
 	},
 	methods: {
 		copyLink(process_id) {
