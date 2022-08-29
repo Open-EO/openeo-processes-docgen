@@ -30,7 +30,7 @@
   ],
   "dependencies": {
     "@openeo/js-commons": "^1.4.1",
-    "@openeo/vue-components": "^2.10.0",
+    "@openeo/vue-components": "^2.10.2",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "vue": "^2.7.0"
@@ -42,6 +42,7 @@
     "sass-loader": "^10.2.0"
   },
   "browserslist": [
-    "> 1%"
+    "> 1%",
+    "chrome >= 69"
   ]
 }
