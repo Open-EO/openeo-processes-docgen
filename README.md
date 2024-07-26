@@ -1,5 +1,5 @@
 # openEO Processes DocGen
-Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api), either in version 0.4.x or 1.0.x.
+Library to generate a human-readable version of documents following the [specification for openEO processes](https://github.com/open-eo/openeo-api), either in version 0.4.x or 1.x.x.
 
 * [Demo](https://open-eo.github.io/openeo-processes-docgen/demo/).
 
@@ -32,7 +32,7 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 					// or (2) an array or object containing the processes.
 					document: 'processes.json',
 					// The version of the openEO API
-					apiVersion: "1.0.0",
+					apiVersion: "1.2.0",
 					// Title for the table of contents
 					// title: "My processes",
 					// Sorts the processes by id if set to true, otherwise keeps order of the document
@@ -43,6 +43,9 @@ You can simply create an HTML file and change the `document` and `apiVersion` (s
 					// showTableOfContents: true,
 					// A message that is shown to users
 					// notice: ''
+					// Show or hide experimental and/or deprecated entites by default (e.g. processes, collections)
+					// showExperimentalByDefault: false,
+					// showDeprecatedByDefault: false,
 				}
 			})
 		});
@@ -69,4 +72,5 @@ To build the files follow these steps:
 		* Library: Build the project by executing `npm run build`. Afterwards you can publish the library to npm or so.
 
 ## License
+
 This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.
