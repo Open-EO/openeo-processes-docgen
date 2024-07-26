@@ -19,6 +19,9 @@ export default {
 	// Show/Hide table of contents, links and search box
 	showTableOfContents: true,
 	// A message that is shown to users
-	notice: ''
+	notice: '',
+	// Show or hide experimental and/or deprecated entites by default (e.g. processes, collections)
+	showExperimentalByDefault: true,
+	showDeprecatedByDefault: false,
 
 };

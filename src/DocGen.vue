@@ -12,6 +12,19 @@
 				<section class="toc">
 					<h2>{{ title }}</h2>
 					<SearchBox v-model="searchTerm" placeholder="Search in processes" />
+					<div class="filters">
+						<span class="label">
+							Show
+						</span>
+						<label class="show-deprecated" title="Show deprecated elements?">
+							<input type="checkbox" v-model="showDeprecated">
+							deprecated
+						</label>
+						<label class="show-experimental" title="Show experimental elements?">
+							<input type="checkbox" v-model="showExperimental">
+							experimental
+						</label>
+					</div>
 					<ul class="controls">
 						<li v-if="showCategories"><a @click="expandAll" title="Expand all"><i class="fas fa-angle-double-down"></i></a></li>
 						<li v-if="showCategories"><a @click="collapseAll" title="Collapse all"><i class="fas fa-angle-double-up"></i></a></li>
@@ -19,7 +32,9 @@
 						<li v-else><a @click="switchCategoryView" title="Show Categories"><i class="fas fa-folder"></i></a></li>
 					</ul>
 					<template v-if="showCategories">
-						<Processes class="categories" v-for="category in categories" :key="category.id" ref="categories" :processes="category.processes" :searchTerm="searchTerm" :offerDetails="false" :heading="category.id" :collapsed="allCollapsedState">
+						<Processes class="categories" v-for="category in categories" :key="category.id" ref="categories"
+							:processes="category.processes" :searchTerm="searchTerm" :offerDetails="false" :heading="category.id"
+							:collapsed="allCollapsedState" :hideDeprecated="!showDeprecated" :hideExperimental="!showExperimental">
 							<template #summary="{ summary }">
 								<a :href="'#' + summary.identifier"><strong>{{ summary.identifier }}</strong></a>
 								<small v-if="summary.summary">{{ summary.summary }}</small>
@@ -27,7 +42,8 @@
 						</Processes>
 						<p v-if="!hasResults">No search results found.</p>
 					</template>
-					<Processes v-else :processes="processes" :searchTerm="searchTerm" :offerDetails="false" :heading="null">
+					<Processes v-else :processes="processes" :searchTerm="searchTerm" :offerDetails="false" :heading="null"
+						:hideDeprecated="!showDeprecated" :hideExperimental="!showExperimental">
 						<template #summary="{ summary }">
 							<a :href="'#' + summary.identifier"><strong>{{ summary.identifier }}</strong></a>
 							<small v-if="summary.summary">{{ summary.summary }}</small>
@@ -119,6 +135,14 @@ export default {
 		notice: {
 			type: String,
 			default: BaseConfig.notice
+		},
+		showDeprecatedByDefault: {
+			type: Boolean,
+			default: BaseConfig.showDeprecatedByDefault
+		},
+		showExperimentalByDefault: {
+			type: Boolean,
+			default: BaseConfig.showExperimentalByDefault
 		}
 	},
 	data() {
@@ -127,13 +151,15 @@ export default {
 			searchTerm: '',
 			allCollapsedState: true,
 			hasResults: true,
-            showCategories: this.categorize,
+			showCategories: this.categorize,
 			processes: [],
 			categories: [],
 			links: [],
 			protocol: null,
 			copied: null,
-			canCopy: false
+			canCopy: false,
+			showDeprecated: this.showDeprecatedByDefault,
+			showExperimental: this.showExperimentalByDefault,
 		};
 	},
 	watch: {
@@ -274,9 +300,9 @@ export default {
 				}
 			}
 		},
-        switchCategoryView() {
-            this.showCategories = !this.showCategories;
-        },
+		switchCategoryView() {
+			this.showCategories = !this.showCategories;
+		},
 		expandAll() {
 			this.toggleAll(true);
 		},
@@ -365,14 +391,14 @@ export default {
 
 .docgen .notice {
 	margin: 0rem 3rem 1rem 2rem;
-    padding: 1rem 3.5rem 1rem 1rem;
-    border: 1px solid transparent;
-    border-radius: .25rem;
+	padding: 1rem 3.5rem 1rem 1rem;
+	border: 1px solid transparent;
+	border-radius: .25rem;
 	position: fixed;
 	bottom: 0;
 	color: #856404;
-    background-color: #fff3cd;
-    border-color: #856404;
+	background-color: #fff3cd;
+	border-color: #856404;
 }
 .docgen .notice p:last-of-type {
 	margin-bottom: 0;
@@ -381,15 +407,15 @@ export default {
 	position: absolute;
 	top: 0;
 	right: 0;
-    font-size: 1.5em;
-    padding: 0.5rem;
-    margin: 0.5rem;
-    font-weight: 700;
-    line-height: 1;
-    opacity: .5;
+	font-size: 1.5em;
+	padding: 0.5rem;
+	margin: 0.5rem;
+	font-weight: 700;
+	line-height: 1;
+	opacity: .5;
 	background-color: transparent;
-    border: 0;
-    color: inherit;
+	border: 0;
+	color: inherit;
 	cursor: pointer;
 }
 .docgen .notice .close:hover {
@@ -408,7 +434,7 @@ export default {
 }
 .docgen .categories ul.list {
 	margin-left: 0.5em;
-    margin-top: 0.25em;
+	margin-top: 0.25em;
 }
 .docgen .categories ul.list li {
 	margin-left: 0.5em;
@@ -500,6 +526,25 @@ export default {
 .docgen .related-links {
 	margin-top: 4em;
 	margin-bottom: 2em;
+}
+
+.docgen .filters {
+	display: flex;
+	justify-content: center;
+	flex-flow: row wrap;
+}
+.docgen .filters .show-deprecated,
+.docgen .filters .show-experimental,
+.docgen .filters .label {
+	align-content: center;
+	display: inline-block;
+	white-space: nowrap;
+	margin: 0.25rem;
+	font-size: 0.9em;
+	cursor: pointer;
+}
+.docgen .filters .label {
+	cursor: default;
 }
 
 @media only screen and (min-width: 800px) {
