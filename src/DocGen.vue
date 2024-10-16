@@ -179,7 +179,7 @@ export default {
 	},
 	computed: {
 		isLocalDocument() {
-			return this.protocol === 'file:' && !this.document.match(/^https?:/i);
+			return this.protocol === 'file:' && typeof this.document === 'string' && !this.document.match(/^https?:/i);
 		}
 	},
 	mounted() {
